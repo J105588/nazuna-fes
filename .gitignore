@@ -12,11 +12,38 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Design source assets & large files (PSD / AI / RAW assets)
+*.psd
+*.ai
+*.eps
+パンフレット用*/
+パンフレット用*
+
+# Test renders & temporary build/export scripts
+test_*.png
+test_*.jpg
+export_psd*.mjs
+build_optimized_poster.mjs
+setup-assets.js
+setup-assets.ps1
+
+# AI & Agent local workspace directories
+.gemini
+.agents
+*.tmp
+*.bak
+
+# Editor directories and OS files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj

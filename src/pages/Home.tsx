@@ -20,10 +20,18 @@ import { OpeningIntro } from '../components/intro/OpeningIntro';
 interface HomeProps {
   organizations: Organization[];
   initialGenre?: string;
+  introKey?: number;
+  onIntroComplete?: () => void;
   onSelectTab?: (tab: 'timetable' | 'info') => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ organizations, initialGenre = 'all', onSelectTab }) => {
+export const Home: React.FC<HomeProps> = ({
+  organizations,
+  initialGenre = 'all',
+  introKey = 0,
+  onIntroComplete,
+  onSelectTab
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState(initialGenre);
   const [selectedFloor, setSelectedFloor] = useState('all');
@@ -53,7 +61,7 @@ export const Home: React.FC<HomeProps> = ({ organizations, initialGenre = 'all',
       {/* ===============================================
           常設背景: シネマティック・ポスター演出 (fixed z-0)
           =============================================== */}
-      <OpeningIntro />
+      <OpeningIntro key={introKey} onComplete={onIntroComplete} />
 
       {/* ===============================================
           スクロールコンテンツ層 (z-10 relative)

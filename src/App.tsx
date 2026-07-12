@@ -13,6 +13,8 @@ import type { Organization, TimetableEvent } from './types/database';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'home' | 'timetable' | 'info'>('home');
+  const [isIntroFinished, setIsIntroFinished] = useState(false);
+  const [introKey, setIntroKey] = useState(0);
 
   const [organizations, setOrganizations] = useState<Organization[]>(mockOrganizations);
   const [timetableEvents, setTimetableEvents] = useState<TimetableEvent[]>(mockTimetableEvents);
@@ -30,9 +32,10 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#060919] text-[#F0F4F8] selection:bg-[#E51937] selection:text-white">
-      {/* ナビゲーションバー (z-40 sticky) */}
+      {/* ナビゲーションバー (z-40 sticky / 演出完了時または別タブ時はメニューボタンを表示) */}
       <Navbar
         currentTab={currentTab}
+        isIntroFinished={isIntroFinished || currentTab !== 'home'}
         onSelectTab={(tab) => {
           setCurrentTab(tab);
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -52,6 +55,8 @@ export const App: React.FC = () => {
         }}
         onReplayIntro={() => {
           setCurrentTab('home');
+          setIsIntroFinished(false);
+          setIntroKey((prev) => prev + 1);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
@@ -61,6 +66,8 @@ export const App: React.FC = () => {
         <Home
           organizations={organizations}
           initialGenre={genreQuick}
+          introKey={introKey}
+          onIntroComplete={() => setIsIntroFinished(true)}
           onSelectTab={(tab) => {
             setCurrentTab(tab);
             window.scrollTo({ top: 0, behavior: 'smooth' });

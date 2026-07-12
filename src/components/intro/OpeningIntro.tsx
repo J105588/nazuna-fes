@@ -20,12 +20,18 @@ import type { PosterRefs } from './PosterCanvas';
 
 interface OpeningIntroProps {
   skipAnimation?: boolean;
+  onComplete?: () => void;
 }
 
-export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = false }) => {
+export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = false, onComplete }) => {
   const posterRef = useRef<PosterRefs | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   const showAllLayers = useCallback(() => {
     if (!posterRef.current) return;
@@ -81,6 +87,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = fals
 
     if (skipAnimation || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       showAllLayers();
+      onCompleteRef.current?.();
       return;
     }
 
@@ -137,6 +144,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = fals
         layerRefs.current.forEach((el) => {
           if (el) gsap.set(el, { clearProps: 'filter,willChange,transform' });
         });
+        onCompleteRef.current?.();
       },
     });
     tlRef.current = tl;
