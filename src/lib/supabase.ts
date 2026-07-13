@@ -1,146 +1,97 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Organization, TimetableEvent } from '../types/database';
+import type {
+  Organization,
+  TimetableEvent,
+  Announcement,
+  LostItem,
+  InventoryStatus,
+  LostItemStatus,
+  AnnouncementCategory
+} from '../types/database';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mock.supabase.nazuna.jp';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'mock-anon-key';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
-// モック・インメモリデータストア（環境変数がない・またはローカル検証時に完全に動く）
-export let mockOrganizations: Organization[] = [
-  {
-    id: 'org-1',
-    name: '3年A組 幻影茶屋・百夜の宴',
-    category: 'class',
-    genre: 'food',
-    description: '和モダンを追求した特製抹茶ラテと手作り団子をご提供します。静寂なる極夜に灯る赤提灯のもとで、特別な和スイーツをお楽しみください。',
-    image_url: '/assets/poster/poster_complete.png',
-    room_code: '3A_ROOM',
-    floor_info: '本館3F 西棟',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    inventory_status: 'STATUS_AVAILABLE'
-  },
-  {
-    id: 'org-2',
-    name: '3年B組 迷宮・あやかしの館',
-    category: 'class',
-    genre: 'attraction',
-    description: '最先端の照明と音響で演出する和風ホラーアトラクション。赤傘が舞う暗闇を抜け、無事に脱出できるか挑戦してください。',
-    image_url: '/assets/poster/poster_complete.png',
-    room_code: '3B_ROOM',
-    floor_info: '本館3F 中央棟',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    inventory_status: 'STATUS_FEW'
-  },
-  {
-    id: 'org-3',
-    name: '2年C組 百輝焼きそば本舗',
-    category: 'class',
-    genre: 'food',
-    description: '秘伝の特製ソースとシャキシャキキャベツで焼き上げる絶品屋台焼きそば！ポスターキーカラーを模した赤紅生姜つき。',
-    image_url: '/assets/poster/poster_complete.png',
-    room_code: '2C_ROOM',
-    floor_info: '中庭 屋台スペース',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    inventory_status: 'STATUS_SOLD_OUT'
-  },
-  {
-    id: 'org-4',
-    name: '書道部・蒼墨会',
-    category: 'club',
-    genre: 'exhibition',
-    description: '今年度のテーマ「百輝夜行」の題字およびポスター輪郭を手掛けた部員による大作展示会。巨大筆文字の迫力を体感してください。',
-    image_url: '/assets/poster/poster_complete.png',
-    room_code: 'SHODO_ROOM',
-    floor_info: '東館2F 書道室',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    inventory_status: 'STATUS_AVAILABLE'
-  },
-  {
-    id: 'org-5',
-    name: 'ダンス部・LUMINOUS',
-    category: 'club',
-    genre: 'stage',
-    description: '夜を照らすホタルのように舞い踊る圧巻のステージ演目。ヒップホップからコンテンポラリーまで、全8曲をお届けします。',
-    image_url: '/assets/poster/poster_complete.png',
-    room_code: 'GYM_STAGE',
-    floor_info: '第一体育館',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    inventory_status: 'STATUS_AVAILABLE'
-  },
-  {
-    id: 'org-6',
-    name: '科学部・サイバー工学班',
-    category: 'club',
-    genre: 'exhibition',
-    description: 'レーザー光線とスモークを用いた光学アートの没入型展示。ネオンの青と金が交差する幻想空間を創り出します。',
-    image_url: '/assets/poster/poster_complete.png',
-    room_code: 'SCIENCE_ROOM',
-    floor_info: '理科棟3F 物理実験室',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    inventory_status: 'STATUS_AVAILABLE'
+// フロントエンドにはDBから読み込む予定のものたちは何も事前データを書き込まないため初期値は空配列 []
+export let mockOrganizations: Organization[] = [];
+export let mockTimetableEvents: TimetableEvent[] = [];
+export let mockAnnouncements: Announcement[] = [];
+export let mockLostItems: LostItem[] = [];
+
+// DBからのデータ取得関数
+export async function fetchOrganizationsFromDB(): Promise<Organization[]> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .order('room_code', { ascending: true });
+      if (!error && data) {
+        mockOrganizations = data as Organization[];
+        return mockOrganizations;
+      }
+    } catch {
+      // ネットワークまたはDB未接続時
+    }
   }
-];
+  return mockOrganizations;
+}
 
-export let mockTimetableEvents: TimetableEvent[] = [
-  {
-    id: 'evt-1',
-    organization_id: 'org-5',
-    title: 'ダンス部 OPパフォーマンス「百夜の目覚め」',
-    start_time: new Date(Date.now() - 20 * 60 * 1000).toISOString(), // 現在進行中（NOWハイライトテスト用）
-    end_time: new Date(Date.now() + 25 * 60 * 1000).toISOString(),
-    stage_location: 'gym',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    organization_name: 'ダンス部・LUMINOUS'
-  },
-  {
-    id: 'evt-2',
-    title: '書道部 音楽コラボ書道パフォーマンス',
-    start_time: new Date(Date.now() + 45 * 60 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 90 * 60 * 1000).toISOString(),
-    stage_location: 'gym',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    organization_name: '書道部・蒼墨会'
-  },
-  {
-    id: 'evt-3',
-    title: '有志バンド「THE NAZUNA NEON」スペシャルライブ',
-    start_time: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 現在進行中
-    end_time: new Date(Date.now() + 35 * 60 * 1000).toISOString(),
-    stage_location: 'courtyard',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    organization_name: '有志バンド団体'
-  },
-  {
-    id: 'evt-4',
-    title: '軽音楽部 「極夜のロックフェスティバル」',
-    start_time: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 120 * 60 * 1000).toISOString(),
-    stage_location: 'courtyard',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    organization_name: '軽音楽部'
-  },
-  {
-    id: 'evt-5',
-    title: '演劇部 公演「あやかしの街角で」',
-    start_time: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 70 * 60 * 1000).toISOString(),
-    stage_location: 'av_room',
-    is_published: true,
-    updated_at: new Date().toISOString(),
-    organization_name: '演劇部'
+export async function fetchTimetableEventsFromDB(): Promise<TimetableEvent[]> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('timetable_events')
+        .select('*')
+        .order('start_time', { ascending: true });
+      if (!error && data) {
+        mockTimetableEvents = data as TimetableEvent[];
+        return mockTimetableEvents;
+      }
+    } catch {
+      // ネットワークまたはDB未接続時
+    }
   }
-];
+  return mockTimetableEvents;
+}
+
+export async function fetchAnnouncementsFromDB(): Promise<Announcement[]> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        mockAnnouncements = data as Announcement[];
+        return mockAnnouncements;
+      }
+    } catch {
+      // ネットワークまたはDB未接続時
+    }
+  }
+  return mockAnnouncements;
+}
+
+export async function fetchLostItemsFromDB(): Promise<LostItem[]> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('lost_items')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        mockLostItems = data as LostItem[];
+        return mockLostItems;
+      }
+    } catch {
+      // ネットワークまたはDB未接続時
+    }
+  }
+  return mockLostItems;
+}
 
 // リアルタイム更新用リスナー・エミッター
 type ChangeListener = () => void;
@@ -158,16 +109,183 @@ export function notifyDataChanged() {
   listeners.forEach((l) => l());
 }
 
-export function toggleOrganizationPublish(id: string, published: boolean) {
+// --- 管理画面用 CRUD & トグル操作 (即時反映・リアルタイム同期) ---
+
+// 1. 出展団体操作
+export async function toggleOrganizationPublish(id: string, published: boolean) {
   mockOrganizations = mockOrganizations.map((o) =>
     o.id === id ? { ...o, is_published: published, updated_at: new Date().toISOString() } : o
   );
   notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('organizations').update({ is_published: published, updated_at: new Date().toISOString() }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
 }
 
-export function toggleTimetableEventPublish(id: string, published: boolean) {
+export async function updateOrganizationInDB(id: string, updates: Partial<Organization>) {
+  mockOrganizations = mockOrganizations.map((o) =>
+    o.id === id ? { ...o, ...updates, updated_at: new Date().toISOString() } : o
+  );
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('organizations').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+export async function updateOrganizationInventoryInDB(id: string, inventory_status: InventoryStatus) {
+  mockOrganizations = mockOrganizations.map((o) =>
+    o.id === id ? { ...o, inventory_status, updated_at: new Date().toISOString() } : o
+  );
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('organizations').update({ inventory_status, updated_at: new Date().toISOString() }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+// 2. タイムテーブル操作
+export async function toggleTimetableEventPublish(id: string, published: boolean) {
   mockTimetableEvents = mockTimetableEvents.map((e) =>
     e.id === id ? { ...e, is_published: published, updated_at: new Date().toISOString() } : e
   );
   notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('timetable_events').update({ is_published: published, updated_at: new Date().toISOString() }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+export async function updateTimetableEventInDB(id: string, updates: Partial<TimetableEvent>) {
+  mockTimetableEvents = mockTimetableEvents.map((e) =>
+    e.id === id ? { ...e, ...updates, updated_at: new Date().toISOString() } : e
+  );
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('timetable_events').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+// 3. お知らせ配信操作
+export async function createAnnouncementInDB(title: string, content: string, category: AnnouncementCategory) {
+  const newItem: Announcement = {
+    id: `ann-${Date.now()}`,
+    title,
+    content,
+    category,
+    is_published: true,
+    created_at: new Date().toISOString()
+  };
+  mockAnnouncements = [newItem, ...mockAnnouncements];
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('announcements').insert([newItem]);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+  return newItem;
+}
+
+export async function toggleAnnouncementPublish(id: string, published: boolean) {
+  mockAnnouncements = mockAnnouncements.map((a) =>
+    a.id === id ? { ...a, is_published: published } : a
+  );
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('announcements').update({ is_published: published }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+export async function deleteAnnouncementInDB(id: string) {
+  mockAnnouncements = mockAnnouncements.filter((a) => a.id !== id);
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('announcements').delete().eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+// 4. 落とし物掲示板操作
+export async function createLostItemInDB(item_name: string, found_place: string, storage_location: string) {
+  const newItem: LostItem = {
+    id: `lost-${Date.now()}`,
+    item_name,
+    found_place,
+    storage_location,
+    status: 'storage',
+    created_at: new Date().toISOString()
+  };
+  mockLostItems = [newItem, ...mockLostItems];
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('lost_items').insert([newItem]);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+  return newItem;
+}
+
+export async function updateLostItemStatusInDB(id: string, status: LostItemStatus) {
+  mockLostItems = mockLostItems.map((l) =>
+    l.id === id ? { ...l, status } : l
+  );
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('lost_items').update({ status }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+export async function deleteLostItemInDB(id: string) {
+  mockLostItems = mockLostItems.filter((l) => l.id !== id);
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('lost_items').delete().eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
 }

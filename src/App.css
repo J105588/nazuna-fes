@@ -1,14 +1,14 @@
 /*
   ========================================================================
-  App.css - 百輝夜行 アプリケーション共通レイアウト＆和モダンアニメーション
+  App.css - 百輝夜行 モダン和風 アニメーション＆共通レイアウト
   ========================================================================
 */
 
-/* スムーズスクロールとスクロールバーのカスタマイズ */
+/* スムーズスクロールとスクロールバー（和風） */
 html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
-  scrollbar-color: #F5D061 #050711;
+  scrollbar-color: var(--wafuu-ekasumi) var(--wafuu-bg-kinari);
 }
 
 ::-webkit-scrollbar {
@@ -17,28 +17,43 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #050711;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--wafuu-bg-kinari);
+  border-left: 1px solid rgba(30, 30, 30, 0.06);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #E51937, #DDA428);
+  background: linear-gradient(180deg, var(--wafuu-shu), var(--wafuu-kincha));
   border-radius: 4px;
-  border: 1px solid rgba(245, 208, 97, 0.4);
+  border: 1px solid rgba(196, 162, 101, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ff2446, #F5D061);
+  background: linear-gradient(180deg, #E05A50, #D4B44A);
 }
 
-/* テキスト選択のスタイル */
+/* テキスト選択 */
 ::selection {
-  background-color: #E51937;
+  background-color: var(--wafuu-shu);
   color: #FFFFFF;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
 
-/* ポスター調・掛け軸展開アニメーション (右側ドロワー開閉専用最適化) */
+/* ========================================================================
+   障子オープニング アニメーション
+   ======================================================================== */
+@keyframes shojiGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(201, 168, 62, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(201, 168, 62, 0.5), 0 0 80px rgba(201, 168, 62, 0.15);
+  }
+}
+
+.animate-shoji-glow {
+  animation: shojiGlow 2s ease-in-out infinite;
+}
+
+/* 掛け軸展開アニメーション (ドロワー用) */
 @keyframes kakejikuUnroll {
   0% {
     opacity: 0;
@@ -56,11 +71,11 @@ html {
   will-change: transform, opacity;
 }
 
-/* モーダルのスプリングスケールイン */
+/* モーダルのスケールイン */
 @keyframes modalScaleIn {
   0% {
     opacity: 0;
-    transform: scale(0.92) translateY(16px);
+    transform: scale(0.95) translateY(12px);
   }
   100% {
     opacity: 1;
@@ -74,38 +89,71 @@ html {
   will-change: transform, opacity;
 }
 
-/* 和傘・金赤パルスグロー */
-@keyframes pulseGlowRedGold {
+/* 朱色パルスグロー */
+@keyframes pulseShu {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(229, 25, 55, 0.6), 0 0 30px rgba(245, 208, 97, 0.2);
+    box-shadow: 0 0 12px rgba(209, 75, 65, 0.4);
   }
   50% {
-    box-shadow: 0 0 25px rgba(229, 25, 55, 0.9), 0 0 45px rgba(245, 208, 97, 0.45);
+    box-shadow: 0 0 24px rgba(209, 75, 65, 0.7), 0 0 40px rgba(201, 168, 62, 0.2);
   }
 }
 
-.animate-pulse-red-gold {
-  animation: pulseGlowRedGold 3s infinite ease-in-out;
+.animate-pulse-shu {
+  animation: pulseShu 3s infinite ease-in-out;
 }
 
-/* フォームエラー等シェイクアニメーション (未定義解消・新規追加) */
+/* シェイクアニメーション */
 @keyframes shakeAnimation {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  20%, 60% {
-    transform: translateX(-6px);
-  }
-  40%, 80% {
-    transform: translateX(6px);
-  }
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
 }
 
 .animate-shake {
   animation: shakeAnimation 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
-/* Admin等各コンポーネント用エイリアス (fadeIn / fade-in 統一) */
+/* フェードイン */
 .animate-fadeIn {
   animation: fadeInSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ========================================================================
+   霧エマージ（メニュー出現用 — 和風版）
+   ======================================================================== */
+@keyframes mistEmerge {
+  0% {
+    opacity: 0;
+    filter: blur(20px) brightness(1.1);
+    transform: scale(0.92) translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-mist-emerge {
+  transform-origin: center center;
+  animation: mistEmerge 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+/* 旧互換アニメーション */
+.animate-pulse-red-gold {
+  animation: pulseShu 3s infinite ease-in-out;
+}
+
+.animate-fog-left {
+  animation: none;
+}
+
+.animate-fog-right {
+  animation: none;
+}
+
+.animate-orb-float {
+  animation: none;
 }

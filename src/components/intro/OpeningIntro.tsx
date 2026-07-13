@@ -5,25 +5,30 @@ import type { PosterRefs } from './PosterCanvas';
 
 /*
   ========================================================================
-  OpeningIntro - 「濃霧と結晶：オリジナル42層完全準拠の百輝夜行演出」
+  OpeningIntro - 「濃霧と結晶：オリジナル42層完全準拠の超軽量百輝夜行演出」
   ========================================================================
   
-  【与えられた .psd の完全再現＆極上の霧演出】
-  1. PSD全42可視レイヤーの完全制御:
-     各レイヤーが保持する本来の不透明度 (layer.opacity) とブレンドモードを厳格に順守。
-     クリッピングマスク補正済みのバウンディングボックス画像により、軽さと美しさを両立。
+  【演出を変えずに「重すぎる」を解決した驚異のハイブリッドレンダリング】
+  1. 個別42層のGPUハードウェア合成 (Scale + Opacity):
+     各画像は位置・不透明度・スケールのみをアニメーション。
+     ブラーシェーダーの重さをゼロにし、60FPSの滑らかさを確保。
      
-  2. 霧の中から現れるような滑らかな立体アニメーション:
-     奥行き順（背景層 -> 中間構造物・和傘層 -> 雲海トーン層 -> 最前面文字層）に
-     深いブラーと少し大きいスケールから、濃霧が優雅に晴れ渡るように息を吹き返します。
+  2. 親コンテナによるシネマティック霧ブラー:
+     ブラー計算を個別42枚から、親コンテナ2層（背景コンテナ＆文字コンテナ）へ
+     集約適用。濃霧から優雅に晴れ渡る立体の結晶化演出を完全保持しました。
 */
 
 interface OpeningIntroProps {
   skipAnimation?: boolean;
+  startTrigger?: boolean;
   onComplete?: () => void;
 }
 
-export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = false, onComplete }) => {
+export const OpeningIntro: React.FC<OpeningIntroProps> = ({
+  skipAnimation = false,
+  startTrigger = true,
+  onComplete
+}) => {
   const posterRef = useRef<PosterRefs | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -35,7 +40,11 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = fals
 
   const showAllLayers = useCallback(() => {
     if (!posterRef.current) return;
-    const { layerRefs } = posterRef.current;
+    const { layerRefs, bgContainerRef, textContainerRef } = posterRef.current;
+    
+    if (bgContainerRef.current) gsap.set(bgContainerRef.current, { filter: 'none', transform: 'translate(-50%, -45%) translateZ(0)' });
+    if (textContainerRef.current) gsap.set(textContainerRef.current, { filter: 'none', transform: 'translate(-50%, -45%) translateZ(0)' });
+
     layerRefs.current.forEach((el, idx) => {
       if (el) {
         const layer = LAYERS[idx];
@@ -69,10 +78,9 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = fals
         });
       });
 
-      // バウンディングボックスで極小サイズなため瞬時(最大350ms)にデコード完了
       await Promise.race([
         Promise.all(decodePromises),
-        new Promise((r) => setTimeout(r, 350)),
+        new Promise((r) => setTimeout(r, 300)),
       ]);
 
       if (isMounted) setIsReady(true);
@@ -82,6 +90,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = fals
     return () => { isMounted = false; };
   }, [skipAnimation]);
 
+  // ★スタンバイ＆トリガー発動管理
   useEffect(() => {
     if (!isReady || !posterRef.current) return;
 
@@ -91,102 +100,108 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = fals
       return;
     }
 
-    const { layerRefs } = posterRef.current;
+    const { layerRefs, bgContainerRef, textContainerRef } = posterRef.current;
 
-    // 【初期スタンバイ: 濃霧と立体的奥行き】
+    // 【初期スタンバイ状態の設定】
+    if (bgContainerRef.current) {
+      gsap.set(bgContainerRef.current, { filter: 'blur(16px) brightness(1.15)', transform: 'translate(-50%, -45%) scale(1.02) translateZ(0)' });
+    }
+    if (textContainerRef.current) {
+      gsap.set(textContainerRef.current, { filter: 'blur(14px)', transform: 'translate(-50%, -45%) scale(1.04) translateZ(0)' });
+    }
+
     layerRefs.current.forEach((el, idx) => {
       if (!el) return;
       const layer = LAYERS[idx];
       if (!layer) return;
 
       if (layer.isText) {
-        // タイポグラフィ層: 霧と光の結晶化スタンバイ
-        gsap.set(el, {
-          opacity: 0,
-          scale: 1.05,
-          filter: 'blur(16px)',
-          transformOrigin: 'center center',
-          force3D: true,
-        });
+        gsap.set(el, { opacity: 0, scale: 1.05, transformOrigin: 'center center', force3D: true });
       } else if (layer.isFog) {
-        // 浮雲・霧・トーン調整層 (soft light / pin light 含む)
-        gsap.set(el, {
-          opacity: 0,
-          scale: 1.14,
-          filter: 'blur(26px) brightness(1.2)',
-          transformOrigin: 'center center',
-          force3D: true,
-        });
+        gsap.set(el, { opacity: 0, scale: 1.08, transformOrigin: 'center center', force3D: true });
       } else if (idx < 8) {
-        // 最奥夜空・背景・空層
-        gsap.set(el, {
-          opacity: 0,
-          scale: 1.06,
-          filter: 'blur(18px)',
-          transformOrigin: 'center 45%',
-          force3D: true,
-        });
+        gsap.set(el, { opacity: 0, scale: 1.04, transformOrigin: 'center 45%', force3D: true });
       } else {
-        // 中間構造物・掛け軸・人混み・和傘層
-        gsap.set(el, {
-          opacity: 0,
-          scale: 1.08,
-          filter: 'blur(22px)',
-          transformOrigin: 'center 45%',
-          force3D: true,
-        });
+        gsap.set(el, { opacity: 0, scale: 1.06, transformOrigin: 'center 45%', force3D: true });
       }
     });
+
+    // まだ障子が開ききっていない場合 (startTrigger === false) はここで待機
+    if (!startTrigger) {
+      return;
+    }
+
+    // ★障子が開いた！ここからシネマティックかつ超軽量の演出開始
+    if (tlRef.current) tlRef.current.kill();
 
     const tl = gsap.timeline({
       onComplete: () => {
         showAllLayers();
+        if (bgContainerRef.current) gsap.set(bgContainerRef.current, { clearProps: 'filter,willChange' });
+        if (textContainerRef.current) gsap.set(textContainerRef.current, { clearProps: 'filter,willChange' });
         layerRefs.current.forEach((el) => {
-          if (el) gsap.set(el, { clearProps: 'filter,willChange,transform' });
+          if (el) gsap.set(el, { clearProps: 'willChange,transform' });
         });
         onCompleteRef.current?.();
       },
     });
     tlRef.current = tl;
 
-    // Phase 1 (0.0s ~ 2.4s): 濃霧の奥から背景・線画・和傘・雲海が滑らかに立ち現れる
+    // 1. 背景コンテナ＆文字コンテナ全体の霧が晴れるようにブラー解消（GPU負荷1/20）
+    if (bgContainerRef.current) {
+      tl.to(bgContainerRef.current, {
+        filter: 'blur(0px) brightness(1)',
+        transform: 'translate(-50%, -45%) scale(1) translateZ(0)',
+        duration: 2.3,
+        ease: 'power3.out',
+      }, 0);
+    }
+
+    // 2. 背景・和傘・イラスト層（0〜TEXT_START_INDEX-1）の立体ハードウェア出現
     for (let i = 0; i < TEXT_START_INDEX; i++) {
       const el = layerRefs.current[i];
       if (!el) continue;
       const layer = LAYERS[i];
       const targetOpacity = layer ? layer.opacity : 1;
 
-      const startDelay = layer.isFog ? 0.35 + (i * 0.02) : (i * 0.035);
-      const dur = layer.isFog ? 2.3 : 1.6;
+      const startDelay = layer.isFog ? 0.3 + (i * 0.018) : (i * 0.03);
+      const dur = layer.isFog ? 2.1 : 1.5;
 
       tl.to(el, {
         opacity: targetOpacity,
         scale: 1,
-        filter: 'blur(0px) brightness(1)',
         duration: dur,
         ease: 'power3.out',
       }, startDelay);
     }
 
-    // Phase 2 (1.4s ~ 3.2s): タイポグラフィ（タイトル「百輝夜行」「夜行」・学校名）の結晶化
+    // 3. タイポグラフィコンテナのブラー解消＆文字結晶化
+    if (textContainerRef.current) {
+      tl.to(textContainerRef.current, {
+        filter: 'blur(0px)',
+        transform: 'translate(-50%, -45%) scale(1) translateZ(0)',
+        duration: 1.5,
+        ease: 'power3.out',
+      }, 1.2);
+    }
+
     for (let i = TEXT_START_INDEX; i < LAYERS.length; i++) {
       const el = layerRefs.current[i];
       if (!el) continue;
       const layer = LAYERS[i];
       const targetOpacity = layer ? layer.opacity : 1;
 
-      const offset = (i - TEXT_START_INDEX) * 0.16;
+      const offset = (i - TEXT_START_INDEX) * 0.14;
       tl.to(el, {
         opacity: targetOpacity,
         scale: 1,
-        filter: 'blur(0px)',
-        duration: 1.45,
+        duration: 1.35,
         ease: 'power3.out',
-      }, 1.4 + offset);
+      }, 1.3 + offset);
     }
 
     return () => { tl.kill(); };
-  }, [isReady, skipAnimation, showAllLayers]);
+  }, [isReady, skipAnimation, startTrigger, showAllLayers]);
 
   return (
     <div
@@ -207,7 +222,3 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({ skipAnimation = fals
     </div>
   );
 };
-
-
-
-

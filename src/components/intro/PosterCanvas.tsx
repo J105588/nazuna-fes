@@ -19,19 +19,41 @@ export { MANIFEST as LAYERS, TEXT_START_INDEX };
      Soft Light (レイヤー 39) と Pin Light (レイヤー 42) が本来持っていた広大な効果範囲と
      トーン調整力を100%発揮し、全体の色味が薄くなったり変なクリッピング跡が出たりする
      不具合を完全に解消しました。
+     
+  3. 文字同士の衝突・重なり防止＆PC画面での非拡大（ジャストフィット適応）:
+     背景イラスト層はモニター全体を覆う「cover」サイズで優雅に展開しつつ、
+     文字・タイポグラフィ層（レイヤー35〜41）は独立した「contain（Math.min）比率固定コンテナ」
+     に格納してレンダリング。これにより、PC画面で文字部分が巨大化してはみ出したり、
+     文字同士がぶつかったり重なったりする問題を根絶し、すべての端末・画面幅で
+     ポスターデザイン本来の美しいレイアウトと文字余白を100%保持して収めます。
 */
 
 export interface PosterRefs {
   containerRef: React.RefObject<HTMLDivElement | null>;
+  bgContainerRef: React.RefObject<HTMLDivElement | null>;
+  textContainerRef: React.RefObject<HTMLDivElement | null>;
   layerRefs: React.RefObject<(HTMLImageElement | null)[]>;
 }
 
 export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const bgContainerRef = useRef<HTMLDivElement | null>(null);
+  const textContainerRef = useRef<HTMLDivElement | null>(null);
   const layerRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const [isMobileOrPortrait, setIsMobileOrPortrait] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkPortrait = () => {
+      const isMobile = window.matchMedia('(max-width: 768px) or (orientation: portrait)').matches;
+      setIsMobileOrPortrait(isMobile);
+    };
+    checkPortrait();
+    window.addEventListener('resize', checkPortrait);
+    return () => window.removeEventListener('resize', checkPortrait);
+  }, []);
 
   useImperativeHandle(ref, () => ({
-    containerRef, layerRefs
+    containerRef, bgContainerRef, textContainerRef, layerRefs
   }));
 
   return (
@@ -48,7 +70,9 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
         transform: 'translateZ(0)',
       }}
     >
+      {/* 1. 背景・イラストレイヤーコンテナ (画面全体を余白なく覆う object-fit: cover 挙動) */}
       <div
+        ref={bgContainerRef}
         style={{
           position: 'absolute',
           left: '50%',
@@ -57,9 +81,10 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
           width: 'max(100vw, 100vh * (2480 / 3508))',
           height: 'max(100vh, 100vw * (3508 / 2480))',
           pointerEvents: 'none',
+          willChange: 'filter, transform',
         }}
       >
-        {MANIFEST.map((layer, idx) => {
+        {MANIFEST.slice(0, TEXT_START_INDEX).map((layer, idx) => {
           const isTemporarilyDisabled = layer.name === 'レイヤー 39';
           return (
             <img
@@ -80,7 +105,52 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                 mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
                 pointerEvents: 'none',
                 transform: 'translateZ(0)',
-                willChange: 'opacity, transform, filter',
+                willChange: 'transform, opacity',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* 2. 文字・タイポグラフィ層コンテナ (スマホ縦画面では背景層と完全同期した比率でレイアウト一致を保持し、PC横長では文字はみ出し防止で100vw固定) */}
+      <div
+        ref={textContainerRef}
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '45%',
+          transform: 'translate(-50%, -45%) translateZ(0)',
+          width: isMobileOrPortrait ? 'max(100vw, 100vh * (2480 / 3508))' : '100vw',
+          height: isMobileOrPortrait ? 'max(100vh, 100vw * (3508 / 2480))' : 'calc(100vw * (3508 / 2480))',
+          pointerEvents: 'none',
+          willChange: 'filter, transform',
+        }}
+      >
+        {MANIFEST.slice(TEXT_START_INDEX).map((layer, relativeIdx) => {
+          const idx = TEXT_START_INDEX + relativeIdx;
+          const isTemporarilyDisabled = layer.name === 'レイヤー 39';
+          return (
+            <img
+              key={layer.filename}
+              ref={(el) => { layerRefs.current[idx] = el; }}
+              src={layer.filename}
+              alt={layer.name}
+              decoding="async"
+              draggable={false}
+              style={{
+                position: 'absolute',
+                left: `${layer.leftPct}%`,
+                top: `${layer.topPct}%`,
+                width: `${layer.widthPct}%`,
+                height: `${layer.heightPct}%`,
+                opacity: 0,
+                display: isTemporarilyDisabled ? 'none' : undefined,
+                mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
+                pointerEvents: 'none',
+                transform: 'translateZ(0)',
+                willChange: 'transform, opacity',
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
               }}
@@ -91,8 +161,3 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
     </div>
   );
 });
-
-
-
-
-

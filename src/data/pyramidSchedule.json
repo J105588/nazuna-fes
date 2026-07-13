@@ -1,0 +1,48 @@
+{
+  "scheduleConfig": {
+    "festivalDays": ["2026-09-12", "2026-09-13"],
+    "note": "配信データは1日2回（計4回等）、管理画面または運営担当者が事前に流し込み、定時になると自動で最新結果を公開します。最終結果開示前は全集計が非表示ロック状態になります。"
+  },
+  "releases": [
+    {
+      "releaseId": "day1_noon",
+      "title": "第1回 中間開示 (1日目 13:00発表)",
+      "scheduledTime": "2026-09-12T13:00:00+09:00",
+      "isEmbargoed": false,
+      "pyramidTiers": {
+        "high": ["org-1", "org-5", "org-9", "org-15"],
+        "upper": ["org-2", "org-6", "org-10", "org-12", "org-16", "org-18"],
+        "middle": ["org-3", "org-4", "org-7", "org-8", "org-11", "org-13", "org-14", "org-17", "org-19", "org-20"]
+      }
+    },
+    {
+      "releaseId": "day1_evening",
+      "title": "第2回 中間開示 (1日目 17:00発表)",
+      "scheduledTime": "2026-09-12T17:00:00+09:00",
+      "isEmbargoed": false,
+      "pyramidTiers": {
+        "high": ["org-1", "org-2", "org-5", "org-12"],
+        "upper": ["org-3", "org-6", "org-9", "org-10", "org-15", "org-18"],
+        "middle": ["org-4", "org-7", "org-8", "org-11", "org-13", "org-14", "org-16", "org-17", "org-19", "org-20"]
+      }
+    },
+    {
+      "releaseId": "day2_noon",
+      "title": "第3回 中間開示 (2日目 13:00発表)",
+      "scheduledTime": "2026-09-13T13:00:00+09:00",
+      "isEmbargoed": false,
+      "pyramidTiers": {
+        "high": ["org-2", "org-5", "org-1", "org-10"],
+        "upper": ["org-3", "org-6", "org-9", "org-12", "org-15", "org-17"],
+        "middle": ["org-4", "org-7", "org-8", "org-11", "org-13", "org-14", "org-16", "org-18", "org-19", "org-20"]
+      }
+    },
+    {
+      "releaseId": "day2_final_pre_embargo",
+      "title": "【最終結果集計・開示期間前】現在非表示ロック中",
+      "scheduledTime": "2026-09-13T16:30:00+09:00",
+      "isEmbargoed": true,
+      "embargoMessage": "最終結果の公式集計および厳正な審査期間に入りました。閉会式での公式発表・結果開示完了まで集計データは非表示となります。"
+    }
+  ]
+}

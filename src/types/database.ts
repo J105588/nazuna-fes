@@ -30,9 +30,35 @@ export interface TimetableEvent {
   organization_name?: string;
 }
 
+export type PyramidTierLevel = 'high' | 'upper' | 'middle' | 'normal' | 'embargoed';
+
 export interface VotePyramidData {
   class_id: string;
-  rank: number;
-  total_votes: number;
-  pyramid_tier: 'gold' | 'silver' | 'bronze' | 'normal';
+  pyramid_tier: PyramidTierLevel; // 'high': 高(頂点層), 'upper': 上(上層), 'middle': 中(中核層)
+  tier_label: '高' | '上' | '中' | '一般' | '集計ロック・非表示';
+  release_title: string;
+  is_embargoed: boolean;
+  embargo_message?: string;
+}
+
+export type AnnouncementCategory = 'urgent' | 'general' | 'stage';
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  category: AnnouncementCategory;
+  is_published: boolean;
+  created_at: string;
+}
+
+export type LostItemStatus = 'storage' | 'returned';
+
+export interface LostItem {
+  id: string;
+  item_name: string;
+  found_place: string;
+  storage_location: string;
+  status: LostItemStatus;
+  created_at: string;
 }
