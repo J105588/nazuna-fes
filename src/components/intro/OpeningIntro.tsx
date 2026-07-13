@@ -42,8 +42,8 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     if (!posterRef.current) return;
     const { layerRefs, bgContainerRef, textContainerRef } = posterRef.current;
     
-    if (bgContainerRef.current) gsap.set(bgContainerRef.current, { filter: 'none', transform: 'translate(-50%, -45%) translateZ(0)' });
-    if (textContainerRef.current) gsap.set(textContainerRef.current, { filter: 'none', transform: 'translate(-50%, -45%) translateZ(0)' });
+    if (bgContainerRef.current) gsap.set(bgContainerRef.current, { clearProps: 'filter,transform,willChange' });
+    if (textContainerRef.current) gsap.set(textContainerRef.current, { clearProps: 'filter,transform,willChange' });
 
     layerRefs.current.forEach((el, idx) => {
       if (el) {
@@ -102,14 +102,15 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
 
     const { layerRefs, bgContainerRef, textContainerRef } = posterRef.current;
     const isMobile = window.matchMedia('(max-width: 768px) or (orientation: portrait)').matches;
-    const translateY = isMobile ? '-50%' : '-45%';
+    const bgTranslateY = isMobile ? '-50%' : '-45%';
+    const textTranslateY = '-50%';
 
     // 【初期スタンバイ状態の設定】
     if (bgContainerRef.current) {
-      gsap.set(bgContainerRef.current, { filter: 'blur(16px) brightness(1.15)', transform: `translate(-50%, ${translateY}) scale(1.02) translateZ(0)` });
+      gsap.set(bgContainerRef.current, { filter: 'blur(16px) brightness(1.15)', transform: `translate(-50%, ${bgTranslateY}) scale(1.02) translateZ(0)` });
     }
     if (textContainerRef.current) {
-      gsap.set(textContainerRef.current, { filter: 'blur(14px)', transform: `translate(-50%, ${translateY}) scale(1.04) translateZ(0)` });
+      gsap.set(textContainerRef.current, { filter: 'blur(14px)', transform: `translate(-50%, ${textTranslateY}) scale(1.04) translateZ(0)` });
     }
 
     layerRefs.current.forEach((el, idx) => {
@@ -139,8 +140,8 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     const tl = gsap.timeline({
       onComplete: () => {
         showAllLayers();
-        if (bgContainerRef.current) gsap.set(bgContainerRef.current, { clearProps: 'filter,willChange' });
-        if (textContainerRef.current) gsap.set(textContainerRef.current, { clearProps: 'filter,willChange' });
+        if (bgContainerRef.current) gsap.set(bgContainerRef.current, { clearProps: 'filter,transform,willChange' });
+        if (textContainerRef.current) gsap.set(textContainerRef.current, { clearProps: 'filter,transform,willChange' });
         layerRefs.current.forEach((el) => {
           if (el) gsap.set(el, { clearProps: 'willChange,transform' });
         });
@@ -153,7 +154,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     if (bgContainerRef.current) {
       tl.to(bgContainerRef.current, {
         filter: 'blur(0px) brightness(1)',
-        transform: `translate(-50%, ${translateY}) scale(1) translateZ(0)`,
+        transform: `translate(-50%, ${bgTranslateY}) scale(1) translateZ(0)`,
         duration: 2.3,
         ease: 'power3.out',
       }, 0);
@@ -181,7 +182,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     if (textContainerRef.current) {
       tl.to(textContainerRef.current, {
         filter: 'blur(0px)',
-        transform: `translate(-50%, ${translateY}) scale(1) translateZ(0)`,
+        transform: `translate(-50%, ${textTranslateY}) scale(1) translateZ(0)`,
         duration: 1.5,
         ease: 'power3.out',
       }, 1.2);
