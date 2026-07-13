@@ -41,9 +41,21 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
   const showAllLayers = useCallback(() => {
     if (!posterRef.current) return;
     const { layerRefs, bgContainerRef, textContainerRef } = posterRef.current;
-    
-    if (bgContainerRef.current) gsap.set(bgContainerRef.current, { clearProps: 'filter,transform,willChange' });
-    if (textContainerRef.current) gsap.set(textContainerRef.current, { clearProps: 'filter,transform,willChange' });
+    const isMobile = window.matchMedia('(max-width: 768px) or (orientation: portrait)').matches;
+    const bgTranslateY = isMobile ? '-50%' : '-45%';
+
+    if (bgContainerRef.current) {
+      gsap.set(bgContainerRef.current, {
+        clearProps: 'filter,willChange',
+        transform: `translate(-50%, ${bgTranslateY}) scale(1) translateZ(0)`
+      });
+    }
+    if (textContainerRef.current) {
+      gsap.set(textContainerRef.current, {
+        clearProps: 'filter,willChange',
+        transform: 'translate(-50%, -50%) scale(1) translateZ(0)'
+      });
+    }
 
     layerRefs.current.forEach((el, idx) => {
       if (el) {
@@ -140,8 +152,6 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     const tl = gsap.timeline({
       onComplete: () => {
         showAllLayers();
-        if (bgContainerRef.current) gsap.set(bgContainerRef.current, { clearProps: 'filter,transform,willChange' });
-        if (textContainerRef.current) gsap.set(textContainerRef.current, { clearProps: 'filter,transform,willChange' });
         layerRefs.current.forEach((el) => {
           if (el) gsap.set(el, { clearProps: 'willChange,transform' });
         });
