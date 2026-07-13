@@ -66,20 +66,20 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
         width: '100%',
         height: '100%',
         overflow: 'hidden',
-        backgroundColor: '#050711',
+        backgroundColor: isMobileOrPortrait ? '#F7F3ED' : '#050711',
         transform: 'translateZ(0)',
       }}
     >
-      {/* 1. 背景・イラストレイヤーコンテナ (画面全体を余白なく覆う object-fit: cover 挙動) */}
+      {/* 1. 背景・イラストレイヤーコンテナ (スマホ縦画面では全体が綺麗に収まる contain 比率で余白量と文字位置を完成版ポスター完全準拠保持、PCは cover) */}
       <div
         ref={bgContainerRef}
         style={{
           position: 'absolute',
           left: '50%',
-          top: '45%',
-          transform: 'translate(-50%, -45%) translateZ(0)',
-          width: 'max(100vw, 100vh * (2480 / 3508))',
-          height: 'max(100vh, 100vw * (3508 / 2480))',
+          top: isMobileOrPortrait ? '50%' : '45%',
+          transform: isMobileOrPortrait ? 'translate(-50%, -50%) translateZ(0)' : 'translate(-50%, -45%) translateZ(0)',
+          width: isMobileOrPortrait ? 'min(100vw, 100vh * (2480 / 3508))' : 'max(100vw, 100vh * (2480 / 3508))',
+          height: isMobileOrPortrait ? 'min(100vh, 100vw * (3508 / 2480))' : 'max(100vh, 100vw * (3508 / 2480))',
           pointerEvents: 'none',
           willChange: 'filter, transform',
         }}
@@ -114,16 +114,16 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
         })}
       </div>
 
-      {/* 2. 文字・タイポグラフィ層コンテナ (スマホ縦画面では背景層と完全同期した比率でレイアウト一致を保持し、PC横長では文字はみ出し防止で100vw固定) */}
+      {/* 2. 文字・タイポグラフィ層コンテナ (スマホ縦画面では背景層と完全同期した contain 比率で完成版ポスターと寸分違わぬ文字位置・余白を保持) */}
       <div
         ref={textContainerRef}
         style={{
           position: 'absolute',
           left: '50%',
-          top: '45%',
-          transform: 'translate(-50%, -45%) translateZ(0)',
-          width: isMobileOrPortrait ? 'max(100vw, 100vh * (2480 / 3508))' : '100vw',
-          height: isMobileOrPortrait ? 'max(100vh, 100vw * (3508 / 2480))' : 'calc(100vw * (3508 / 2480))',
+          top: isMobileOrPortrait ? '50%' : '45%',
+          transform: isMobileOrPortrait ? 'translate(-50%, -50%) translateZ(0)' : 'translate(-50%, -45%) translateZ(0)',
+          width: isMobileOrPortrait ? 'min(100vw, 100vh * (2480 / 3508))' : '100vw',
+          height: isMobileOrPortrait ? 'min(100vh, 100vw * (3508 / 2480))' : 'calc(100vw * (3508 / 2480))',
           pointerEvents: 'none',
           willChange: 'filter, transform',
         }}

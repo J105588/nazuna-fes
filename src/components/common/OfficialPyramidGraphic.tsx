@@ -29,7 +29,7 @@ export const OfficialPyramidGraphic: React.FC<OfficialPyramidGraphicProps> = ({
           <Lock className="w-4 h-4 text-wafuu-shu" />
           <span>OFFICIAL PYRAMID SEALED / 集計ロック中</span>
         </div>
-        
+
         {/* 封印されたシンプルピラミッド */}
         <div className="relative w-full max-w-[260px] mx-auto py-2 opacity-80">
           <svg viewBox="0 0 300 220" className="w-full h-auto">
@@ -120,23 +120,12 @@ export const OfficialPyramidGraphic: React.FC<OfficialPyramidGraphicProps> = ({
             filter={isHigh ? "url(#glowHigh)" : undefined}
             className="transition-all duration-500"
           />
-          <text
-            x="130"
-            y="62"
-            textAnchor="middle"
-            fill={isHigh ? "#FFFFFF" : "#7C8494"}
-            fontSize="22"
-            fontWeight="900"
-            fontFamily="serif"
-          >
-            高
-          </text>
 
           {isHigh && (
             <g className="animate-fade-in">
               <line x1="172" y1="48.5" x2="215" y2="48.5" stroke="#C9A83E" strokeWidth="3" strokeDasharray="4,2" />
               <polygon points="172,48.5 186,40 186,57" fill="#C9A83E" filter="url(#glowHigh)" />
-              <text x="200" y="55" fill="#1E1E1E" fontSize="18" fontWeight="900" fontFamily="serif">◀【 高 】(頂点)</text>
+              <text x="200" y="55" fill="#1E1E1E" fontSize="18" fontWeight="900" fontFamily="serif">◀</text>
             </g>
           )}
 
@@ -150,22 +139,12 @@ export const OfficialPyramidGraphic: React.FC<OfficialPyramidGraphicProps> = ({
             filter={isUpper ? "url(#glowUpper)" : undefined}
             className="transition-all duration-500"
           />
-          <text
-            x="130"
-            y="128"
-            textAnchor="middle"
-            fill={isUpper ? "#FFFFFF" : "#7C8494"}
-            fontSize="24"
-            fontWeight="900"
-            fontFamily="serif"
-          >
-            上
-          </text>
+
 
           {isUpper && (
             <g className="animate-fade-in">
               <polygon points="208,119.5 222,111 222,128" fill="#D14B41" filter="url(#glowUpper)" />
-              <text x="236" y="126" fill="#1E1E1E" fontSize="19" fontWeight="900" fontFamily="serif">◀【 上 】(上層)</text>
+              <text x="236" y="126" fill="#1E1E1E" fontSize="19" fontWeight="900" fontFamily="serif">◀</text>
             </g>
           )}
 
@@ -179,29 +158,18 @@ export const OfficialPyramidGraphic: React.FC<OfficialPyramidGraphicProps> = ({
             filter={isMiddle ? "url(#glowMiddle)" : undefined}
             className="transition-all duration-500"
           />
-          <text
-            x="130"
-            y="199"
-            textAnchor="middle"
-            fill={isMiddle ? "#FFFFFF" : "#7C8494"}
-            fontSize="26"
-            fontWeight="900"
-            fontFamily="serif"
-          >
-            中
-          </text>
 
           {isMiddle && (
             <g className="animate-fade-in">
               <polygon points="245,191 259,182.5 259,199.5" fill="#2B3A5C" filter="url(#glowMiddle)" />
-              <text x="272" y="198" fill="#1E1E1E" fontSize="20" fontWeight="900" fontFamily="serif">◀【 中 】(中核)</text>
+              <text x="272" y="198" fill="#1E1E1E" fontSize="20" fontWeight="900" fontFamily="serif">◀</text>
             </g>
           )}
         </svg>
       </div>
 
       <p className="text-[11px] text-wafuu-text-muted text-center font-sans mt-2 pt-2 border-t border-wafuu-sumi/10">
-        ※ なずな祭の投票結果は個別の得票数を秘匿し、該当階層の色塗りと矢印でのみリアルタイム開示されます。
+        ※ なずな祭の投票情報は個別の得票数を秘匿し、該当階層の色塗りと矢印でのみ開示されます。
       </p>
     </div>
   );

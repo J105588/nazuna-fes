@@ -1,219 +1,257 @@
-import React, { useState, useEffect, useRef } from 'react';
-import type { TimetableEvent, StageLocation } from '../../types/database';
-import { Calendar, Clock, MapPin, Sparkles, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import type { TimetableEvent, TimetableDay, StageLocation } from '../../types/database';
+import { fetchTimetableDaysFromDB } from '../../lib/supabase';
+import { Calendar, Clock, Heart } from 'lucide-react';
+
+/*
+  ========================================================================
+  TimetableSection - 時間表グリッド形式（1時間・30分区切り・現在時刻バー・日にちタブ対応）
+  ========================================================================
+*/
 
 interface TimetableSectionProps {
   events: TimetableEvent[];
   initialStage?: StageLocation;
 }
 
-export const TimetableSection: React.FC<TimetableSectionProps> = ({ events, initialStage = 'gym' }) => {
-  const [activeTab, setActiveTab] = useState<StageLocation>(initialStage);
-  const [currentTime, setCurrentTime] = useState<number>(Date.now());
-  const activeCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+export const TimetableSection: React.FC<TimetableSectionProps> = ({ events }) => {
+  const [days, setDays] = useState<TimetableDay[]>([]);
+  const [selectedDayId, setSelectedDayId] = useState<string>('day-1');
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   useEffect(() => {
-    if (initialStage) setActiveTab(initialStage);
-  }, [initialStage]);
+    fetchTimetableDaysFromDB().then((data) => {
+      if (data && data.length > 0) {
+        setDays(data);
+        setSelectedDayId(data[0].id);
+      }
+    });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 60000);
-    return () => clearInterval(interval);
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // 1分ごとに更新
+    return () => clearInterval(timer);
   }, []);
 
-  const isEventNow = React.useCallback((startIso: string, endIso: string) => {
-    const start = new Date(startIso).getTime();
-    const end = new Date(endIso).getTime();
-    return currentTime >= start && currentTime <= end;
-  }, [currentTime]);
+  // 日にちに紐づく公開イベント
+  const dayEvents = useMemo(() => {
+    return events.filter((e) => e.is_published && (!e.day_id || e.day_id === selectedDayId));
+  }, [events, selectedDayId]);
 
-  const filteredEvents = React.useMemo(() => events
-    .filter((e) => e.is_published && e.stage_location === activeTab)
-    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()),
-    [events, activeTab]
-  );
-
-  const scrollToNowEvent = React.useCallback(() => {
-    const nowEvt = filteredEvents.find((e) => isEventNow(e.start_time, e.end_time));
-    if (nowEvt && activeCardRefs.current[nowEvt.id]) {
-      activeCardRefs.current[nowEvt.id]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }
-  }, [filteredEvents, isEventNow]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      scrollToNowEvent();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [activeTab, scrollToNowEvent]);
-
-  const stages: { id: StageLocation; label: string; iconColor: string; description: string }[] = [
-    { id: 'gym', label: '第一体育館 メインステージ', iconColor: 'text-wafuu-shu', description: 'ダンス・書道・オープニング公演' },
-    { id: 'courtyard', label: '中庭 屋外特設ステージ', iconColor: 'text-wafuu-kincha', description: '有志バンド・軽音楽部ライブフェス' },
-    { id: 'av_room', label: '視聴覚室・演劇ステージ', iconColor: 'text-wafuu-ai', description: '演劇部・アコースティック公演' }
+  // ステージ列定義（本祭の3大ステージ＋拡張ステージ）
+  const stages: { id: StageLocation; label: string }[] = [
+    { id: 'gym', label: '第一体育館 メインステージ' },
+    { id: 'courtyard', label: '中庭 屋外特設ステージ' },
+    { id: 'av_room', label: '視聴覚室 演劇・アコースティック' }
   ];
 
-  const formatTime = (isoString: string) => {
+  // 時間軸：8:30 〜 17:30 まで 30分（0.5時間）単位でスロットを生成
+  // 1時間スロット = 120px, 30分スロット = 60px
+  const START_HOUR = 8.5; // 8:30
+  const END_HOUR = 17.5;  // 17:30
+  const SLOT_HEIGHT = 60; // 30分あたりの高さ(px)
+
+  const timeSlots = useMemo(() => {
+    const slots = [];
+    for (let h = START_HOUR; h <= END_HOUR; h += 0.5) {
+      const hour = Math.floor(h);
+      const min = h % 1 === 0 ? '00' : '30';
+      slots.push({
+        timeValue: h,
+        label: `${hour}:${min}`
+      });
+    }
+    return slots;
+  }, []);
+
+  // 時刻文字列 (ISO または HH:mm) から時間数値 (例: 9:30 -> 9.5) を取得
+  const parseHourValue = (isoString: string): number => {
     const d = new Date(isoString);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (!isNaN(d.getTime())) {
+      return d.getHours() + d.getMinutes() / 60;
+    }
+    // HH:mm 形式の場合
+    const parts = isoString.split(':');
+    if (parts.length >= 2) {
+      return parseInt(parts[0], 10) + parseInt(parts[1], 10) / 60;
+    }
+    return START_HOUR;
   };
 
+  const formatTimeText = (isoString: string) => {
+    const d = new Date(isoString);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return isoString;
+  };
+
+  // 現在時刻バーの Y座標算出
+  const currentHourValue = currentTime.getHours() + currentTime.getMinutes() / 60;
+  const isTodayInRange = currentHourValue >= START_HOUR && currentHourValue <= END_HOUR;
+  const currentTimeOffsetY = (currentHourValue - START_HOUR) * (SLOT_HEIGHT * 2);
+
   return (
-    <div className="space-y-12 animate-fade-in">
-      {/* 上部ヘッダー＆説明 */}
-      <div className="wafuu-panel p-6 sm:p-10 rounded-3xl border border-wafuu-sumi/10 space-y-7 shadow-sm relative overflow-hidden bg-white">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-wafuu-shu/10 via-transparent to-transparent rounded-full blur-3xl pointer-events-none" />
+    <div className="space-y-8 animate-fade-in max-w-7xl mx-auto px-2 sm:px-6">
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-          <div className="flex items-center gap-4.5">
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-wafuu-shu to-wafuu-shu-dark text-white shadow-sm border border-wafuu-ekasumi/40">
-              <Calendar className="w-7 h-7" />
-            </div>
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-wafuu-sumi tracking-wider font-serif">
-                ステージ・演目 タイムテーブル
-              </h2>
-              <p className="text-xs sm:text-sm text-wafuu-text-sub mt-1.5 font-serif leading-relaxed max-w-xl">
-                進行中の演目は朱色と金茶の伝統色フレームでリアルタイムに自動ハイライト・追従表示されます。
-              </p>
-            </div>
+      {/* 上部ヘッダー（日にちタブ ＆ タイトル） */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-wafuu-sumi/15 pb-6">
+        <div>
+          <div className="inline-flex items-center gap-2 text-xs font-serif font-bold text-wafuu-shu tracking-widest mb-1.5">
+            <Calendar className="w-4 h-4" />
+            <span>公式ステージ進行表</span>
           </div>
-
-          <div className="flex items-center gap-2.5 font-serif text-xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-wafuu-shu shadow-[0_0_10px_#D14B41] animate-ping" />
-            <span className="text-wafuu-sumi font-bold bg-wafuu-kinari px-4 py-2 rounded-xl border border-wafuu-sumi/10 shadow-inner">
-              自動追従・現在進行時刻ハイライト機能 稼働中
-            </span>
-          </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-wafuu-sumi tracking-wider font-serif">
+            ステージタイムテーブル
+          </h2>
         </div>
 
-        {/* タブ選択 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-wafuu-sumi/8">
-          {stages.map((stage) => {
-            const isActive = activeTab === stage.id;
-            return (
-              <button
-                key={stage.id}
-                onClick={() => setActiveTab(stage.id)}
-                className={`p-5 rounded-2xl transition-all duration-300 text-left relative overflow-hidden flex items-start gap-4 border ${
-                  isActive
-                    ? 'bg-gradient-to-br from-wafuu-shu to-wafuu-shu-dark text-white border-wafuu-kincha shadow-[0_8px_25px_rgba(209,75,65,0.25)] scale-[1.01]'
-                    : 'bg-wafuu-kinari/80 hover:bg-wafuu-kinari text-wafuu-sumi border-wafuu-sumi/10 hover:border-wafuu-ekasumi/60 font-serif'
-                }`}
-              >
-                <div
-                  className={`p-3 rounded-xl ${
-                    isActive ? 'bg-white/20 text-white' : `bg-white ${stage.iconColor} shadow-sm border border-wafuu-sumi/6`
-                  }`}
+        {/* 日にち切り替えタブ（DB設定から流し込み） */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {days.length === 0 ? (
+            <button className="px-5 py-2.5 rounded-xl bg-[#2C3E55] text-white font-bold text-xs sm:text-sm font-serif shadow-sm">
+              DAY 1 (本祭)
+            </button>
+          ) : (
+            days.map((day) => {
+              const isSelected = selectedDayId === day.id;
+              return (
+                <button
+                  key={day.id}
+                  onClick={() => setSelectedDayId(day.id)}
+                  className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-serif font-bold text-xs sm:text-sm flex items-center gap-2 border ${isSelected
+                      ? 'bg-wafuu-shu text-white border-wafuu-shu shadow-md scale-[1.03]'
+                      : 'bg-white hover:bg-[#FAF8F5] text-wafuu-sumi border-wafuu-sumi/20 hover:border-wafuu-shu/60'
+                    }`}
                 >
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-serif font-bold text-base sm:text-lg tracking-wide">{stage.label}</h4>
-                  <p className={`text-xs mt-1 font-serif ${isActive ? 'text-white/90' : 'text-wafuu-text-sub'}`}>
-                    {stage.description}
-                  </p>
-                </div>
-              </button>
-            );
-          })}
+                  <Clock className={`w-4 h-4 ${isSelected ? 'text-[#F5D061]' : 'text-wafuu-sumi/40'}`} />
+                  <span>{day.label}</span>
+                </button>
+              );
+            })
+          )}
         </div>
       </div>
 
-      {/* タイムラインリスト */}
-      <div className="relative pl-6 sm:pl-10 space-y-7 before:absolute before:left-2.5 sm:before:left-4.5 before:top-4 before:bottom-4 before:w-1 before:bg-gradient-to-b before:from-wafuu-shu before:via-wafuu-kincha before:to-wafuu-ekasumi/40 before:rounded-full">
-        {filteredEvents.length === 0 ? (
-          <div className="wafuu-panel p-16 text-center rounded-3xl text-wafuu-text-muted space-y-4 border border-wafuu-sumi/10 shadow-sm font-serif">
-            <Clock className="w-12 h-12 mx-auto text-wafuu-kincha/50" />
-            <p className="text-base font-bold text-wafuu-sumi">現在、このステージで公開されている演目はありません。</p>
-          </div>
-        ) : (
-          filteredEvents.map((evt) => {
-            const isNow = isEventNow(evt.start_time, evt.end_time);
+      {/* タイムテーブル・時間表グリッドカレンダー (1時間・30分単位の横区切り) */}
+      <div className="bg-[#FAF8F5] rounded-3xl border border-wafuu-sumi/20 shadow-sm overflow-x-auto relative">
+        <div className="min-w-[760px] lg:min-w-full">
 
-            return (
+          {/* 列ヘッダー（各ステージ名） */}
+          <div className="grid grid-cols-[80px_1fr_1fr_1fr] sm:grid-cols-[90px_1fr_1fr_1fr] border-b-2 border-[#2C3E55]/60 bg-white sticky top-0 z-20">
+            <div className="p-3 text-center text-[11px] font-mono font-bold text-wafuu-sumi/50 border-r border-wafuu-sumi/10 flex items-center justify-center bg-[#FAF8F5]">
+              TIME
+            </div>
+            {stages.map((stage) => (
               <div
-                key={evt.id}
-                ref={(el) => {
-                  activeCardRefs.current[evt.id] = el;
-                }}
-                className={`relative transition-all duration-400 rounded-3xl p-6 sm:p-7 border font-serif ${
-                  isNow
-                    ? 'bg-gradient-to-r from-wafuu-shu/10 via-wafuu-kincha/5 to-white border-wafuu-shu shadow-[0_12px_36px_rgba(209,75,65,0.15)] scale-[1.01]'
-                    : 'wafuu-panel wafuu-panel-hover border-wafuu-sumi/10'
-                }`}
+                key={stage.id}
+                className="py-3.5 px-3 text-center border-r last:border-r-0 border-wafuu-sumi/15 font-serif font-bold text-xs sm:text-sm text-[#2C3E55] tracking-wide bg-white shadow-sm"
               >
-                {/* 丸印（タイムラインピン） */}
-                <div
-                  className={`absolute -left-6 sm:-left-10 top-7 w-4 h-4 rounded-full border-2 border-white transition-transform ${
-                    isNow
-                      ? 'bg-wafuu-shu shadow-[0_0_15px_#D14B41] scale-125'
-                      : 'bg-wafuu-kincha shadow-[0_0_8px_#C9A83E]'
-                  }`}
-                >
-                  {isNow && (
-                    <span className="absolute -inset-1.5 rounded-full bg-wafuu-shu animate-ping opacity-75" />
-                  )}
-                </div>
+                {stage.label}
+              </div>
+            ))}
+          </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div
-                        className={`font-mono text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-xl border ${
-                          isNow
-                            ? 'bg-wafuu-shu text-white border-wafuu-shu shadow-sm'
-                            : 'bg-wafuu-kinari text-wafuu-sumi border-wafuu-sumi/10'
+          {/* 時間軸＆グリッド本体（Y軸方向に時間が進行） */}
+          <div className="relative grid grid-cols-[80px_1fr_1fr_1fr] sm:grid-cols-[90px_1fr_1fr_1fr]" style={{ height: `${(timeSlots.length - 1) * SLOT_HEIGHT}px` }}>
+
+            {/* 左側：時刻目盛り列 ＆ 右側：横区切り線（1時間=実線, 30分=点線） */}
+            <div className="col-span-4 absolute inset-0 pointer-events-none grid grid-cols-[80px_1fr_1fr_1fr] sm:grid-cols-[90px_1fr_1fr_1fr]">
+              {timeSlots.map((slot, idx) => {
+                const isHourly = slot.timeValue % 1 === 0;
+                return (
+                  <React.Fragment key={slot.label}>
+                    {/* 左目盛り時刻ラベル */}
+                    <div
+                      className={`text-right pr-3 font-mono text-xs border-r border-wafuu-sumi/15 select-none -mt-2.5 ${isHourly ? 'font-bold text-wafuu-sumi' : 'text-wafuu-sumi/40 text-[11px]'
                         }`}
-                      >
-                        {formatTime(evt.start_time)} 〜 {formatTime(evt.end_time)}
-                      </div>
+                      style={{ top: `${idx * SLOT_HEIGHT}px`, position: 'absolute', width: '80px' }}
+                    >
+                      {slot.label}
+                    </div>
 
-                      {isNow && (
-                        <div className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-wafuu-shu to-wafuu-shu-dark text-white font-black border border-wafuu-kincha/60 text-xs tracking-widest flex items-center gap-2 shadow-[0_4px_12px_rgba(209,75,65,0.3)] animate-pulse">
-                          <Sparkles className="w-4 h-4 text-wafuu-kincha" />
-                          <span>NOW ON STAGE</span>
+                    {/* ステージ1〜3を横断する区切り線 */}
+                    <div
+                      className={`absolute left-[80px] sm:left-[90px] right-0 ${isHourly
+                          ? 'border-t border-wafuu-sumi/25'
+                          : 'border-t border-dashed border-wafuu-sumi/12'
+                        }`}
+                      style={{ top: `${idx * SLOT_HEIGHT}px` }}
+                    />
+                  </React.Fragment>
+                );
+              })}
+            </div>
+
+            {/* ステージ列ごとの境界線 */}
+            <div className="col-start-2 border-r border-wafuu-sumi/10 h-full" />
+            <div className="col-start-3 border-r border-wafuu-sumi/10 h-full" />
+            <div className="col-start-4 h-full" />
+
+            {/* 現在時刻を示すインジケーター（赤＆紺ラインとハートマークバッジ） */}
+            {isTodayInRange && (
+              <div
+                className="absolute left-[80px] sm:left-[90px] right-0 z-30 pointer-events-none flex items-center transition-all duration-1000"
+                style={{ top: `${currentTimeOffsetY}px` }}
+              >
+                {/* ハートマーク目印（添付画像 input_file_2.png 準拠） */}
+                <div className="-ml-3 w-6 h-6 rounded-sm bg-[#A8B5C2] border border-white text-white flex items-center justify-center shadow-md shrink-0 z-10">
+                  <Heart className="w-3.5 h-3.5 fill-current text-white" />
+                </div>
+                {/* 赤または紺の横断ライン */}
+                <div className="w-full h-[2px] bg-gradient-to-r from-[#D14B41] via-[#2C3E55] to-[#D14B41] shadow-[0_0_8px_rgba(209,75,65,0.7)]" />
+              </div>
+            )}
+
+            {/* 演目カード配置（各イベントの start_time と end_time から座標と高さを計算） */}
+            {stages.map((stage, colIdx) => {
+              const stageEvts = dayEvents.filter((e) => e.stage_location === stage.id);
+              return stageEvts.map((evt) => {
+                const startV = parseHourValue(evt.start_time);
+                const endV = parseHourValue(evt.end_time);
+
+                // 表示範囲(START_HOUR 〜 END_HOUR)外や異常値の安全クリップ
+                const clampedStart = Math.max(START_HOUR, startV);
+                const clampedEnd = Math.min(END_HOUR, Math.max(clampedStart + 0.3, endV));
+
+                const topPx = (clampedStart - START_HOUR) * (SLOT_HEIGHT * 2);
+                const heightPx = Math.max(35, (clampedEnd - clampedStart) * (SLOT_HEIGHT * 2));
+
+                const colClass = colIdx === 0
+                  ? 'left-[80px] sm:left-[90px] w-[calc((100%-80px)/3)] sm:w-[calc((100%-90px)/3)]'
+                  : colIdx === 1
+                    ? 'left-[calc(80px+(100%-80px)/3)] sm:left-[calc(90px+(100%-90px)/3)] w-[calc((100%-80px)/3)] sm:w-[calc((100%-90px)/3)]'
+                    : 'left-[calc(80px+(100%-80px)*2/3)] sm:left-[calc(90px+(100%-90px)*2/3)] w-[calc((100%-80px)/3)] sm:w-[calc((100%-90px)/3)]';
+
+                return (
+                  <div
+                    key={evt.id}
+                    className={`absolute ${colClass} p-1.5 sm:p-2 z-10 transition-all duration-300 hover:z-25`}
+                    style={{ top: `${topPx}px`, height: `${heightPx}px` }}
+                  >
+                    {/* カード本体（添付画像 input_file_2.png 準拠：朱色または淡い和風色合いのスマートなブロック） */}
+                    <div className="w-full h-full bg-[#FCECEB] border-2 border-[#D14B41] rounded-lg p-2.5 sm:p-3.5 flex flex-col justify-center shadow-sm hover:shadow-lg transition-all overflow-hidden relative group font-serif">
+                      <div className="font-bold text-xs sm:text-sm text-[#2C3E55] leading-snug line-clamp-2">
+                        {evt.title}
+                      </div>
+                      <div className="font-mono text-[11px] text-wafuu-sumi/75 mt-1 font-bold">
+                        {formatTimeText(evt.start_time)} - {formatTimeText(evt.end_time)}
+                      </div>
+                      {evt.organization_name && (
+                        <div className="text-[11px] text-wafuu-sumi/65 font-sans mt-0.5 line-clamp-1">
+                          {evt.organization_name}
                         </div>
                       )}
                     </div>
-
-                    <h3 className="font-serif font-bold text-xl sm:text-2xl text-wafuu-sumi tracking-wide">
-                      {evt.title}
-                    </h3>
-
-                    {evt.organization_name && (
-                      <p className="text-xs sm:text-sm text-wafuu-text-sub font-sans">
-                        主催・出演：
-                        <span className={`font-bold ml-1.5 font-serif ${isNow ? 'text-wafuu-shu' : 'text-wafuu-sumi'}`}>
-                          {evt.organization_name}
-                        </span>
-                      </p>
-                    )}
                   </div>
+                );
+              });
+            })}
 
-                  <div className="flex items-center gap-2 self-start sm:self-center">
-                    {isNow ? (
-                      <span className="text-xs font-bold text-wafuu-shu flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-wafuu-shu/30 shadow-sm">
-                        <CheckCircle2 className="w-4.5 h-4.5 text-wafuu-shu" />
-                        <span>只今上演中</span>
-                      </span>
-                    ) : (
-                      <span className="text-xs text-wafuu-text-muted font-mono bg-wafuu-kinari px-3.5 py-2 rounded-xl border border-wafuu-sumi/8">
-                        待機 / スケジュール
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        )}
+          </div>
+        </div>
       </div>
+
     </div>
   );
 };

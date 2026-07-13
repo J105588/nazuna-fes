@@ -1,7 +1,7 @@
 import React from 'react';
 import useSWR from 'swr';
-import type { Organization, VotePyramidData } from '../../types/database';
-import { fetchVotePyramid, openExternalMap, openGoogleFormVote } from '../../lib/api';
+import type { Organization, VotePyramidData, NazunaGraphItem, InventoryStatus } from '../../types/database';
+import { fetchVotePyramid, openExternalMap, openGoogleFormVote, fetchNazunaGraphItems, fetchInventoryStatus } from '../../lib/api';
 import { OfficialPyramidGraphic } from '../common/OfficialPyramidGraphic';
 import {
   X,
@@ -10,7 +10,9 @@ import {
   ExternalLink,
   CheckCircle2,
   AlertTriangle,
-  Ban
+  Ban,
+  Clock,
+  Coffee
 } from 'lucide-react';
 
 interface ClassDetailModalProps {
@@ -25,9 +27,26 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
     { refreshInterval: 20000 }
   );
 
+  const isCafeExhibition = Boolean(org && org.genre === 'food' && org.use_menu_api);
+
+  // NazunaGraph メニュー在庫アイテムリスト取得 (喫茶展示かつトグルオン時のみ)
+  const { data: menuItems } = useSWR<NazunaGraphItem[]>(
+    isCafeExhibition ? `nazuna-graph-items-${org?.id}` : null,
+    () => (org ? fetchNazunaGraphItems({ owner_id: org.menu_owner_id || org.id }) : Promise.reject('No org')),
+    { refreshInterval: 15000 }
+  );
+
+  // 総合ステータス (喫茶展示かつトグルオン時のみ)
+  const { data: currentStatus } = useSWR<InventoryStatus>(
+    isCafeExhibition ? `modal-status-${org?.id}` : null,
+    () => (org ? fetchInventoryStatus(org) : Promise.reject('No org')),
+    { refreshInterval: 15000, fallbackData: 'STATUS_AVAILABLE' }
+  );
+
   if (!org) return null;
 
-  const isSoldOut = org.inventory_status === 'STATUS_SOLD_OUT';
+  const isSoldOut = isCafeExhibition && currentStatus === 'STATUS_SOLD_OUT';
+  const isPreparing = isCafeExhibition && currentStatus === 'STATUS_PREPARING';
 
   const renderPyramidIndicator = () => {
     if (!pyramid) {
@@ -72,7 +91,7 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
           <img
             src={org.image_url || '/assets/poster/poster_complete.png'}
             alt={org.name}
-            className={`w-full h-full object-cover ${isSoldOut ? 'filter grayscale' : ''}`}
+            className={`w-full h-full object-cover ${isSoldOut || isPreparing ? 'filter grayscale' : ''}`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
 
@@ -96,19 +115,24 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4.5 rounded-xl bg-wafuu-kinari border border-wafuu-sumi/6">
             <div className="flex items-center gap-2.5 text-xs sm:text-sm text-wafuu-text-sub">
               <span className="text-wafuu-text-muted">ステータス：</span>
-              {org.inventory_status === 'STATUS_AVAILABLE' && (
+              {currentStatus === 'STATUS_AVAILABLE' && (
                 <span className="text-wafuu-ai font-bold flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" /> スムーズにご案内可能
                 </span>
               )}
-              {org.inventory_status === 'STATUS_FEW' && (
+              {currentStatus === 'STATUS_FEW' && (
                 <span className="text-[#9A7A1E] font-bold flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4" /> 残りわずか
+                  <AlertTriangle className="w-4 h-4" /> 残りわずか・混雑
                 </span>
               )}
-              {org.inventory_status === 'STATUS_SOLD_OUT' && (
+              {currentStatus === 'STATUS_SOLD_OUT' && (
                 <span className="text-wafuu-shu font-bold flex items-center gap-1.5">
-                  <Ban className="w-4 h-4" /> 本日の受付終了
+                  <Ban className="w-4 h-4" /> 本日の受付終了・完売
+                </span>
+              )}
+              {currentStatus === 'STATUS_PREPARING' && (
+                <span className="text-gray-600 font-bold flex items-center gap-1.5">
+                  <Clock className="w-4 h-4" /> 準備中・公開待ち
                 </span>
               )}
             </div>
@@ -130,16 +154,72 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
             </p>
           </div>
 
+          {/* NazunaGraph メニュー＆販売状況一覧 (/api/items 連携：喫茶展示かつトグルオン時のみ) */}
+          {isCafeExhibition && menuItems && menuItems.length > 0 && (
+            <div className="space-y-4 pt-2 border-t border-wafuu-sumi/10">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm sm:text-base font-bold text-wafuu-sumi font-serif flex items-center gap-2">
+                  <Coffee className="w-4 h-4 text-wafuu-kincha" />
+                  <span>メニュー・販売状況</span>
+                </h4>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {menuItems.map((item) => {
+                  const isItemSoldOut = item.status.id === 3 || item.status.label === '完売';
+                  const isItemFew = item.status.id === 2 || item.status.label === '残りわずか';
+                  const isItemPrep = item.status.id === 4 || item.status.label === '準備中';
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`p-3.5 rounded-xl border flex items-start gap-3 transition-all ${isItemSoldOut || isItemPrep
+                        ? 'bg-gray-50 border-gray-200 opacity-60 grayscale'
+                        : isItemFew
+                          ? 'bg-amber-50/60 border-amber-300'
+                          : 'bg-white border-wafuu-sumi/15 shadow-sm hover:border-wafuu-shu/40'
+                        }`}
+                    >
+                      {item.image_url && (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-16 h-16 rounded-lg object-cover shrink-0 bg-wafuu-silk border border-wafuu-sumi/10"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[10px] font-bold font-serif text-wafuu-ai bg-wafuu-silk px-2 py-0.5 rounded">
+                            {item.category.name}
+                          </span>
+                          <span className={`text-[10px] font-bold font-serif px-2 py-0.5 rounded shadow-2xs text-white ${isItemSoldOut ? 'bg-red-600' : isItemPrep ? 'bg-gray-500' : isItemFew ? 'bg-amber-500' : 'bg-emerald-600'
+                            }`}>
+                            {item.status.label}
+                          </span>
+                        </div>
+                        <h5 className="font-bold text-xs sm:text-sm text-wafuu-sumi font-serif line-clamp-1">
+                          {item.name}
+                        </h5>
+                        <p className="text-[11px] text-wafuu-text-muted line-clamp-2 leading-tight font-sans">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* アクションボタン */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-5 border-t border-wafuu-sumi/6">
             <button
               disabled={isSoldOut}
               onClick={() => openGoogleFormVote(org.id, org.name)}
-              className={`w-full py-4 px-6 rounded-xl font-bold flex items-center justify-center gap-3 transition-all duration-300 text-sm sm:text-base ${
-                isSoldOut
-                  ? 'bg-wafuu-kinari text-wafuu-text-muted cursor-not-allowed border border-wafuu-sumi/6 font-serif'
-                  : 'btn-wafuu-shu hover:scale-[1.02] font-serif'
-              }`}
+              className={`w-full py-4 px-6 rounded-xl font-bold flex items-center justify-center gap-3 transition-all duration-300 text-sm sm:text-base ${isSoldOut
+                ? 'bg-wafuu-kinari text-wafuu-text-muted cursor-not-allowed border border-wafuu-sumi/6 font-serif'
+                : 'btn-wafuu-shu hover:scale-[1.02] font-serif'
+                }`}
             >
               <Heart className="w-5 h-5 fill-current" />
               <span>{isSoldOut ? '受付停止中' : 'この団体に投票する (Forms)'}</span>

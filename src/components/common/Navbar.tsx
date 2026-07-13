@@ -3,17 +3,16 @@ import { BurgerMenu } from './BurgerMenu';
 
 /*
   ========================================================================
-  Navbar - モダン和風フローティングナビゲーション
+  Navbar - モダン和風固定ヘッダーバー＆メニューコントローラー
   ========================================================================
 */
 
 interface NavbarProps {
-  currentTab: 'home' | 'timetable' | 'info' | 'lostfound' | 'admin';
+  currentTab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy';
   isIntroFinished?: boolean;
-  onSelectTab: (tab: 'home' | 'timetable' | 'info' | 'lostfound' | 'admin') => void;
+  onSelectTab: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
   onSelectGenreQuick?: (genre: string) => void;
   onSelectStageQuick?: (stage: string) => void;
-  onReplayIntro?: () => void;
   onOpenMapModal?: () => void;
 }
 
@@ -22,68 +21,90 @@ export const Navbar: React.FC<NavbarProps> = ({
   isIntroFinished = true,
   onSelectTab,
   onSelectGenreQuick,
-  onSelectStageQuick,
-  onReplayIntro,
   onOpenMapModal
 }) => {
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
 
   return (
     <>
-      {/* フローティングメニューボタン */}
-      <div className="fixed top-0 left-0 right-0 z-[60] pointer-events-none p-5 sm:p-7 flex items-center justify-end max-w-[100vw] overflow-x-hidden">
-        
-        {/* メニューボタン（和風） */}
-        <div className={`transition-all duration-1000 ease-out transform ${
-          isIntroFinished ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-12 scale-90 pointer-events-none'
-        }`}>
+      {/* 上部固定モダン和風ヘッダーバー (城に近い和風な色：漆喰白・白鷺城しらさぎじょうの白壁を想起させる生成り白グラデーション＋藍と朱の上質アクセント) */}
+      <header className={`fixed top-0 left-0 right-0 z-[80] transition-all duration-700 ease-out backdrop-blur-xl ${
+        isIntroFinished
+          ? 'opacity-100 translate-y-0 pointer-events-auto bg-gradient-to-r from-[#FBF9F5]/95 via-[#FAF6F0]/95 to-[#FBF9F5]/95 text-[#2C3E55] shadow-[0_4px_25px_rgba(44,62,85,0.12)] border-b border-wafuu-ekasumi/80'
+          : 'opacity-0 -translate-y-12 pointer-events-none bg-transparent border-transparent'
+      }`}>
+        {/* 上部の極細 朱＆金茶＆藍アクセントライン */}
+        <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-wafuu-shu via-[#D4AF37] to-wafuu-ai opacity-90" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+          
+          {/* 左側：サイトロゴ・名称「上に小さく2026年、その下に大きくなずな祭」 */}
+          <button
+            onClick={() => {
+              if (isBurgerOpen) setIsBurgerOpen(false);
+              onSelectTab('home');
+            }}
+            className="flex flex-col justify-center text-left group transition-all duration-300 hover:opacity-90 focus:outline-none py-1"
+            title="総合トップポータルへ戻る"
+          >
+            <span className="text-[11px] sm:text-xs font-mono font-bold text-wafuu-kincha tracking-[0.2em] block leading-tight">
+              2026年
+            </span>
+            <span className="text-xl sm:text-2xl font-black font-serif text-[#2C3E55] tracking-widest block leading-tight group-hover:text-wafuu-shu transition-colors -mt-0.5 drop-shadow-2xs">
+              なずな祭
+            </span>
+          </button>
+
+          {/* 右端：三本線 ↔ × に滑らかに変形するメニューボタン */}
           <button
             onClick={() => setIsBurgerOpen(!isBurgerOpen)}
-            className={`group w-13 h-13 sm:w-15 sm:h-15 rounded-2xl sm:rounded-3xl backdrop-blur-xl border transition-all duration-500 flex items-center justify-center select-none shrink-0 ${
+            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border transition-all duration-300 flex items-center justify-center shrink-0 shadow-sm ${
               isBurgerOpen
-                ? 'bg-wafuu-shu/90 border-wafuu-kincha shadow-[0_0_25px_rgba(209,75,65,0.4)]'
-                : 'bg-white/85 hover:bg-white/95 border-wafuu-ekasumi/60 hover:border-wafuu-shu/60 shadow-[0_4px_20px_rgba(30,30,30,0.12)] hover:shadow-[0_8px_30px_rgba(30,30,30,0.18)]'
+                ? 'bg-wafuu-shu text-white border-wafuu-shu shadow-[0_0_15px_rgba(209,75,65,0.5)]'
+                : 'bg-white hover:bg-[#F3ECE0] text-[#2C3E55] border-wafuu-ekasumi/80 hover:border-wafuu-kincha'
             }`}
             title={isBurgerOpen ? "メニューを閉じる" : "総合メニューを開く"}
             aria-label={isBurgerOpen ? "メニューを閉じる" : "メニューを開く"}
           >
-            {/* 筆ストローク風ハンバーガー ↔ 閉じるバツ */}
-            <div className="relative w-6 sm:w-7 h-5 flex items-center justify-center">
+            {/* 三本線 ↔ × 変形アニメーションアイコン */}
+            <div className="relative w-6 h-5 flex items-center justify-center shrink-0">
+              {/* 上の線 ↔ ×の片側 */}
               <span
                 className={`absolute w-full h-[2.5px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.68,-0.6,0.32,1.6)] ${
                   isBurgerOpen
                     ? 'translate-y-0 rotate-45 bg-white'
-                    : '-translate-y-2.5 rotate-0 bg-wafuu-sumi'
+                    : '-translate-y-2 rotate-0 bg-current'
                 }`}
               />
+              {/* 真ん中の線 */}
               <span
                 className={`absolute w-full h-[2.5px] rounded-full transition-all duration-300 ease-out ${
                   isBurgerOpen
                     ? 'opacity-0 scale-x-0 bg-white'
-                    : 'opacity-100 scale-x-100 bg-wafuu-shu'
+                    : 'opacity-100 scale-x-100 bg-current'
                 }`}
               />
+              {/* 下の線 ↔ ×のもう片側 */}
               <span
                 className={`absolute w-full h-[2.5px] rounded-full transition-all duration-500 ease-[cubic-bezier(0.68,-0.6,0.32,1.6)] ${
                   isBurgerOpen
                     ? 'translate-y-0 -rotate-45 bg-white'
-                    : 'translate-y-2.5 rotate-0 bg-wafuu-sumi'
+                    : 'translate-y-2 rotate-0 bg-current'
                 }`}
               />
             </div>
           </button>
-        </div>
-      </div>
 
-      {/* 総合案内メニュー */}
+        </div>
+      </header>
+
+      {/* 総合案内メニュー（質素で洗練されたページ遷移リスト） */}
       <BurgerMenu
         isOpen={isBurgerOpen}
         onClose={() => setIsBurgerOpen(false)}
         currentTab={currentTab}
         onSelectTab={onSelectTab}
         onSelectGenreQuick={onSelectGenreQuick}
-        onSelectStageQuick={onSelectStageQuick}
-        onReplayIntro={onReplayIntro}
         onOpenMapModal={onOpenMapModal}
       />
     </>

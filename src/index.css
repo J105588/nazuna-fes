@@ -235,3 +235,145 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* =========================================================
+   縦を軸（Y軸）を中心にして1回転しながら浮き出してくるアニメーション
+   ========================================================= */
+@keyframes rotateYPop {
+  0% {
+    transform: perspective(600px) rotateY(0deg) scale(1) translateY(0);
+  }
+  50% {
+    transform: perspective(600px) rotateY(180deg) scale(1.15) translateY(-4px);
+  }
+  100% {
+    transform: perspective(600px) rotateY(360deg) scale(1.1) translateY(-2px);
+  }
+}
+
+.group:hover .hover-icon-z-spin,
+.group:hover .hover-icon-y-spin {
+  animation: rotateYPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* =========================================================
+   ご案内セクションの筆書きダブル飾りライン (input_file_1.png準拠)
+   ========================================================= */
+.brush-title-container {
+  position: relative;
+  display: inline-block;
+  padding: 0.75rem 2.5rem;
+}
+
+.brush-line-top,
+.brush-line-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  pointer-events: none;
+}
+
+.brush-line-top {
+  top: 0;
+}
+
+.brush-line-bottom {
+  bottom: 0;
+}
+
+/* =========================================================
+   8連ダブルリング丸型エンブレムバッジ (input_file_1.png準拠)
+   ========================================================= */
+.emblem-double-ring {
+  position: relative;
+  border-radius: 9999px;
+  border: 3px solid #2C3E55;
+  padding: 5px;
+  background-color: #FAF8F5;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(44, 62, 85, 0.08);
+}
+
+.emblem-double-ring::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  border: 1.5px solid #4A6382;
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.group:hover .emblem-double-ring {
+  border-color: var(--wafuu-shu);
+  box-shadow: 0 14px 35px rgba(209, 75, 65, 0.18);
+  transform: translateY(-5px);
+}
+
+.group:hover .emblem-double-ring::before {
+  border-color: var(--wafuu-kincha);
+}
+
+/* =========================================================
+   和の亀甲模様（六角形）隣り合わせタイル (Guidance / ご案内セクション専用)
+   ========================================================= */
+.hexagon-border-box {
+  position: relative;
+  filter: drop-shadow(0 4px 14px rgba(44, 62, 85, 0.12));
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  width: 100%;
+}
+
+.hexagon-border-box:hover {
+  filter: drop-shadow(0 14px 28px rgba(209, 75, 65, 0.28));
+  transform: translateY(-5px) scale(1.03);
+}
+
+.hexagon-outer {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(135deg, #2C3E55 0%, #C9A83E 100%);
+  padding: 3.5px;
+  transition: all 0.4s ease;
+  width: 100%;
+  aspect-ratio: 1 / 1.12;
+}
+
+.hexagon-border-box:hover .hexagon-outer {
+  background: linear-gradient(135deg, #D14B41 0%, #F5D061 100%);
+}
+
+.hexagon-inner {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: #FAF8F5;
+  transition: all 0.4s ease;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 0.75rem;
+  text-align: center;
+}
+
+.hexagon-border-box:hover .hexagon-inner {
+  background: linear-gradient(145deg, #2C3E55 0%, #1B273E 100%);
+}
+
+/* 六角形内部の二重線フレーム (亀甲飾り) */
+.hexagon-decor-ring {
+  position: absolute;
+  inset: 7px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border: 1px dashed rgba(201, 168, 62, 0.6);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.hexagon-border-box:hover .hexagon-decor-ring {
+  border-color: rgba(245, 208, 97, 0.85);
+}
+
+

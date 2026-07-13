@@ -2,7 +2,7 @@ import React from 'react';
 import useSWR from 'swr';
 import type { Organization, InventoryStatus } from '../../types/database';
 import { fetchInventoryStatus } from '../../lib/api';
-import { MapPin, ChevronRight, Ban, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { MapPin, ChevronRight, Ban, AlertTriangle, CheckCircle2, Clock, Sparkles } from 'lucide-react';
 
 interface OrganizationCardProps {
   org: Organization;
@@ -10,18 +10,22 @@ interface OrganizationCardProps {
 }
 
 export const OrganizationCard: React.FC<OrganizationCardProps> = ({ org, onSelectCard }) => {
+  const isCafeExhibition = org.genre === 'food' && org.use_menu_api;
+
   const { data: status } = useSWR<InventoryStatus>(
-    `inventory-${org.id}`,
-    () => fetchInventoryStatus(org.id),
+    isCafeExhibition ? `inventory-${org.id}` : null,
+    () => fetchInventoryStatus(org),
     {
-      refreshInterval: 15000,
-      fallbackData: org.inventory_status || 'STATUS_AVAILABLE'
+      refreshInterval: 30000,
+      fallbackData: 'STATUS_AVAILABLE'
     }
   );
 
-  const isSoldOut = status === 'STATUS_SOLD_OUT';
+  const isSoldOut = isCafeExhibition && status === 'STATUS_SOLD_OUT';
+  const isPreparing = isCafeExhibition && status === 'STATUS_PREPARING';
 
   const renderStatusBadge = () => {
+    if (!isCafeExhibition) return null;
     switch (status) {
       case 'STATUS_AVAILABLE':
         return (
@@ -44,6 +48,13 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({ org, onSelec
             <span className="font-serif tracking-wider">本日の受付終了</span>
           </div>
         );
+      case 'STATUS_PREPARING':
+        return (
+          <div className="status-pill bg-gray-500 text-white shadow-sm">
+            <Clock className="w-3.5 h-3.5" />
+            <span className="font-serif tracking-wider">準備中・アクセス制限</span>
+          </div>
+        );
       default:
         return null;
     }
@@ -61,9 +72,9 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({ org, onSelec
 
   return (
     <div
-      onClick={() => onSelectCard(org)}
-      className={`group cursor-pointer rounded-2xl overflow-hidden transition-all duration-500 flex flex-col bg-white border border-wafuu-sumi/8 hover:border-wafuu-shu/40 shadow-sm hover:shadow-[0_12px_32px_rgba(30,30,30,0.1)] hover:-translate-y-1 relative ${
-        isSoldOut ? 'opacity-70' : ''
+      onClick={() => !isPreparing && onSelectCard(org)}
+      className={`group rounded-2xl overflow-hidden transition-all duration-500 flex flex-col bg-white border border-wafuu-sumi/8 hover:border-wafuu-shu/40 shadow-sm hover:shadow-[0_12px_32px_rgba(30,30,30,0.1)] hover:-translate-y-1 relative ${
+        isPreparing ? 'opacity-50 cursor-not-allowed pointer-events-none grayscale' : isSoldOut ? 'opacity-70 cursor-pointer' : 'cursor-pointer'
       }`}
     >
       {/* サムネイル画像 */}
@@ -72,16 +83,24 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({ org, onSelec
           src={org.image_url || '/assets/poster/poster_complete.png'}
           alt={org.name}
           className={`w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${
-            isSoldOut ? 'filter grayscale' : ''
+            isSoldOut || isPreparing ? 'filter grayscale' : ''
           }`}
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-80" />
 
-        {/* ステータスバッジ */}
+        {/* ステータスバッジ (喫茶展示かつAPI連携オンの時のみ表示) */}
         <div className="absolute top-3.5 left-3.5 z-20 font-serif">
           {renderStatusBadge()}
         </div>
+
+        {/* NazunaGraph メニューAPI同期バッジ */}
+        {isCafeExhibition && (
+          <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-600/90 text-white text-[10px] font-bold tracking-wider shadow-sm backdrop-blur-sm font-mono">
+            <Sparkles className="w-3 h-3" />
+            <span>NazunaGraph API</span>
+          </div>
+        )}
 
         {/* ジャンル＆種別 */}
         <div className="absolute bottom-3.5 left-3.5 z-20 flex items-center gap-2 font-serif">
@@ -119,12 +138,12 @@ export const OrganizationCard: React.FC<OrganizationCardProps> = ({ org, onSelec
         {/* アクション */}
         <div className="pt-4 border-t border-wafuu-sumi/6 flex items-center justify-between">
           <span className="text-xs font-bold text-wafuu-shu tracking-wider group-hover:underline flex items-center gap-1">
-            <span>{isSoldOut ? '詳細情報を見る' : '詳細・投票へ進む'}</span>
+            <span>{isPreparing ? '現在アクセスできません' : isSoldOut ? '詳細情報を見る' : '詳細・投票へ進む'}</span>
           </span>
 
           <div
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              isSoldOut
+              isSoldOut || isPreparing
                 ? 'bg-wafuu-kinari text-wafuu-text-muted border border-wafuu-sumi/6'
                 : 'bg-gradient-to-br from-wafuu-shu to-wafuu-shu-dark text-white group-hover:translate-x-1 shadow-sm group-hover:shadow-md'
             }`}
