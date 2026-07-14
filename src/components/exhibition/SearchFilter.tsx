@@ -29,8 +29,9 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
   const floors = [
     { label: 'すべての場所・フロア', value: 'all' },
     { label: '本館3F (クラス企画)', value: '本館3F' },
-    { label: '中庭 屋台スペース', value: '中庭' },
-    { label: '第一体育館 メインステージ', value: '第一体育館' },
+    { label: 'Nステ会場 (中庭・屋台エリア)', value: 'Nステ会場' },
+    { label: '古賀記念アリーナ', value: '古賀記念アリーナ' },
+    { label: '國枝記念国際ホール', value: '國枝記念国際ホール' },
     { label: '東館・書道室/文化部エリア', value: '東館2F' },
     { label: '理科棟3F 物理/科学', value: '理科棟3F' }
   ];

@@ -9,8 +9,11 @@ import { AdminPage } from './pages/AdminPage';
 import { GuidanceDetailPage, type GuidanceSectionId } from './pages/GuidanceDetailPage';
 import { PolicyPage, type PolicySectionId } from './pages/PolicyPage';
 import { ExhibitionPage } from './pages/ExhibitionPage';
+import { AnnouncementsPage } from './pages/AnnouncementsPage';
+import { UrgentAnnouncementModal } from './components/common/UrgentAnnouncementModal';
 import { ShojiOpening } from './components/intro/ShojiOpening';
 import { openExternalMap } from './lib/api';
+import { NotFoundView } from './components/common/NotFoundView';
 import {
   mockOrganizations,
   mockTimetableEvents,
@@ -20,17 +23,22 @@ import {
   fetchTimetableEventsFromDB,
   fetchAnnouncementsFromDB,
   fetchLostItemsFromDB,
-  subscribeToDataChanges
+  fetchPageSettingsFromDB,
+  mockPageSettings,
+  subscribeToDataChanges,
+  supabase
 } from './lib/supabase';
-import type { Organization, TimetableEvent, Announcement, LostItem } from './types/database';
+import type { Organization, TimetableEvent, Announcement, LostItem, PageSetting } from './types/database';
 
-type TabId = 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy';
+export type TabId = 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy' | 'not_found';
 
 function getTabFromUrl(): TabId {
   const hash = window.location.hash.replace(/^#\/?/, '').split('?')[0].toLowerCase();
   const path = window.location.pathname.replace(/^\//, '').split('/')[0].toLowerCase();
   const target = hash || path;
 
+  if (!target || target === 'home' || target === 'index' || target === 'index.html') return 'home';
+  if (target === 'news' || target === 'announcements' || target === 'notice') return 'news';
   if (target === 'exhibitions' || target === 'exhibition' || target === 'kikaku') return 'exhibitions';
   if (target === 'timetable' || target === 'schedule') return 'timetable';
   if (target === 'map' || target === 'campusmap' || target === 'icompass') return 'map';
@@ -39,7 +47,7 @@ function getTabFromUrl(): TabId {
   if (target === 'admin' || target === 'dashboard' || target === 'login') return 'admin';
   if (target === 'guidance' || target === 'guide') return 'guidance';
   if (target === 'policy' || target === 'privacy') return 'policy';
-  return 'home';
+  return 'not_found';
 }
 
 export const App: React.FC = () => {
@@ -67,9 +75,23 @@ export const App: React.FC = () => {
     return false;
   };
 
-  const [isIntroFinished, setIsIntroFinished] = useState<boolean>(false);
+  const [isIntroFinished, setIsIntroFinished] = useState<boolean>(() => {
+    const initialTab = getTabFromUrl();
+    // 初期ロードが home 以外の画面（またはスキップ判定時）は、オープニング演出待ちを行わず最初からヘッダー等を表示
+    if (initialTab !== 'home' || checkShouldSkipIntro()) {
+      return true;
+    }
+    return false;
+  });
   const [introKey] = useState(0);
   const [isShojiFinished, setIsShojiFinished] = useState<boolean>(() => checkShouldSkipIntro());
+
+  useEffect(() => {
+    // home 以外の画面に遷移・リロードした際は確実にヘッダーを表示する
+    if (currentTab !== 'home' && !isIntroFinished) {
+      setIsIntroFinished(true);
+    }
+  }, [currentTab, isIntroFinished]);
 
   // ページ切り替えとURL履歴 (window.history / window.location.hash) の同期
   const setCurrentTab = (tab: TabId) => {
@@ -105,6 +127,8 @@ export const App: React.FC = () => {
   const [timetableEvents, setTimetableEvents] = useState<TimetableEvent[]>(mockTimetableEvents);
   const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
   const [lostItems, setLostItems] = useState<LostItem[]>(mockLostItems);
+  const [pageSettings, setPageSettings] = useState<PageSetting[]>(mockPageSettings);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
 
   const [genreQuick, setGenreQuick] = useState<string>('all');
   const [stageQuick, setStageQuick] = useState<string>('gym');
@@ -122,11 +146,20 @@ export const App: React.FC = () => {
       const evts = await fetchTimetableEventsFromDB();
       const anns = await fetchAnnouncementsFromDB();
       const losts = await fetchLostItemsFromDB();
+      const pages = await fetchPageSettingsFromDB();
 
       if (orgs.length > 0) setOrganizations(orgs);
       if (evts.length > 0) setTimetableEvents(evts);
       if (anns.length > 0) setAnnouncements(anns);
       if (losts.length > 0) setLostItems(losts);
+      if (pages.length > 0) setPageSettings(pages);
+
+      if (supabase) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          setIsAdminLoggedIn(!!session?.user);
+        } catch {}
+      }
     }
     loadFromDB();
 
@@ -134,10 +167,22 @@ export const App: React.FC = () => {
       (newOrgs: Organization[]) => setOrganizations(newOrgs),
       (newEvts: TimetableEvent[]) => setTimetableEvents(newEvts),
       (newAnns: Announcement[]) => setAnnouncements(newAnns),
-      (newLosts: LostItem[]) => setLostItems(newLosts)
+      (newLosts: LostItem[]) => setLostItems(newLosts),
+      (newPages: PageSetting[]) => setPageSettings(newPages)
     );
 
-    return () => unsubscribe();
+    let authUnsubscribe: (() => void) | undefined;
+    if (supabase) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+        setIsAdminLoggedIn(!!session?.user);
+      });
+      authUnsubscribe = () => subscription.unsubscribe();
+    }
+
+    return () => {
+      unsubscribe();
+      if (authUnsubscribe) authUnsubscribe();
+    };
   }, []);
 
   // ジャンルクイック選択で独立企画一覧ページに移動
@@ -191,9 +236,19 @@ export const App: React.FC = () => {
         />
       )}
 
+      {/* 緊急速報・重要お知らせの全画面強制表示モーダル */}
+      <UrgentAnnouncementModal
+        announcements={announcements}
+        isIntroFinished={isIntroFinished}
+        onNavigateToNews={() => {
+          setCurrentTab('news');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+
       {/* モダン和風ナビゲーション */}
       <Navbar
-        currentTab={currentTab}
+        currentTab={currentTab === 'not_found' ? 'home' : currentTab}
         isIntroFinished={isIntroFinished}
         onSelectTab={(tab) => {
           setCurrentTab(tab);
@@ -205,98 +260,154 @@ export const App: React.FC = () => {
           setCurrentTab('map');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
+        pageSettings={pageSettings}
       />
 
       {/* メインコンテンツ切り替え */}
-      {currentTab === 'home' && (
-        <Home
-          organizations={organizations}
-          announcements={announcements}
-          initialGenre={genreQuick}
-          introKey={introKey}
-          isShojiFinished={isShojiFinished}
-          isIntroFinished={isIntroFinished}
-          onIntroComplete={() => {
-            setIsIntroFinished(true);
-            try {
-              localStorage.setItem('last_shoji_played_time', Date.now().toString());
-            } catch {}
-          }}
-          onSelectTab={(tab) => {
-            setCurrentTab(tab);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onNavigateGuidancePage={(section) => {
-            if (section === 'campus-map') {
-              setCurrentTab('map');
-            } else {
-              setActiveGuidanceSection(section);
-              setCurrentTab('guidance');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-          }}
-          onNavigatePolicyPage={(section) => {
-            setActivePolicySection(section);
-            setCurrentTab('policy');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onNavigateExhibitionsPage={(query, genre, floor) => {
-            setSearchQueryQuick(query);
-            setGenreQuick(genre);
-            setFloorQuick(floor);
-            setCurrentTab('exhibitions');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-        />
-      )}
-      {currentTab === 'exhibitions' && (
-        <main className="w-full pt-20">
-          <ExhibitionPage
-            organizations={organizations}
-            initialQuery={searchQueryQuick}
-            initialGenre={genreQuick}
-            initialFloor={floorQuick}
-            onNavigateTab={(tab) => {
-              setCurrentTab(tab);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
-        </main>
-      )}
-      {currentTab === 'timetable' && (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28">
-          <TimetablePage
-            events={timetableEvents}
-            initialStage={stageQuick as 'gym' | 'courtyard' | 'av_room'}
-          />
-        </main>
-      )}
-      {currentTab === 'info' && (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28">
-          <SchoolInfoPage />
-        </main>
-      )}
-      {currentTab === 'lostfound' && (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28">
-          <LostFoundPage lostItems={lostItems} />
-        </main>
-      )}
-      {currentTab === 'guidance' && (
-        <main className="w-full">
-          <GuidanceDetailPage
-            initialSection={activeGuidanceSection}
-            onNavigateTab={(tab) => setCurrentTab(tab)}
-          />
-        </main>
-      )}
-      {currentTab === 'policy' && (
-        <main className="w-full">
-          <PolicyPage
-            initialSection={activePolicySection}
-            onNavigateTab={(tab) => setCurrentTab(tab)}
-          />
-        </main>
-      )}
+      {(() => {
+        if (currentTab === 'not_found') {
+          return (
+            <main className="w-full pt-20 flex-1 flex flex-col justify-center">
+              <NotFoundView
+                onNavigateHome={() => {
+                  setCurrentTab('home');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onNavigateAdmin={() => {
+                  setCurrentTab('admin');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                isAdminLoggedIn={isAdminLoggedIn}
+                isHiddenPage={false}
+              />
+            </main>
+          );
+        }
+
+        const activePageSetting = pageSettings?.find((p) => p.id === currentTab);
+        const isCurrentPageMaintenance =
+          activePageSetting &&
+          !activePageSetting.is_public &&
+          currentTab !== 'home';
+
+        if (isCurrentPageMaintenance) {
+          return (
+            <main className="w-full pt-20 flex-1 flex flex-col justify-center">
+              <NotFoundView
+                onNavigateHome={() => {
+                  setCurrentTab('home');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onNavigateAdmin={() => {
+                  setCurrentTab('admin');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                isAdminLoggedIn={isAdminLoggedIn}
+                isHiddenPage={true}
+              />
+            </main>
+          );
+        }
+
+        return (
+          <>
+            {currentTab === 'home' && (
+              <Home
+                organizations={organizations}
+                announcements={announcements}
+                initialGenre={genreQuick}
+                introKey={introKey}
+                isShojiFinished={isShojiFinished}
+                isIntroFinished={isIntroFinished}
+                onIntroComplete={() => {
+                  setIsIntroFinished(true);
+                  try {
+                    localStorage.setItem('last_shoji_played_time', Date.now().toString());
+                  } catch {}
+                }}
+                onSelectTab={(tab) => {
+                  setCurrentTab(tab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onNavigateGuidancePage={(section) => {
+                  if (section === 'campus-map') {
+                    setCurrentTab('map');
+                  } else {
+                    setActiveGuidanceSection(section);
+                    setCurrentTab('guidance');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                onNavigatePolicyPage={(section) => {
+                  setActivePolicySection(section);
+                  setCurrentTab('policy');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onNavigateExhibitionsPage={(query, genre, floor) => {
+                  setSearchQueryQuick(query);
+                  setGenreQuick(genre);
+                  setFloorQuick(floor);
+                  setCurrentTab('exhibitions');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
+            )}
+            {currentTab === 'news' && (
+              <main className="w-full pt-20">
+                <AnnouncementsPage announcements={announcements} />
+              </main>
+            )}
+            {currentTab === 'exhibitions' && (
+              <main className="w-full pt-20">
+                <ExhibitionPage
+                  organizations={organizations}
+                  initialQuery={searchQueryQuick}
+                  initialGenre={genreQuick}
+                  initialFloor={floorQuick}
+                  onNavigateTab={(tab) => {
+                    setCurrentTab(tab);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
+              </main>
+            )}
+            {currentTab === 'timetable' && (
+              <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28">
+                <TimetablePage
+                  events={timetableEvents}
+                  initialStage={stageQuick as 'gym' | 'courtyard' | 'av_room'}
+                />
+              </main>
+            )}
+            {currentTab === 'info' && (
+              <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28">
+                <SchoolInfoPage />
+              </main>
+            )}
+            {currentTab === 'lostfound' && (
+              <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28">
+                <LostFoundPage lostItems={lostItems} />
+              </main>
+            )}
+            {currentTab === 'guidance' && (
+              <main className="w-full">
+                <GuidanceDetailPage
+                  initialSection={activeGuidanceSection}
+                  onNavigateTab={(tab) => setCurrentTab(tab)}
+                />
+              </main>
+            )}
+            {currentTab === 'policy' && (
+              <main className="w-full">
+                <PolicyPage
+                  initialSection={activePolicySection}
+                  onNavigateTab={(tab) => setCurrentTab(tab)}
+                />
+              </main>
+            )}
+          </>
+        );
+      })()}
 
       {/* フッター */}
       <Footer

@@ -39,19 +39,12 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     const checkVisibility = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').split('?')[0].toLowerCase();
       const isHome = !hash || hash === 'home';
-      if (!isHome) {
-        setIsHeroInView(false);
-        return;
-      }
-      const scrollY = window.scrollY || window.pageYOffset;
-      setIsHeroInView(scrollY < window.innerHeight * 1.8);
+      setIsHeroInView(isHome);
     };
 
     checkVisibility();
-    window.addEventListener('scroll', checkVisibility, { passive: true });
     window.addEventListener('hashchange', checkVisibility);
     return () => {
-      window.removeEventListener('scroll', checkVisibility);
       window.removeEventListener('hashchange', checkVisibility);
     };
   }, []);
@@ -140,7 +133,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
 
     // 【初期スタンバイ状態の設定】
     if (bgContainerRef.current) {
-      gsap.set(bgContainerRef.current, { filter: 'blur(16px) brightness(1.15)', transform: `translate(-50%, ${bgTranslateY}) scale(1.02) translateZ(0)` });
+      gsap.set(bgContainerRef.current, { filter: 'blur(16px) brightness(1)', transform: `translate(-50%, ${bgTranslateY}) scale(1.02) translateZ(0)` });
     }
     if (textContainerRef.current) {
       gsap.set(textContainerRef.current, { filter: 'blur(14px)', transform: `translate(-50%, ${textTranslateY}) scale(1.04) translateZ(0)` });
@@ -155,6 +148,8 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
         gsap.set(el, { opacity: 0, scale: 1.05, transformOrigin: 'center center', force3D: true });
       } else if (layer.isFog) {
         gsap.set(el, { opacity: 0, scale: 1.08, transformOrigin: 'center center', force3D: true });
+      } else if (idx === 0) {
+        gsap.set(el, { opacity: 1, scale: 1.02, transformOrigin: 'center center', force3D: true });
       } else if (idx < 8) {
         gsap.set(el, { opacity: 0, scale: 1.04, transformOrigin: 'center 45%', force3D: true });
       } else {
@@ -243,11 +238,11 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
   return (
     <div
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
-        height: '100vh',
+        height: '100%',
         zIndex: 0,
         pointerEvents: 'none',
         userSelect: 'none',

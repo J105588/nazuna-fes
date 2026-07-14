@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, ShieldAlert, Info, X } from 'lucide-react';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 export interface AdminConfirmModalProps {
   isOpen: boolean;
@@ -24,6 +25,8 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
   onCancel,
   isLoading = false
 }) => {
+  useScrollLock(isOpen);
+
   if (!isOpen) return null;
 
   const getVariantStyles = () => {
@@ -53,7 +56,7 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
   const styles = getVariantStyles();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs select-none animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm select-none animate-in fade-in duration-200">
       <div
         className="relative w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-6 transform animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}

@@ -1,8 +1,9 @@
 import React from 'react';
 import useSWR from 'swr';
 import type { Organization, VotePyramidData, NazunaGraphItem, InventoryStatus } from '../../types/database';
-import { fetchVotePyramid, openExternalMap, openGoogleFormVote, fetchNazunaGraphItems, fetchInventoryStatus } from '../../lib/api';
+import { fetchVotePyramid, openExternalMap, openGoogleFormVote, fetchNazunaGraphItems, fetchInventoryStatus, getNazunaGraphOwnerId } from '../../lib/api';
 import { OfficialPyramidGraphic } from '../common/OfficialPyramidGraphic';
+import { useScrollLock } from '../../hooks/useScrollLock';
 import {
   X,
   MapPin,
@@ -21,6 +22,8 @@ interface ClassDetailModalProps {
 }
 
 export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose }) => {
+  useScrollLock(Boolean(org));
+
   const { data: pyramid } = useSWR<VotePyramidData>(
     org ? `pyramid-${org.id}` : null,
     () => (org ? fetchVotePyramid(org.id) : Promise.reject('No org')),
@@ -28,11 +31,12 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
   );
 
   const isCafeExhibition = Boolean(org && org.genre === 'food' && org.use_menu_api);
+  const nazunaGraphId = org ? getNazunaGraphOwnerId(org) : null;
 
   // NazunaGraph メニュー在庫アイテムリスト取得 (喫茶展示かつトグルオン時のみ)
   const { data: menuItems } = useSWR<NazunaGraphItem[]>(
-    isCafeExhibition ? `nazuna-graph-items-${org?.id}` : null,
-    () => (org ? fetchNazunaGraphItems({ owner_id: org.menu_owner_id || org.id }) : Promise.reject('No org')),
+    isCafeExhibition && nazunaGraphId ? `nazuna-graph-items-${nazunaGraphId}` : null,
+    () => (nazunaGraphId ? fetchNazunaGraphItems({ owner_id: nazunaGraphId }) : Promise.reject('No org')),
     { refreshInterval: 15000 }
   );
 
@@ -75,7 +79,7 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-wafuu-sumi/50 backdrop-blur-sm animate-fade-in select-none">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-wafuu-sumi/50 backdrop-blur-sm animate-fade-in select-none">
       <div className="wafuu-panel w-full max-w-2xl max-h-[92vh] overflow-y-auto relative rounded-2xl border border-wafuu-sumi/10 shadow-[0_20px_60px_rgba(30,30,30,0.2)] animate-modal-scale">
         {/* 閉じるボタン */}
         <button

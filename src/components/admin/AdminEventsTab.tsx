@@ -183,12 +183,12 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
   const getLocationBadge = (loc: StageLocation) => {
     switch (loc) {
       case 'gym':
-        return { label: '第一体育館', bg: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' };
+        return { label: '古賀記念アリーナ', bg: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' };
       case 'av_room':
-        return { label: '多目的ホール', bg: 'bg-purple-500/10 text-purple-400 border-purple-500/20' };
+        return { label: '國枝記念国際ホール', bg: 'bg-purple-500/10 text-purple-400 border-purple-500/20' };
       case 'courtyard':
       default:
-        return { label: '中庭メインステージ', bg: 'bg-blue-500/10 text-blue-400 border-blue-500/20' };
+        return { label: 'Nステ会場', bg: 'bg-blue-500/10 text-blue-400 border-blue-500/20' };
     }
   };
 
@@ -336,10 +336,10 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
             onChange={(e) => setSelectedLocation(e.target.value as any)}
             className="bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-1.5 text-xs font-medium focus:outline-none focus:border-blue-600 transition-all shadow-xs"
           >
-            <option value="all">すべてのステージ</option>
-            <option value="courtyard">中庭メインステージ</option>
-            <option value="gym">第一体育館</option>
-            <option value="av_room">多目的ホール</option>
+            <option value="all">すべてのステージ・会場</option>
+            <option value="av_room">國枝記念国際ホール</option>
+            <option value="gym">古賀記念アリーナ</option>
+            <option value="courtyard">Nステ会場</option>
           </select>
         </div>
       </div>
@@ -427,7 +427,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
 
       {/* 新規ステージ演目登録モーダル */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
             className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
@@ -477,9 +477,9 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
                     onChange={(e) => setCreateForm({ ...createForm, location: e.target.value as StageLocation })}
                     className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
                   >
-                    <option value="courtyard">中庭メインステージ</option>
-                    <option value="gym">第一体育館</option>
-                    <option value="av_room">多目的ホール</option>
+                    <option value="av_room">國枝記念国際ホール</option>
+                    <option value="gym">古賀記念アリーナ</option>
+                    <option value="courtyard">Nステ会場</option>
                   </select>
                 </div>
               </div>
@@ -531,7 +531,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
 
       {/* 演目編集モーダル */}
       {editingEvent && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
             className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
@@ -580,9 +580,9 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
                     onChange={(e) => setEditForm({ ...editForm, location: e.target.value as StageLocation })}
                     className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
                   >
-                    <option value="courtyard">中庭メインステージ</option>
-                    <option value="gym">第一体育館</option>
-                    <option value="av_room">多目的ホール</option>
+                    <option value="av_room">國枝記念国際ホール</option>
+                    <option value="gym">古賀記念アリーナ</option>
+                    <option value="courtyard">Nステ会場</option>
                   </select>
                 </div>
               </div>

@@ -215,7 +215,7 @@ export const ShojiOpening: React.FC<ShojiOpeningProps> = ({ onComplete }) => {
         left: 0,
         width: '100%',
         height: '100vh',
-        zIndex: 100,
+        zIndex: 1000,
         pointerEvents: 'auto', // 演出中は裏側の要素へのクリックやスクロールタッチを完全遮断
         overflow: 'hidden',
       }}

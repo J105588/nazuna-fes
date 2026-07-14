@@ -9,11 +9,12 @@ import {
   Shield,
   LogOut,
   User,
-  ChevronRight
+  ChevronRight,
+  Globe
 } from 'lucide-react';
 import type { AdminUser } from '../../types/database';
 
-export type AdminTabId = 'overview' | 'users' | 'orgs' | 'events' | 'announcements' | 'lostfound' | 'pyramid';
+export type AdminTabId = 'overview' | 'users' | 'pages' | 'orgs' | 'events' | 'announcements' | 'lostfound' | 'pyramid';
 
 export interface AdminSidebarProps {
   activeTab: AdminTabId;
@@ -65,6 +66,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           }
         ]
         : []),
+      {
+        id: 'pages',
+        label: 'ページ公開設定',
+        icon: Globe,
+        description: 'ページ単位の公開切替'
+      },
       {
         id: 'orgs',
         label: '団体・企画管理',

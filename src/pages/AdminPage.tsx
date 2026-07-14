@@ -34,7 +34,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({
           .from('admin_users')
           .select('*')
           .eq('email', sessionUser.email)
-          .single();
+          .maybeSingle();
 
         if (userData) {
           setCurrentUser(userData as AdminUser);
@@ -49,7 +49,16 @@ export const AdminPage: React.FC<AdminPageProps> = ({
             created_at: new Date().toISOString()
           };
           try {
-            await client.from('admin_users').upsert([fallbackUser], { onConflict: 'email' });
+            const { data: existingById } = await client.from('admin_users').select('id').eq('id', sessionUser.id).maybeSingle();
+            if (existingById) {
+              await client.from('admin_users').update({
+                email: fallbackUser.email,
+                role: fallbackUser.role,
+                display_name: fallbackUser.display_name
+              }).eq('id', sessionUser.id);
+            } else {
+              await client.from('admin_users').insert([fallbackUser]);
+            }
           } catch { }
           setCurrentUser(fallbackUser);
           setRole(fallbackUser.role);

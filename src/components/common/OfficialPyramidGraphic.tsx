@@ -27,7 +27,7 @@ export const OfficialPyramidGraphic: React.FC<OfficialPyramidGraphicProps> = ({
       <div className="p-6 sm:p-8 rounded-3xl bg-wafuu-kinari border-2 border-wafuu-shu shadow-sm text-center space-y-4 font-serif">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-wafuu-shu/10 border border-wafuu-shu text-wafuu-shu text-xs font-bold tracking-widest uppercase">
           <Lock className="w-4 h-4 text-wafuu-shu" />
-          <span>OFFICIAL PYRAMID SEALED / 集計ロック中</span>
+          <span>集計ロック中</span>
         </div>
 
         {/* 封印されたシンプルピラミッド */}

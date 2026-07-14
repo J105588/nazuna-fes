@@ -86,8 +86,8 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
       setNewRole('admin');
       showToast('新しい管理者アカウントを作成しました。', 'success');
       await loadUsers();
-    } catch {
-      showToast('アカウント登録に失敗しました。', 'error');
+    } catch (err: any) {
+      showToast(err instanceof Error ? err.message : (err?.message || 'アカウント登録に失敗しました。'), 'error');
     } finally {
       setIsSubmitting(false);
     }

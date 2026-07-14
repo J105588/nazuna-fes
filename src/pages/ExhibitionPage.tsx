@@ -15,7 +15,7 @@ interface ExhibitionPageProps {
   initialQuery?: string;
   initialGenre?: string;
   initialFloor?: string;
-  onNavigateTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
+  onNavigateTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
 }
 
 export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
@@ -62,18 +62,15 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
 
   return (
     <div className="w-full min-h-screen bg-[#FAF8F5] py-16 sm:py-24 font-serif relative overflow-hidden">
-      
+
       {/* 背景の市松模様あしらい */}
       <div className="absolute top-0 right-0 w-48 h-48 pattern-ichimatsu pointer-events-none opacity-40" />
       <div className="absolute bottom-0 left-0 w-48 h-48 pattern-ichimatsu pointer-events-none opacity-40" />
 
       <div className="max-w-6xl mx-auto px-5 sm:px-8 space-y-12 relative z-10">
-        
+
         {/* ヘッダー */}
         <div className="text-center space-y-4 border-b border-wafuu-sumi/15 pb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#2C3E55]/10 border border-[#2C3E55]/30 text-xs font-serif font-bold text-[#2C3E55] tracking-widest">
-            <span>企画一覧・検索窓口</span>
-          </div>
           <h1 className="text-3xl sm:text-5xl font-black text-wafuu-sumi tracking-wider font-serif">
             出し物・展示 企画一覧 ＆ 検索
           </h1>
@@ -84,7 +81,7 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
 
         {/* 検索バー ＆ フィルター（トップページ検索と直結・同等機能） */}
         <div className="space-y-8 bg-white/90 p-6 sm:p-10 rounded-3xl border border-wafuu-ekasumi/60 shadow-sm font-sans">
-          
+
           {/* モダンキーワード検索バー (`[ Q ] + キーワードを入力`) */}
           <div className="max-w-3xl mx-auto shadow-[0_10px_30px_rgba(44,62,85,0.12)] rounded-xl overflow-hidden flex border-2 border-[#2C3E55] bg-white">
             <div className="w-14 sm:w-16 bg-[#2C3E55] text-white flex items-center justify-center shrink-0">
@@ -106,7 +103,7 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
                 className="px-4 flex items-center text-wafuu-sumi/40 hover:text-wafuu-sumi transition-colors"
                 title="検索キーワードをクリア"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
               </button>
             )}
           </div>
@@ -141,7 +138,7 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
                 className="text-xs font-mono font-bold text-wafuu-shu hover:underline flex items-center gap-1"
               >
                 <span>検索・絞り込みをリセット</span>
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18" /><path d="M6 6l12 12" /></svg>
               </button>
             )}
           </div>
@@ -149,7 +146,7 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
           {filteredOrganizations.length === 0 ? (
             <div className="bg-white p-16 text-center rounded-3xl border border-wafuu-ekasumi/60 space-y-5 shadow-sm font-sans">
               <div className="w-16 h-16 mx-auto rounded-full bg-wafuu-shu/10 text-wafuu-shu flex items-center justify-center">
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               </div>
               <div className="space-y-2">
                 <p className="text-xl font-black text-wafuu-sumi font-serif">該当する出展企画が見つかりませんでした</p>

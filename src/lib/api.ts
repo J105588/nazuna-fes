@@ -1,5 +1,4 @@
 import type { VotePyramidData, InventoryStatus, PyramidTierLevel, NazunaGraphItem, Organization } from '../types/database';
-import pyramidSchedule from '../data/pyramidSchedule.json';
 import { mockOrganizations, mockPyramidReleases, fetchPyramidReleasesFromDB } from './supabase';
 
 const API_PYRAMID_URL = import.meta.env.VITE_PYRAMID_API_URL || '';
@@ -8,6 +7,35 @@ const INVENTORY_API_BASE = import.meta.env.VITE_INVENTORY_API || 'https://invent
 const GOOGLE_FORM_BASE_URL = import.meta.env.VITE_GOOGLE_FORM_URL || 'https://docs.google.com/forms/d/e/1FAIpQLSc_FORM_ID/viewform';
 const GOOGLE_FORM_ENTRY_ID = import.meta.env.VITE_GOOGLE_FORM_ENTRY_ID || 'entry.100001';
 const GOOGLE_FORM_ENTRY_NAME = import.meta.env.VITE_GOOGLE_FORM_ENTRY_NAME || 'entry.100002';
+
+/**
+ * NazunaGraphAPIがオンにされたとき、クラスIDは通常の出展団体IDや部屋番号と独立したもの（メニューオーナーID等）を取得します。
+ * 通常のクラス（3-3のような形式）のところのみデータとして取得し、以前与えたパラメータを付与します。
+ */
+export function getNazunaGraphOwnerId(org: Organization | undefined | null): string | null {
+  if (!org || !org.use_menu_api) return null;
+  // 1. 独立設定された menu_owner_id があればそれを優先して利用（以前与えたパラメータを付与可能）
+  if (org.menu_owner_id && org.menu_owner_id.trim() !== '' && org.menu_owner_id !== org.id) {
+    return org.menu_owner_id.trim();
+  }
+  // 2. 独立IDが未設定またはUUIDと同じ場合、通常のクラスデータ（3-3や3-Aのような形式）のところのみデータとして取得
+  if (org.room_code && org.room_code.trim() !== '') {
+    const rc = org.room_code.trim();
+    if (/^\d+-[0-9A-Za-z]+$/.test(rc)) {
+      return rc;
+    }
+    // 3A や 2C などを 3-A, 2-C 形式 (3-3のような形式) に変換
+    const match = rc.match(/^(\d+)([A-Za-z0-9]+)$/);
+    if (match) {
+      return `${match[1]}-${match[2]}`;
+    }
+    // 先頭が数字のクラス形式のみ許容
+    if (/^\d+/.test(rc)) {
+      return rc;
+    }
+  }
+  return null;
+}
 
 // ============================================================================
 // 1. NazunaGraph (メニュー在庫管理システム) 連携 API & キャッシュ機構
@@ -154,8 +182,11 @@ export async function fetchInventoryStatus(orgOrId: Organization | string): Prom
 
   // 喫茶展示 (genre === 'food') かつ API連携トグルがオンにされている場合のみ、外部APIへリクエスト
   if (org && org.genre === 'food' && org.use_menu_api) {
-    const items = await fetchNazunaGraphItems({ owner_id: org.menu_owner_id || org.id });
-    return computeNazunaGraphAggregateStatus(items);
+    const ownerId = getNazunaGraphOwnerId(org);
+    if (ownerId) {
+      const items = await fetchNazunaGraphItems({ owner_id: ownerId });
+      return computeNazunaGraphAggregateStatus(items);
+    }
   }
 
   // トグルオフおよび非喫茶展示ではステータス機能は動作させず、デフォルト値を返却
@@ -184,9 +215,17 @@ export async function fetchVotePyramid(orgId: string): Promise<VotePyramidData> 
   }
 
   await fetchPyramidReleasesFromDB();
-  const releases: any[] = (mockPyramidReleases && mockPyramidReleases.length > 0)
-    ? mockPyramidReleases
-    : pyramidSchedule.releases;
+  const releases: any[] = mockPyramidReleases || [];
+  if (releases.length === 0) {
+    return {
+      class_id: orgId,
+      pyramid_tier: 'embargoed',
+      tier_label: '集計準備中',
+      release_title: '開示スケジュール準備中',
+      is_embargoed: true,
+      embargo_message: '結果開示スケジュールをお待ちください。'
+    };
+  }
 
   const now = new Date().getTime();
   let activeRelease = releases[0];

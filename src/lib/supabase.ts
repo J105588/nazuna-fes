@@ -10,9 +10,9 @@ import type {
   AnnouncementCategory,
   AdminUser,
   AdminRole,
-  PyramidRelease
+  PyramidRelease,
+  PageSetting
 } from '../types/database';
-import pyramidScheduleJson from '../data/pyramidSchedule.json';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -20,41 +20,14 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 // 管理画面およびローカルプレビュー環境ですぐに全機能を使用できるよう初期状態シードデータを用意
-export let mockOrganizations: Organization[] = [
-  { id: 'org-1', name: '3年A組「赤い和傘と極夜の謎解き迷宮」', category: 'class', genre: 'attraction', description: '百輝夜行の世界観を完全に再現した巨大脱出ゲーム。あやかしの街角で失われた和傘の謎を解き明かせ！難易度調整可能な3つのルートを完備。', room_code: '3A', floor_info: '本館3F 北側教室', image_url: '/assets/poster/poster_complete.png', inventory_status: 'STATUS_AVAILABLE', is_published: true, use_menu_api: false, menu_owner_id: 'org-1', updated_at: new Date().toISOString() },
-  { id: 'org-2', name: '2年C組「極夜カフェ 〜緋と金のあやかし茶屋〜」', category: 'class', genre: 'food', description: '市川学園名物の手作りマドレーヌと、夜をイメージした金粉入り極上の和風タピオカドリンクをお届けします。ポスターの窓の灯りを再現した癒やしの空間へどうぞ。', room_code: '2C', floor_info: '本館2F 中央ホールそば', image_url: '/assets/poster/poster_complete.png', inventory_status: 'STATUS_AVAILABLE', is_published: true, use_menu_api: false, menu_owner_id: 'org-2', updated_at: new Date().toISOString() },
-  { id: 'org-3', name: '軽音楽部「HYAKKI-YAKO ROCK FESTIVAL 2026」', category: 'club', genre: 'stage', description: '中庭特設ステージを熱気と爆音で揺らす総勢12バンドの白熱ライブ！和モダンロックやオリジナルテーマソング「百の輝き」を初披露します。', room_code: 'STAGE-1', floor_info: '中庭 屋外特設ステージ', image_url: '/assets/poster/poster_complete.png', inventory_status: 'STATUS_AVAILABLE', is_published: true, use_menu_api: false, menu_owner_id: 'org-3', updated_at: new Date().toISOString() },
-  { id: 'org-4', name: '物理・科学部「あやかしネオンと光の実験展示」', category: 'club', genre: 'exhibition', description: 'レーザー光線とホログラムで百輝夜行を科学の力で表現！自分で作れる蛍光和傘ストラップのワークショップも同時開催中。', room_code: 'SCI-3', floor_info: '理科棟3F 物理実験室', image_url: '/assets/poster/poster_complete.png', inventory_status: 'STATUS_AVAILABLE', is_published: true, use_menu_api: false, menu_owner_id: 'org-4', updated_at: new Date().toISOString() },
-  { id: 'org-5', name: '3年F組「百物語・戦慄のあやかし屋敷」', category: 'class', genre: 'attraction', description: '最新の立体音響プロジェクションマッピング技術を結集させた本格お化け屋敷。赤い和傘を持って進む、未だかつてない恐怖と感動体験。', room_code: '3F', floor_info: '本館3F 南側教室', image_url: '/assets/poster/poster_complete.png', inventory_status: 'STATUS_AVAILABLE', is_published: true, use_menu_api: false, menu_owner_id: 'org-5', updated_at: new Date().toISOString() },
-  { id: 'org-6', name: '書道部「一筆書きの奇跡 〜毛筆の覚醒〜」', category: 'club', genre: 'exhibition', description: 'ポスタービジュアルの原点となった力強い毛筆線画の巨大掛け軸展示と、当日の書道パフォーマンス。文字の中に灯る熱意を感じてください。', room_code: 'ART-1', floor_info: '東館2F 書道室', image_url: '/assets/poster/poster_complete.png', inventory_status: 'STATUS_AVAILABLE', is_published: true, use_menu_api: false, menu_owner_id: 'org-6', updated_at: new Date().toISOString() }
-];
-
-export let mockTimetableDays: TimetableDay[] = [
-  { id: 'day-1', date_string: '2026-09-19', label: 'DAY 1 (9/19 校内祭)', is_published: true, display_order: 1 },
-  { id: 'day-2', date_string: '2026-09-20', label: 'DAY 2 (9/20 一般公開)', is_published: true, display_order: 2 }
-];
-
-export let mockTimetableEvents: TimetableEvent[] = [
-  { id: 'evt-1', title: 'オープニングセレモニー ＆ 書道パフォーマンス「百輝夜行」', organization_name: '書道部・文化祭実行委員会', day_id: 'day-1', start_time: '2026-09-19T09:00:00+09:00', end_time: '2026-09-19T09:45:00+09:00', stage_location: 'gym', is_published: true, updated_at: new Date().toISOString() },
-  { id: 'evt-2', title: '有志バンドトップバッター「THE NAZUNA BEATS」', organization_name: '軽音楽部有志', day_id: 'day-1', start_time: '2026-09-19T10:15:00+09:00', end_time: '2026-09-19T11:00:00+09:00', stage_location: 'courtyard', is_published: true, updated_at: new Date().toISOString() },
-  { id: 'evt-3', title: '演劇部 秋季特別公演「極夜にさす赤い傘」', organization_name: '演劇部', day_id: 'day-1', start_time: '2026-09-19T11:30:00+09:00', end_time: '2026-09-19T12:45:00+09:00', stage_location: 'av_room', is_published: true, updated_at: new Date().toISOString() },
-  { id: 'evt-4', title: 'ダンス部メインステージ「HYAKKI DANCE PARADE」', organization_name: 'ダンス部', day_id: 'day-2', start_time: '2026-09-20T13:30:00+09:00', end_time: '2026-09-20T14:30:00+09:00', stage_location: 'gym', is_published: true, updated_at: new Date().toISOString() },
-  { id: 'evt-5', title: '後夜祭フィナーレ ＆ 表彰式「金銀銅・ピラミッド授与式」', organization_name: '文化祭実行委員会', day_id: 'day-2', start_time: '2026-09-20T16:00:00+09:00', end_time: '2026-09-20T17:15:00+09:00', stage_location: 'gym', is_published: true, updated_at: new Date().toISOString() }
-];
-
-export let mockAnnouncements: Announcement[] = [
-  { id: 'ann-1', title: '【重要】第1日目の開門および受付開始時間について', content: '本日9月12日(土)は午前8:45より正門・東門にて来場受付を開始いたします。招待チケットまたはデジタル入場コードをご準備のうえお並びください。', category: 'general', is_published: true, created_at: new Date().toISOString() },
-  { id: 'ann-2', title: '【雨天時変更】中庭ステージ演目の第一体育館への移動案内', content: '10:15開始予定の軽音楽部ライブ「THE NAZUNA BEATS」は、天候への配慮のため中庭特設ステージから第一体育館メインステージへ会場を変更して実施いたします。', category: 'stage', is_published: true, created_at: new Date().toISOString() },
-  { id: 'ann-3', title: '【緊急・混雑警報】3年F組お化け屋敷および2年C組カフェの整理券配布状況', content: '大変多くのご来場をいただき、3年F組および2年C組はただいま整理券によるご案内を実施中です。詳細はインフォメーションセンターまたは企画ページからご確認ください。', category: 'urgent', is_published: true, created_at: new Date().toISOString() }
-];
-
-export let mockLostItems: LostItem[] = [
-  { id: 'lost-1', item_name: '黒い折り畳み傘 (木製ハンドル)', found_place: '第一体育館 入口ベンチ', storage_location: '本館2階総合案内所', status: 'storage', created_at: new Date().toISOString() },
-  { id: 'lost-2', item_name: '水色のパスケース・学生証在中', found_place: '中庭 屋台エリアそば', storage_location: '本館2階総合案内所', status: 'storage', created_at: new Date().toISOString() },
-  { id: 'lost-3', item_name: 'ワイヤレスイヤホン (白いケース)', found_place: '本館3F 北側階段踊り場', storage_location: '本館2階総合案内所', status: 'returned', created_at: new Date().toISOString() }
-];
-
-export let mockPyramidReleases: PyramidRelease[] = pyramidScheduleJson.releases as PyramidRelease[];
+// プログラム内で初期状態シードデータを用意せず、すべてDBから参照する
+export let mockOrganizations: Organization[] = [];
+export let mockTimetableDays: TimetableDay[] = [];
+export let mockTimetableEvents: TimetableEvent[] = [];
+export let mockAnnouncements: Announcement[] = [];
+export let mockLostItems: LostItem[] = [];
+export let mockPyramidReleases: PyramidRelease[] = [];
+export let mockPageSettings: PageSetting[] = [];
 
 // DBからのデータ取得関数
 export async function fetchOrganizationsFromDB(): Promise<Organization[]> {
@@ -182,7 +155,7 @@ export async function fetchPyramidReleasesFromDB(): Promise<PyramidRelease[]> {
         .from('pyramid_releases')
         .select('*')
         .order('scheduled_time', { ascending: true });
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         mockPyramidReleases = data.map((d: any) => ({
           id: d.id || d.release_id,
           releaseId: d.release_id || d.id,
@@ -190,15 +163,55 @@ export async function fetchPyramidReleasesFromDB(): Promise<PyramidRelease[]> {
           scheduledTime: d.scheduled_time || d.scheduledTime,
           isEmbargoed: d.is_embargoed ?? d.isEmbargoed,
           embargoMessage: d.embargo_message || d.embargoMessage,
-          pyramidTiers: typeof d.pyramid_tiers === 'string' ? JSON.parse(d.pyramid_tiers) : (d.pyramid_tiers || d.pyramidTiers)
+          pyramidTiers: typeof d.pyramid_tiers === 'string' ? JSON.parse(d.pyramid_tiers) : (d.pyramid_tiers || d.pyramidTiers || { high: [], upper: [], middle: [] })
         }));
         return mockPyramidReleases;
       }
     } catch {
-      // ネットワーク・DB未接続時はフォールバック
+      // ネットワーク・DB未接続時
     }
   }
   return mockPyramidReleases;
+}
+
+export async function createPyramidReleaseInDB(releaseData: {
+  title: string;
+  scheduledTime: string;
+  embargoMessage: string;
+  isEmbargoed?: boolean;
+  pyramidTiers?: { high: string[]; upper: string[]; middle: string[] };
+}): Promise<PyramidRelease> {
+  const newId = `rel_${crypto.randomUUID()}`;
+  const newItem: PyramidRelease = {
+    id: newId,
+    releaseId: newId,
+    title: releaseData.title,
+    scheduledTime: releaseData.scheduledTime,
+    isEmbargoed: releaseData.isEmbargoed ?? false,
+    embargoMessage: releaseData.embargoMessage,
+    pyramidTiers: releaseData.pyramidTiers || { high: [], upper: [], middle: [] },
+    updated_at: new Date().toISOString()
+  };
+  mockPyramidReleases = [...mockPyramidReleases, newItem];
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('pyramid_releases').insert([{
+        id: newId,
+        release_id: newId,
+        title: newItem.title,
+        scheduled_time: newItem.scheduledTime,
+        is_embargoed: newItem.isEmbargoed,
+        embargo_message: newItem.embargoMessage,
+        pyramid_tiers: newItem.pyramidTiers,
+        updated_at: newItem.updated_at
+      }]);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+  return newItem;
 }
 
 export async function updatePyramidReleaseInDB(idOrReleaseId: string, updates: Partial<PyramidRelease>) {
@@ -225,24 +238,73 @@ export async function updatePyramidReleaseInDB(idOrReleaseId: string, updates: P
   }
 }
 
+export async function deletePyramidReleaseInDB(idOrReleaseId: string) {
+  mockPyramidReleases = mockPyramidReleases.filter((r) => r.id !== idOrReleaseId && r.releaseId !== idOrReleaseId);
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('pyramid_releases').delete().or(`id.eq.${idOrReleaseId},release_id.eq.${idOrReleaseId}`);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
+// ページ公開設定の取得と操作
+export async function fetchPageSettingsFromDB(): Promise<PageSetting[]> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('page_settings')
+        .select('*')
+        .order('id', { ascending: true });
+      if (!error && data && data.length > 0) {
+        mockPageSettings = data as PageSetting[];
+        return mockPageSettings;
+      }
+    } catch {
+      // ネットワーク・DB未接続時
+    }
+  }
+  return mockPageSettings;
+}
+
+export async function updatePageSettingInDB(id: string, updates: Partial<PageSetting>): Promise<void> {
+  mockPageSettings = mockPageSettings.map((p) =>
+    p.id === id ? { ...p, ...updates, updated_at: new Date().toISOString() } : p
+  );
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('page_settings').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+}
+
 // リアルタイム更新用リスナー・エミッター
-type ChangeListener = (orgs: Organization[], evts: TimetableEvent[], anns: Announcement[], losts: LostItem[]) => void;
+type ChangeListener = (orgs: Organization[], evts: TimetableEvent[], anns: Announcement[], losts: LostItem[], pages: PageSetting[]) => void;
 const listeners: ChangeListener[] = [];
 
 export function subscribeToDataChanges(
   onOrgsOrListener: ChangeListener | ((orgs: Organization[]) => void),
   onEvts?: (evts: TimetableEvent[]) => void,
   onAnns?: (anns: Announcement[]) => void,
-  onLosts?: (losts: LostItem[]) => void
+  onLosts?: (losts: LostItem[]) => void,
+  onPages?: (pages: PageSetting[]) => void
 ) {
-  const listener: ChangeListener = (orgs, evts, anns, losts) => {
-    if (onEvts || onAnns || onLosts) {
+  const listener: ChangeListener = (orgs, evts, anns, losts, pages) => {
+    if (onEvts || onAnns || onLosts || onPages) {
       if (onOrgsOrListener) (onOrgsOrListener as (orgs: Organization[]) => void)(orgs);
       if (onEvts) onEvts(evts);
       if (onAnns) onAnns(anns);
       if (onLosts) onLosts(losts);
+      if (onPages) onPages(pages);
     } else {
-      (onOrgsOrListener as ChangeListener)(orgs, evts, anns, losts);
+      (onOrgsOrListener as ChangeListener)(orgs, evts, anns, losts, pages);
     }
   };
   listeners.push(listener);
@@ -253,12 +315,31 @@ export function subscribeToDataChanges(
 }
 
 export function notifyDataChanged() {
-  listeners.forEach((l) => l(mockOrganizations, mockTimetableEvents, mockAnnouncements, mockLostItems));
+  listeners.forEach((l) => l(mockOrganizations, mockTimetableEvents, mockAnnouncements, mockLostItems, mockPageSettings));
 }
 
 // --- 管理画面用 CRUD & トグル操作 (即時反映・リアルタイム同期) ---
 
 // 1. 出展団体操作
+export async function createOrganizationInDB(orgData: Omit<Organization, 'id' | 'updated_at'>): Promise<Organization> {
+  const newItem: Organization = {
+    ...orgData,
+    id: crypto.randomUUID(),
+    updated_at: new Date().toISOString()
+  };
+  mockOrganizations = [newItem, ...mockOrganizations];
+  notifyDataChanged();
+
+  if (supabase) {
+    try {
+      await supabase.from('organizations').insert([newItem]);
+    } catch {
+      // オフラインフォールバック
+    }
+  }
+  return newItem;
+}
+
 export async function toggleOrganizationPublish(id: string, published: boolean) {
   mockOrganizations = mockOrganizations.map((o) =>
     o.id === id ? { ...o, is_published: published, updated_at: new Date().toISOString() } : o
@@ -305,14 +386,17 @@ export async function updateOrganizationInventoryInDB(id: string, inventory_stat
 }
 
 export async function updateOrganizationMenuApiInDB(id: string, use_menu_api: boolean, menu_owner_id?: string) {
-  mockOrganizations = mockOrganizations.map((o) =>
-    o.id === id ? { ...o, use_menu_api, menu_owner_id: menu_owner_id || o.id, updated_at: new Date().toISOString() } : o
-  );
+  mockOrganizations = mockOrganizations.map((o) => {
+    if (o.id !== id) return o;
+    const finalOwnerId = menu_owner_id !== undefined ? menu_owner_id : (o.menu_owner_id || id);
+    return { ...o, use_menu_api, menu_owner_id: finalOwnerId, updated_at: new Date().toISOString() };
+  });
   notifyDataChanged();
 
   if (supabase) {
     try {
-      await supabase.from('organizations').update({ use_menu_api, menu_owner_id: menu_owner_id || id, updated_at: new Date().toISOString() }).eq('id', id);
+      const finalOwnerId = menu_owner_id !== undefined ? menu_owner_id : id;
+      await supabase.from('organizations').update({ use_menu_api, menu_owner_id: finalOwnerId, updated_at: new Date().toISOString() }).eq('id', id);
     } catch {
       // オフラインフォールバック
     }
@@ -352,7 +436,7 @@ export async function updateTimetableEventInDB(id: string, updates: Partial<Time
 
 export async function createTimetableEventInDB(eventData: Omit<TimetableEvent, 'id' | 'updated_at' | 'is_published'>) {
   const newItem: TimetableEvent = {
-    id: `evt-${Date.now()}`,
+    id: crypto.randomUUID(),
     ...eventData,
     is_published: true,
     updated_at: new Date().toISOString()
@@ -386,7 +470,7 @@ export async function deleteTimetableEventInDB(id: string) {
 // 3. お知らせ配信操作
 export async function createAnnouncementInDB(title: string, content: string, category: AnnouncementCategory) {
   const newItem: Announcement = {
-    id: `ann-${Date.now()}`,
+    id: crypto.randomUUID(),
     title,
     content,
     category,
@@ -437,7 +521,7 @@ export async function deleteAnnouncementInDB(id: string) {
 // 4. 落とし物掲示板操作
 export async function createLostItemInDB(item_name: string, found_place: string, storage_location?: string, image_url?: string) {
   const newItem: LostItem = {
-    id: `lost-${Date.now()}`,
+    id: crypto.randomUUID(),
     item_name,
     found_place,
     storage_location: storage_location || '本館2階総合案内所',
@@ -505,10 +589,7 @@ export async function deleteLostItemInDB(id: string) {
 // 管理者権限 (superadmin / admin) アカウント管理 API
 // =========================================================================
 
-export let mockAdminUsers: AdminUser[] = [
-  { id: 'usr-superadmin', email: 'superadmin@nazuna.jp', role: 'superadmin', display_name: 'なずな祭 統括管理本部 (Superadmin)', created_at: new Date().toISOString() },
-  { id: 'usr-admin-1', email: 'admin@nazuna.jp', role: 'admin', display_name: '文化祭実行委員会 業務担当 (Admin)', created_at: new Date().toISOString() }
-];
+export let mockAdminUsers: AdminUser[] = [];
 
 export async function fetchAdminUsersFromDB(): Promise<AdminUser[]> {
   if (supabase) {
@@ -529,51 +610,88 @@ export async function fetchAdminUsersFromDB(): Promise<AdminUser[]> {
 }
 
 export async function createAdminUserInDB(user: { email: string; role: AdminRole; display_name: string; password?: string }): Promise<AdminUser> {
+  let targetUserId: string = crypto.randomUUID();
   const newUser: AdminUser = {
-    id: `usr-${Date.now()}`,
+    id: targetUserId,
     email: user.email,
     role: user.role,
     display_name: user.display_name,
     created_at: new Date().toISOString()
   };
-  mockAdminUsers = [...mockAdminUsers, newUser];
-  notifyDataChanged();
 
   if (supabase) {
-    try {
-      let targetUserId = newUser.id;
-
-      // 1. もしパスワードが入力されている場合、まず Supabase Auth にアカウントを作成・同期
-      //    (DB側の RLS/トリガー 'trg_sync_auth_users_to_admin' が発動して自動的に admin_users へ行が作成されます)
-      if (user.password) {
-        const { data: authData } = await supabase.auth.signUp({
-          email: user.email,
-          password: user.password,
-          options: {
-            data: {
-              display_name: user.display_name,
-              role: user.role
-            }
+    // 1. もしパスワードが入力されている場合、まず Supabase Auth にアカウントを作成・同期
+    //    (現在のログインセッションを上書きしないよう、セッション保持・自動更新をオフにした専用クライアントで実行)
+    if (user.password) {
+      const tempClient = createClient(supabaseUrl, supabaseKey, {
+        auth: { persistSession: false, autoRefreshToken: false }
+      });
+      const { data: authData, error: authError } = await tempClient.auth.signUp({
+        email: user.email,
+        password: user.password,
+        options: {
+          data: {
+            display_name: user.display_name,
+            role: user.role
           }
-        });
-        if (authData?.user?.id) {
-          targetUserId = authData.user.id;
-          newUser.id = targetUserId;
+        }
+      });
+      if (authError) {
+        const msg = (authError.message || '').toLowerCase();
+        if (authError.status === 429 || msg.includes('rate limit') || msg.includes('too many requests')) {
+          throw new Error('【レート制限(429)】短時間での新規アカウント作成が集中し、Supabase Authのレート制限に達しました。時間をおいて再試行するか、Supabaseダッシュボード (Authentication > Rate Limits > Email rate limit) で制限を緩和してください。');
+        } else if (authError.message === 'User already registered' || msg.includes('already registered') || msg.includes('already exists')) {
+          throw new Error('【登録済み(400)】このメールアドレスは既にSupabase Authに登録されています。');
+        } else if (msg.includes('password should be at least') || msg.includes('weak password')) {
+          throw new Error('【パスワード要件(400)】パスワードは6文字以上で設定してください。');
+        } else if (msg.includes('signups not allowed') || msg.includes('signups are disabled')) {
+          throw new Error('【新規登録オフ(400)】Supabaseの認証設定で新規登録(SignUp)がオフになっています。Supabaseダッシュボード (Authentication > Providers > Email > Enable Signups) を有効にしてください。');
+        } else if (msg.includes('invalid email') || msg.includes('unable to validate email')) {
+          throw new Error('【形式エラー(400)】有効なメールアドレスの形式で入力してください。');
+        } else {
+          throw new Error(`認証登録エラー (${authError.status || '400'}): ${authError.message}`);
         }
       }
+      if (authData?.user?.id) {
+        targetUserId = authData.user.id;
+        newUser.id = targetUserId;
+      }
+    }
 
-      // 2. admin_users テーブルの情報を確実に同期（emailで一意連携）
-      await supabase.from('admin_users').upsert([{
-        id: targetUserId,
-        email: user.email,
+    // 2. admin_users テーブルの情報を確実に同期（email または id で既存確認の上、update/insert を切り分け）
+    const { data: existingByEmail } = await supabase.from('admin_users').select('id').eq('email', user.email).maybeSingle();
+    if (existingByEmail) {
+      const { error: updateError } = await supabase.from('admin_users').update({
         role: user.role,
         display_name: user.display_name,
-        created_at: newUser.created_at
-      }], { onConflict: 'email' });
-    } catch {
-      // オフラインフォールバック
+        updated_at: new Date().toISOString()
+      }).eq('id', existingByEmail.id);
+      if (updateError) throw updateError;
+    } else {
+      const { data: existingById } = await supabase.from('admin_users').select('id').eq('id', targetUserId).maybeSingle();
+      if (existingById) {
+        const { error: updateIdError } = await supabase.from('admin_users').update({
+          email: user.email,
+          role: user.role,
+          display_name: user.display_name,
+          updated_at: new Date().toISOString()
+        }).eq('id', targetUserId);
+        if (updateIdError) throw updateIdError;
+      } else {
+        const { error: insertError } = await supabase.from('admin_users').insert([{
+          id: targetUserId,
+          email: user.email,
+          role: user.role,
+          display_name: user.display_name,
+          created_at: newUser.created_at
+        }]);
+        if (insertError) throw insertError;
+      }
     }
   }
+
+  mockAdminUsers = [...mockAdminUsers.filter(u => u.email !== newUser.email), newUser];
+  notifyDataChanged();
   return newUser;
 }
 
@@ -643,7 +761,7 @@ export async function verifyAdminCredentials(email: string, pass?: string): Prom
           .from('admin_users')
           .select('*')
           .eq('email', authData.user.email || email)
-          .single();
+          .maybeSingle();
         if (userData) {
           // Supabase AuthのユーザーIDやメタデータ情報が更新されている場合は同期
           return userData as AdminUser;
@@ -657,7 +775,16 @@ export async function verifyAdminCredentials(email: string, pass?: string): Prom
             created_at: new Date().toISOString()
           };
           try {
-            await supabase.from('admin_users').upsert([fallbackUser], { onConflict: 'email' });
+            const { data: existingById } = await supabase.from('admin_users').select('id').eq('id', authData.user.id).maybeSingle();
+            if (existingById) {
+              await supabase.from('admin_users').update({
+                email: fallbackUser.email,
+                role: fallbackUser.role,
+                display_name: fallbackUser.display_name
+              }).eq('id', authData.user.id);
+            } else {
+              await supabase.from('admin_users').insert([fallbackUser]);
+            }
             mockAdminUsers = [...mockAdminUsers.filter(u => u.email !== fallbackUser.email), fallbackUser];
           } catch {
             // テーブル作成権限またはオフラインのフォールバック

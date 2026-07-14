@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
-import { Compass, Search, Calendar, MapPin, BookOpen, HelpCircle, ChevronRight, FileText, Info } from 'lucide-react';
+import { Compass, Search, Calendar, MapPin, BookOpen, HelpCircle, ChevronRight, FileText, Info, Bell } from 'lucide-react';
+import type { PageSetting } from '../../types/database';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 /*
   ========================================================================
@@ -10,18 +12,24 @@ import { Compass, Search, Calendar, MapPin, BookOpen, HelpCircle, ChevronRight, 
 interface BurgerMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  currentTab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy';
-  onSelectTab: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
+  currentTab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy';
+  onSelectTab: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
   onSelectGenreQuick?: (genre: string) => void;
   onOpenMapModal?: () => void;
+  pageSettings?: PageSetting[];
 }
 
 export const BurgerMenu: React.FC<BurgerMenuProps> = ({
   isOpen,
   onClose,
   currentTab,
-  onSelectTab
+  onSelectTab,
+  onSelectGenreQuick: _onSelectGenreQuick,
+  onOpenMapModal,
+  pageSettings
 }) => {
+  useScrollLock(isOpen);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) onClose();
@@ -30,22 +38,22 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+  const handleTabClick = (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => {
+    const setting = pageSettings?.find((p) => p.id === tab);
+    if (setting && !setting.is_public && tab !== 'home') {
+      return;
     }
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
-  const handleTabClick = (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => {
+    if (tab === 'map' && onOpenMapModal) {
+      onOpenMapModal();
+      onClose();
+      return;
+    }
     onSelectTab(tab);
     onClose();
   };
 
   const navItems: Array<{
-    id: 'home' | 'exhibitions' | 'timetable' | 'map' | 'guidance' | 'info' | 'lostfound' | 'policy';
+    id: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'guidance' | 'info' | 'lostfound' | 'policy';
     label: string;
     subLabel: string;
     icon: React.ReactNode;
@@ -54,39 +62,48 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
   }> = [
       {
         id: 'home',
-        label: 'HOME',
-        subLabel: '総合案内・最新お知らせ',
+        label: 'トップページ',
+        subLabel: 'ホーム',
         icon: <Compass className="w-6 h-6 sm:w-7 sm:h-7 hover-icon-y-spin" />,
+        color: 'bg-wafuu-kincha text-white',
+        badge: 'ホーム',
+      },
+      {
+        id: 'news',
+        label: '実行委員会からのお知らせ',
+        subLabel: '各種情報の確認はこちら',
+        icon: <Bell className="w-6 h-6 sm:w-7 sm:h-7 hover-icon-y-spin" />,
         color: 'bg-wafuu-shu text-white',
+        badge: '情報',
       },
       {
         id: 'exhibitions',
         label: '出し物・展示 企画一覧',
-        subLabel: 'クラス・部活動・有志団体の出展企画',
+        subLabel: '文化部・クラス企画・有志企画索引',
         icon: <Search className="w-6 h-6 sm:w-7 sm:h-7 hover-icon-y-spin" />,
-        color: 'bg-wafuu-shu text-white',
+        color: 'bg-wafuu-ai text-white',
         badge: '企画',
       },
       {
         id: 'timetable',
         label: 'タイムテーブル',
-        subLabel: '各ステージ・会場のスケジュール',
+        subLabel: '各ステージ公演のスケジュールはこちら',
         icon: <Calendar className="w-6 h-6 sm:w-7 sm:h-7 hover-icon-y-spin" />,
-        color: 'bg-wafuu-kincha text-white',
-        badge: 'ステージ',
+        color: 'bg-wafuu-sumi text-white',
+        badge: '時間割',
       },
       {
         id: 'map',
         label: '校内マップ',
-        subLabel: 'マップ・ルート案内',
+        subLabel: '校舎案内図',
         icon: <MapPin className="w-6 h-6 sm:w-7 sm:h-7 hover-icon-y-spin" />,
         color: 'bg-[#2C3E55] text-white',
         badge: 'マップ',
       },
       {
         id: 'guidance',
-        label: 'ご案内・総合案内所窓口',
-        subLabel: '本館2階総合案内所・ご来場ルール・FAQ',
+        label: 'ご案内・総合案内所',
+        subLabel: '文化祭へのご来場に関するご案内はこちら',
         icon: <HelpCircle className="w-6 h-6 sm:w-7 sm:h-7 hover-icon-y-spin" />,
         color: 'bg-[#4A6382] text-white',
         badge: 'ご案内',
@@ -102,7 +119,7 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
       {
         id: 'lostfound',
         label: '落とし物掲示板',
-        subLabel: '拾得物オンライン検索',
+        subLabel: '拾得物検索',
         icon: <Info className="w-6 h-6 sm:w-7 sm:h-7 hover-icon-y-spin" />,
         color: 'bg-wafuu-ekasumi text-white',
         badge: '窓口',
@@ -124,12 +141,12 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-[70] overflow-y-auto overflow-x-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] select-none ${isOpen
-        ? 'opacity-100 pointer-events-auto'
-        : 'opacity-0 pointer-events-none'
-        }`}
+      className={`fixed inset-0 z-[90] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] select-none ${
+        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}
+      style={{ touchAction: isOpen ? 'pan-y' : 'auto' }}
     >
-      {/* 和紙テクスチャ不透明背景（複数レイヤー） */}
+      {/* 和紙テクスチャ不透明背景（画面全体を常時完全に覆うため、どれだけスクロールしても背景が途切れたりはみ出したりしない） */}
       <div
         className="absolute inset-0"
         style={{
@@ -141,7 +158,7 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
         className="absolute inset-0 pointer-events-none"
         style={{ backgroundImage: asanohaPattern, backgroundSize: '60px 60px' }}
       />
-      {/* 青海波パターンレイヤー（下半分寄り） */}
+      {/* 青海波パターンレイヤー */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -152,25 +169,26 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
         }}
       />
       {/* 上部の朱色→金茶のアクセントライン */}
-      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-wafuu-shu via-[#D4AF37] to-wafuu-shu" />
+      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-wafuu-shu via-[#D4AF37] to-wafuu-shu pointer-events-none" />
       {/* 上部の淡い金色グロー */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#D4AF37]/8 to-transparent pointer-events-none" />
 
-      {/* メインコンテンツ（右上起点 origin-top-right で滑らかに展開） */}
-      <div
-        className={`relative w-full max-w-5xl mx-auto px-5 sm:px-10 py-8 sm:py-12 min-h-full flex flex-col justify-between origin-top-right transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen
-          ? 'scale-100 translate-x-0 translate-y-0 opacity-100'
-          : 'scale-90 translate-x-12 -translate-y-12 opacity-0'
+      {/* スクロール専用インナーコンテナ */}
+      <div className="relative w-full h-full overflow-y-auto overflow-x-hidden overscroll-contain">
+        {/* メインコンテンツ（右上起点 origin-top-right で滑らかに展開） */}
+        <div
+          className={`relative w-full max-w-5xl mx-auto px-5 sm:px-10 py-8 sm:py-12 min-h-full flex flex-col justify-between origin-top-right transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            isOpen ? 'scale-100 translate-x-0 translate-y-0 opacity-100' : 'scale-90 translate-x-12 -translate-y-12 opacity-0'
           }`}
-      >
-        {/* メニュータイトルヘッダー */}
-        <div className="flex items-center justify-between gap-4 pb-6 border-b border-[#2C3E55]/15 mb-8 mt-20 sm:mt-24">
+        >
+          {/* メニュータイトルヘッダー */}
+          <div className="flex items-center justify-between gap-4 pb-6 border-b border-[#2C3E55]/15 mb-8 mt-20 sm:mt-24">
           <div>
             <span className="text-xs font-serif font-bold text-wafuu-shu tracking-widest block mb-1">
-              総合案内・ページ目次
+              総合案内
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#2C3E55] tracking-wider font-serif">
-              ナビゲーション
+              メニュー
             </h2>
           </div>
         </div>
@@ -179,43 +197,58 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 my-auto">
           {navItems.map((item, idx) => {
             const isActive = currentTab === item.id;
+            const setting = pageSettings?.find((p) => p.id === item.id);
+            const isHiddenOr404 = Boolean(setting && !setting.is_public && item.id !== 'home');
+
             return (
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
-                className={`w-full p-5 sm:p-6 rounded-2xl text-left flex items-center justify-between transition-all duration-300 group border ${isActive
-                  ? 'bg-white border-2 border-wafuu-shu shadow-md scale-[1.01]'
-                  : 'bg-white/90 hover:bg-white border-[#2C3E55]/10 hover:border-wafuu-shu/50 shadow-sm hover:shadow-md hover:translate-y-[-2px]'
+                disabled={isHiddenOr404}
+                className={`w-full p-5 sm:p-6 rounded-2xl text-left flex items-center justify-between transition-all duration-300 group border ${isHiddenOr404
+                  ? 'bg-gray-100/80 border-dashed border-gray-300 opacity-50 cursor-not-allowed'
+                  : isActive
+                    ? 'bg-white border-2 border-wafuu-shu shadow-md scale-[1.01]'
+                    : 'bg-white/90 hover:bg-white border-[#2C3E55]/10 hover:border-wafuu-shu/50 shadow-sm hover:shadow-md hover:translate-y-[-2px]'
                   }`}
                 style={{
                   transitionDelay: isOpen ? `${idx * 40}ms` : '0ms',
-                  opacity: isOpen ? 1 : 0,
+                  opacity: isOpen ? (isHiddenOr404 ? 0.5 : 1) : 0,
                   transform: isOpen ? 'translateY(0)' : 'translateY(12px)',
                 }}
               >
                 <div className="flex items-center gap-4 min-w-0 flex-1">
-                  <div className={`p-3.5 rounded-xl transition-transform duration-300 group-hover:scale-105 shrink-0 shadow-sm ${item.color}`}>
+                  <div className={`p-3.5 rounded-xl transition-transform duration-300 shrink-0 shadow-sm ${isHiddenOr404 ? 'bg-gray-300 text-gray-500' : `${item.color} group-hover:scale-105`
+                    }`}>
                     {item.icon}
                   </div>
                   <div className="min-w-0 flex-1 pr-2">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-base sm:text-lg font-serif font-bold tracking-wider text-[#2C3E55] group-hover:text-wafuu-shu transition-colors">
+                      <span className={`text-base sm:text-lg font-serif font-bold tracking-wider transition-colors ${isHiddenOr404 ? 'text-gray-500 line-through' : 'text-[#2C3E55] group-hover:text-wafuu-shu'
+                        }`}>
                         {item.label}
                       </span>
-                      {item.badge && (
+                      {isHiddenOr404 ? (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-gray-200 border border-gray-300 text-gray-600 font-bold">
+                          準備中
+                        </span>
+                      ) : item.badge ? (
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#F5F0E6] border border-[#2C3E55]/15 text-[#2C3E55]/70">
                           {item.badge}
                         </span>
-                      )}
+                      ) : null}
                     </div>
-                    <span className="text-xs text-[#2C3E55]/60 font-sans block leading-relaxed line-clamp-1">
-                      {item.subLabel}
+                    <span className={`text-xs font-sans block leading-relaxed line-clamp-1 ${isHiddenOr404 ? 'text-gray-400' : 'text-[#2C3E55]/60'
+                      }`}>
+                      {isHiddenOr404 ? '現在このページは準備中です' : item.subLabel}
                     </span>
                   </div>
                 </div>
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1 shrink-0 ml-2 ${isActive
-                  ? 'bg-wafuu-shu text-white'
-                  : 'bg-[#F5F0E6] text-[#2C3E55]/40 group-hover:bg-wafuu-shu group-hover:text-white'
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ml-2 ${isHiddenOr404
+                  ? 'bg-gray-200 text-gray-400'
+                  : isActive
+                    ? 'bg-wafuu-shu text-white'
+                    : 'bg-[#F5F0E6] text-[#2C3E55]/40 group-hover:bg-wafuu-shu group-hover:text-white group-hover:translate-x-1'
                   }`}>
                   <ChevronRight className="w-5 h-5 stroke-[2.5]" />
                 </div>
@@ -223,14 +256,7 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
             );
           })}
         </div>
-
-        {/* 下部フッター */}
-        <div className="pt-8 mt-10 border-t border-[#2C3E55]/15 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-[#2C3E55]/50 font-sans">
-          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
-            <span>2026年度 なずな祭実行委員会</span>
-          </div>
-          <p>&copy; 2026 市川学園 なずな祭実行委員会</p>
-        </div>
+      </div>
       </div>
     </div>
   );

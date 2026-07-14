@@ -626,10 +626,10 @@
 @keyframes headerSlideDown {
   0% {
     opacity: 0;
-    transform: translateY(-36px);
+    transform: translateY(-28px);
   }
-  40% {
-    opacity: 0.85;
+  60% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
@@ -638,19 +638,19 @@
 }
 
 .animate-header-slide-down {
-  animation: headerSlideDown 1.3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  animation: headerSlideDown 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* =========================================================
-   オープニング終了後：ヘッダー出現と同調するスクロール促進アニメーション
+   オープニング終了後：ヘッダー・スクロール促進・下部円弧が同時に極限の滑らかさで出現
    ========================================================= */
 @keyframes scrollGuideAppear {
   0% {
     opacity: 0;
-    transform: translateY(32px) scale(0.95);
+    transform: translateY(28px) scale(0.96);
   }
-  40% {
-    opacity: 0.8;
+  60% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
@@ -658,13 +658,32 @@
   }
 }
 
+@keyframes arcAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-header-slide-down,
-.animate-scroll-guide-appear {
+.animate-scroll-guide-appear,
+.animate-arc-appear {
   will-change: transform, opacity;
 }
 
 .animate-scroll-guide-appear {
-  animation: scrollGuideAppear 1.3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  animation: scrollGuideAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-arc-appear {
+  animation: arcAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes scrollDownFlow {

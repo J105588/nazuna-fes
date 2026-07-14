@@ -12,7 +12,8 @@ import {
   Coffee,
   CheckCircle2,
   Building2,
-  MapPin
+  MapPin,
+  PlusCircle
 } from 'lucide-react';
 import type { Organization, OrganizationCategory, OrganizationGenre } from '../../types/database';
 
@@ -30,14 +31,27 @@ export interface AdminOrgsTabProps {
       category: OrganizationCategory;
       genre: OrganizationGenre;
     },
-    useMenuApi: boolean
+    useMenuApi: boolean,
+    menuOwnerId?: string
   ) => Promise<void>;
+  onCreateOrg?: (data: {
+    name: string;
+    description: string;
+    image_url: string;
+    room_code: string;
+    floor_info: string;
+    category: OrganizationCategory;
+    genre: OrganizationGenre;
+    use_menu_api: boolean;
+    menu_owner_id?: string;
+  }) => Promise<void>;
 }
 
 export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
   organizations,
   onTogglePublish,
-  onSaveOrg
+  onSaveOrg,
+  onCreateOrg
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<'all' | OrganizationCategory>('all');
@@ -45,8 +59,9 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
-  // 編集モーダルの状態
+  // 編集・作成モーダルの状態
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
+  const [isCreatingOrg, setIsCreatingOrg] = useState(false);
   const [orgForm, setOrgForm] = useState<{
     name: string;
     description: string;
@@ -56,6 +71,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
     category: OrganizationCategory;
     genre: OrganizationGenre;
     use_menu_api: boolean;
+    menu_owner_id: string;
   }>({
     name: '',
     description: '',
@@ -64,7 +80,8 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
     floor_info: '',
     category: 'class',
     genre: 'exhibition',
-    use_menu_api: false
+    use_menu_api: false,
+    menu_owner_id: ''
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -89,6 +106,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
 
   const handleOpenEdit = (org: Organization) => {
     setEditingOrg(org);
+    setIsCreatingOrg(false);
     setOrgForm({
       name: org.name || '',
       description: org.description || '',
@@ -97,8 +115,25 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
       floor_info: org.floor_info || '',
       category: (org.category as OrganizationCategory) || 'class',
       genre: (org.genre as OrganizationGenre) || 'exhibition',
-      use_menu_api: Boolean(org.use_menu_api)
+      use_menu_api: Boolean(org.use_menu_api),
+      menu_owner_id: org.menu_owner_id || ''
     });
+  };
+
+  const handleOpenCreate = () => {
+    setEditingOrg(null);
+    setOrgForm({
+      name: '',
+      description: '',
+      image_url: '/assets/poster/poster_complete.png',
+      room_code: '',
+      floor_info: '本館',
+      category: 'class',
+      genre: 'exhibition',
+      use_menu_api: false,
+      menu_owner_id: ''
+    });
+    setIsCreatingOrg(true);
   };
 
   const handleSaveEdit = async (e: React.FormEvent) => {
@@ -117,9 +152,32 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
           category: orgForm.category,
           genre: orgForm.genre
         },
-        orgForm.use_menu_api
+        orgForm.use_menu_api,
+        orgForm.menu_owner_id
       );
       setEditingOrg(null);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onCreateOrg) return;
+    setIsSaving(true);
+    try {
+      await onCreateOrg({
+        name: orgForm.name,
+        description: orgForm.description,
+        image_url: orgForm.image_url || '/assets/poster/poster_complete.png',
+        room_code: orgForm.room_code,
+        floor_info: orgForm.floor_info,
+        category: orgForm.category,
+        genre: orgForm.genre,
+        use_menu_api: orgForm.use_menu_api,
+        menu_owner_id: orgForm.menu_owner_id
+      });
+      setIsCreatingOrg(false);
     } finally {
       setIsSaving(false);
     }
@@ -168,30 +226,41 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
           </p>
         </div>
 
-        {/* 表示モードトグル */}
-        <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-white border border-slate-200 self-start sm:self-auto shadow-sm">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              viewMode === 'grid'
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          {onCreateOrg && (
+            <button
+              onClick={handleOpenCreate}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>＋ 新規出展団体を登録</span>
+            </button>
+          )}
+          {/* 表示モードトグル */}
+          <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-white border border-slate-200 shadow-sm">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                viewMode === 'grid'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Grid className="w-4 h-4" />
+              <span className="hidden sm:inline">カードグリッド</span>
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                viewMode === 'table'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-          >
-            <Grid className="w-4 h-4" />
-            <span className="hidden sm:inline">カードグリッド</span>
-          </button>
-          <button
-            onClick={() => setViewMode('table')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              viewMode === 'table'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-          >
-            <List className="w-4 h-4" />
-            <span className="hidden sm:inline">リスト一覧</span>
-          </button>
+              }`}
+            >
+              <List className="w-4 h-4" />
+              <span className="hidden sm:inline">リスト一覧</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -441,33 +510,38 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
         </div>
       )}
 
-      {/* 団体情報編集ドロワー/モーダル */}
-      {editingOrg && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+      {/* 団体情報編集・作成ドロワー/モーダル */}
+      {(editingOrg || isCreatingOrg) && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
             className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <div>
-                <span className="text-xs font-mono text-blue-600 block uppercase tracking-wider">Edit Organization</span>
-                <h3 className="font-bold text-lg text-slate-900">団体・企画の編集: {editingOrg.name}</h3>
+                <span className="text-xs font-mono text-blue-600 block uppercase tracking-wider">
+                  {isCreatingOrg ? 'New Organization' : 'Edit Organization'}
+                </span>
+                <h3 className="font-bold text-lg text-slate-900">
+                  {isCreatingOrg ? '新規出展団体の登録' : `団体・企画の編集: ${editingOrg?.name}`}
+                </h3>
               </div>
               <button
-                onClick={() => setEditingOrg(null)}
+                onClick={() => { setEditingOrg(null); setIsCreatingOrg(false); }}
                 className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveEdit} className="space-y-4">
+            <form onSubmit={isCreatingOrg ? handleSaveCreate : handleSaveEdit} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700">団体・企画名</label>
                 <input
                   type="text"
                   value={orgForm.name}
                   onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
+                  placeholder="例: 3年A組「赤い和傘と極夜の謎解き迷宮」"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
                   required
                 />
@@ -480,7 +554,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     type="text"
                     value={orgForm.room_code}
                     onChange={(e) => setOrgForm({ ...orgForm, room_code: e.target.value })}
-                    placeholder="例: 301, 102"
+                    placeholder="例: 3A, 3-3, 102"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-blue-500 transition-all"
                   />
                 </div>
@@ -490,7 +564,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     type="text"
                     value={orgForm.floor_info}
                     onChange={(e) => setOrgForm({ ...orgForm, floor_info: e.target.value })}
-                    placeholder="例: 本館3階"
+                    placeholder="例: 本館3階 北側教室"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
                   />
                 </div>
@@ -544,6 +618,24 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                 </div>
               )}
 
+              {orgForm.genre === 'food' && orgForm.use_menu_api && (
+                <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-2">
+                  <label className="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
+                    <span>NazunaGraph 独立クラスID (`menu_owner_id`)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={orgForm.menu_owner_id}
+                    onChange={(e) => setOrgForm({ ...orgForm, menu_owner_id: e.target.value })}
+                    placeholder="例: 3-3, 3-A, 2-C (空白時は通常のクラスコードから自動取得)"
+                    className="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-indigo-500 transition-all"
+                  />
+                  <p className="text-[11px] text-indigo-700 leading-relaxed">
+                    ※ NazunaGraphAPIがオンにされたとき、クラスIDは通常の出展団体UUIDや部屋番号ではなく独立したものになります。3-3のような形式で入力することで、当該パラメータを付与してデータを取得します。
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700">紹介説明文</label>
                 <textarea
@@ -569,7 +661,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                 <button
                   type="button"
-                  onClick={() => setEditingOrg(null)}
+                  onClick={() => { setEditingOrg(null); setIsCreatingOrg(false); }}
                   disabled={isSaving}
                   className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all border border-slate-200"
                 >
@@ -588,7 +680,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                   ) : (
                     <>
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>変更を保存する</span>
+                      <span>{isCreatingOrg ? '新規団体を登録する' : '変更を保存する'}</span>
                     </>
                   )}
                 </button>

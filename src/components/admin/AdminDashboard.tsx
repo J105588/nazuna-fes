@@ -10,7 +10,8 @@ import type {
   OrganizationCategory,
   OrganizationGenre,
   AdminUser,
-  PyramidRelease
+  PyramidRelease,
+  PageSetting
 } from '../../types/database';
 import {
   toggleOrganizationPublish,
@@ -35,9 +36,15 @@ import {
   fetchOrganizationsFromDB,
   fetchTimetableEventsFromDB,
   fetchAnnouncementsFromDB,
-  fetchLostItemsFromDB
+  fetchLostItemsFromDB,
+  createOrganizationInDB,
+  createPyramidReleaseInDB,
+  deletePyramidReleaseInDB,
+  fetchPageSettingsFromDB,
+  updatePageSettingInDB,
+  mockPageSettings,
+  subscribeToDataChanges
 } from '../../lib/supabase';
-import pyramidSchedule from '../../data/pyramidSchedule.json';
 
 // 分割・新設したコンポーネント群
 import { AdminSidebar, type AdminTabId } from './AdminSidebar';
@@ -50,6 +57,7 @@ import { AdminAnnouncementsTab } from './AdminAnnouncementsTab';
 import { AdminLostFoundTab } from './AdminLostFoundTab';
 import { AdminPyramidTab } from './AdminPyramidTab';
 import { AdminUserManagement } from './AdminUserManagement';
+import { AdminPagesTab } from './AdminPagesTab';
 
 interface AdminDashboardProps {
   organizations: Organization[];
@@ -83,9 +91,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [days, setDays] = useState<TimetableDay[]>([]);
 
   const [selectedReleaseIndex, setSelectedReleaseIndex] = useState(0);
-  const [pyramidReleases, setPyramidReleases] = useState<PyramidRelease[]>(
-    mockPyramidReleases && mockPyramidReleases.length > 0 ? mockPyramidReleases : (pyramidSchedule.releases as any)
-  );
+  const [pyramidReleases, setPyramidReleases] = useState<PyramidRelease[]>(mockPyramidReleases || []);
+  const [pageSettings, setPageSettings] = useState<PageSetting[]>(mockPageSettings);
 
   // トースト通知状態
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -121,6 +128,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     fetchPyramidReleasesFromDB().then((data) => {
       if (data && data.length > 0) setPyramidReleases(data);
     });
+    fetchPageSettingsFromDB().then((data) => {
+      if (data && data.length > 0) setPageSettings(data);
+    });
+
+    const unsubscribe = subscribeToDataChanges(
+      () => {},
+      undefined,
+      undefined,
+      undefined,
+      (newPages) => setPageSettings(newPages)
+    );
+    return () => unsubscribe();
   }, []);
 
   // Propsの更新をローカル状態へ反映
@@ -160,6 +179,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (data) setLostItems(data);
   };
 
+  // ページ公開操作
+  const handleTogglePagePublic = async (pageId: string, nextPublic: boolean) => {
+    try {
+      await updatePageSettingInDB(pageId, { is_public: nextPublic });
+      setPageSettings((prev) => prev.map((p) => (p.id === pageId ? { ...p, is_public: nextPublic } : p)));
+      showToast(`ページ公開ステータスを「${nextPublic ? '公開中' : '準備中（非公開）'}」に変更しました。`, 'success');
+    } catch {
+      showToast('ページのステータス変更に失敗しました。', 'error');
+    }
+  };
+
+  const handleUpdatePageMessage = async (pageId: string, custom_message: string) => {
+    try {
+      await updatePageSettingInDB(pageId, { custom_message });
+      setPageSettings((prev) => prev.map((p) => (p.id === pageId ? { ...p, custom_message } : p)));
+      showToast('準備中メッセージを保存しました。', 'success');
+    } catch {
+      showToast('メッセージの保存に失敗しました。', 'error');
+    }
+  };
+
+  const handleBatchTogglePages = async (nextPublic: boolean) => {
+    try {
+      for (const page of pageSettings) {
+        await updatePageSettingInDB(page.id, { is_public: nextPublic });
+      }
+      setPageSettings((prev) => prev.map((p) => ({ ...p, is_public: nextPublic })));
+      showToast(`すべてのページを「${nextPublic ? '公開中' : '準備中（非公開）'}」に一括変更しました。`, 'success');
+    } catch {
+      showToast('一括変更に失敗しました。', 'error');
+    }
+  };
+
   // 1. 出展団体操作
   const handleToggleOrgPublish = async (orgId: string, current: boolean) => {
     try {
@@ -182,15 +234,48 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       category: OrganizationCategory;
       genre: OrganizationGenre;
     },
-    useMenuApi: boolean
+    useMenuApi: boolean,
+    menuOwnerId?: string
   ) => {
     try {
       await updateOrganizationInDB(orgId, data);
-      await updateOrganizationMenuApiInDB(orgId, useMenuApi);
+      await updateOrganizationMenuApiInDB(orgId, useMenuApi, menuOwnerId);
       await refreshOrgs();
       showToast('団体・企画情報を保存しました。', 'success');
     } catch {
       showToast('保存中にエラーが発生しました。', 'error');
+    }
+  };
+
+  const handleCreateOrg = async (data: {
+    name: string;
+    description: string;
+    image_url: string;
+    room_code: string;
+    floor_info: string;
+    category: OrganizationCategory;
+    genre: OrganizationGenre;
+    use_menu_api: boolean;
+    menu_owner_id?: string;
+  }) => {
+    try {
+      await createOrganizationInDB({
+        name: data.name,
+        description: data.description,
+        image_url: data.image_url,
+        room_code: data.room_code,
+        floor_info: data.floor_info,
+        category: data.category,
+        genre: data.genre,
+        inventory_status: 'STATUS_AVAILABLE',
+        is_published: true,
+        use_menu_api: data.use_menu_api,
+        menu_owner_id: data.menu_owner_id
+      });
+      await refreshOrgs();
+      showToast('新しい出展団体を登録しました。', 'success');
+    } catch {
+      showToast('出展団体の登録に失敗しました。', 'error');
     }
   };
 
@@ -400,6 +485,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  const handleSavePyramidRelease = async (releaseId: string, updates: Partial<PyramidRelease>) => {
+    try {
+      await updatePyramidReleaseInDB(releaseId, updates);
+      setPyramidReleases((prev) =>
+        prev.map((r) => ((r.releaseId || r.id) === releaseId ? { ...r, ...updates } : r))
+      );
+      showToast('ピラミッド結果・受賞構成を保存しました。', 'success');
+    } catch {
+      showToast('保存に失敗しました。', 'error');
+    }
+  };
+
+  const handleCreatePyramidRelease = async (data: {
+    title: string;
+    scheduledTime: string;
+    embargoMessage: string;
+    pyramidTiers?: { high: string[]; upper: string[]; middle: string[] };
+  }) => {
+    try {
+      const newRelease = await createPyramidReleaseInDB(data);
+      setPyramidReleases((prev) => [...prev, newRelease]);
+      showToast('新しい開示スケジュールを追加しました。', 'success');
+    } catch {
+      showToast('追加に失敗しました。', 'error');
+    }
+  };
+
+  const handleDeletePyramidRelease = (releaseId: string, title: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: '開示スケジュールの削除確認',
+      message: `開示スケジュール「${title}」を削除しますか？`,
+      variant: 'danger',
+      confirmLabel: '削除する',
+      onConfirm: async () => {
+        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        try {
+          await deletePyramidReleaseInDB(releaseId);
+          setPyramidReleases((prev) => prev.filter((r) => (r.releaseId || r.id) !== releaseId));
+          if (selectedReleaseIndex >= pyramidReleases.length - 1) {
+            setSelectedReleaseIndex(Math.max(0, pyramidReleases.length - 2));
+          }
+          showToast('開示スケジュールを削除しました。', 'success');
+        } catch {
+          showToast('削除に失敗しました。', 'error');
+        }
+      }
+    });
+  };
+
   const handleTogglePyramidEmbargo = async (releaseId: string, nextEmbargo: boolean) => {
     setConfirmModal({
       isOpen: true,
@@ -485,11 +620,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <AdminUserManagement currentUser={currentUser} />
           )}
 
+          {activeTab === 'pages' && (
+            <AdminPagesTab
+              pageSettings={pageSettings}
+              onTogglePublic={handleTogglePagePublic}
+              onUpdateMessage={handleUpdatePageMessage}
+              onBatchToggle={handleBatchTogglePages}
+            />
+          )}
+
           {activeTab === 'orgs' && (
             <AdminOrgsTab
               organizations={organizations}
               onTogglePublish={handleToggleOrgPublish}
               onSaveOrg={handleSaveOrg}
+              onCreateOrg={handleCreateOrg}
             />
           )}
 
@@ -527,10 +672,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {activeTab === 'pyramid' && (
             <AdminPyramidTab
               pyramidReleases={pyramidReleases}
+              organizations={organizations}
               selectedReleaseIndex={selectedReleaseIndex}
               setSelectedReleaseIndex={setSelectedReleaseIndex}
               onSaveTitleMessage={handleSavePyramidTitleMessage}
+              onSaveRelease={handleSavePyramidRelease}
               onToggleEmbargo={handleTogglePyramidEmbargo}
+              onCreateRelease={handleCreatePyramidRelease}
+              onDeleteRelease={handleDeletePyramidRelease}
             />
           )}
         </div>

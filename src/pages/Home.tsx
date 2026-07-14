@@ -4,6 +4,8 @@ import type { GuidanceSectionId } from './GuidanceDetailPage';
 import type { PolicySectionId } from './PolicyPage';
 import { OpeningIntro } from '../components/intro/OpeningIntro';
 import { openExternalMap } from '../lib/api';
+import { FaqCustomIcon } from '../components/common/FaqCustomIcon';
+import { AnnouncementDetailModal } from '../components/common/AnnouncementDetailModal';
 
 /*
   ========================================================================
@@ -19,7 +21,7 @@ interface HomeProps {
   isShojiFinished?: boolean;
   isIntroFinished?: boolean;
   onIntroComplete?: () => void;
-  onSelectTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
+  onSelectTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
   onNavigateGuidancePage?: (section: GuidanceSectionId) => void;
   onNavigatePolicyPage?: (section: PolicySectionId) => void;
   onNavigateExhibitionsPage?: (query: string, genre: string, floor: string) => void;
@@ -42,6 +44,7 @@ export const Home: React.FC<HomeProps> = ({
   const [selectedGenre, setSelectedGenre] = useState(initialGenre);
   const [selectedFloor] = useState('all');
   const [showScrollGuide, setShowScrollGuide] = useState(true);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
 
   useEffect(() => {
     if (initialGenre) setSelectedGenre(initialGenre);
@@ -88,25 +91,22 @@ export const Home: React.FC<HomeProps> = ({
   return (
     <>
       {/* ===============================================
-          常設背景: ポスター霧演出 (fixed z-0, ダーク背景維持)
-          =============================================== */}
-      <OpeningIntro startTrigger={isShojiFinished} key={introKey} onComplete={onIntroComplete} />
-
-      {/* ===============================================
           スクロールコンテンツ層 (z-10 relative)
           =============================================== */}
       <div className="relative z-10 w-full font-serif">
 
-        {/* ファーストビュー: ポスター鑑賞空間（スマホは115vh、PCは2画面分） */}
-        <div id="hero-poster" className="w-full h-[115vh] sm:h-screen relative pointer-events-none select-none">
+        {/* ファーストビュー: ポスター鑑賞空間（スマホは100svh、PCは1画面分の完璧な高さ） */}
+        <div id="hero-poster" className="w-full h-[100svh] sm:h-screen relative pointer-events-none select-none bg-[#050711] overflow-hidden">
+          {/* ポスター＆霧結晶演出（ページと一緒にスクロール＆超軽量化） */}
+          <OpeningIntro startTrigger={isShojiFinished} key={introKey} onComplete={onIntroComplete} />
+
           {/* =========================================================
               オープニング終了後：ヘッダーと同時に出現するスクロール促進アニメーション
               ========================================================= */}
           {isIntroFinished && (
             <div
-              className={`absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 transition-opacity duration-500 pointer-events-auto ${
-                showScrollGuide ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
+              className={`absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 transition-opacity duration-500 pointer-events-auto ${showScrollGuide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
             >
               <button
                 onClick={() => {
@@ -124,7 +124,7 @@ export const Home: React.FC<HomeProps> = ({
                 <span className="text-[11px] sm:text-xs font-mono font-bold tracking-[0.25em] text-[#EDE8DF] group-hover:text-wafuu-kincha transition-colors drop-shadow-md">
                   SCROLL DOWN
                 </span>
-                
+
                 {/* 縦飾りライン＆下向き矢印 */}
                 <div className="w-6 h-12 sm:w-7 sm:h-14 rounded-full border border-wafuu-ekasumi/60 bg-wafuu-sumi/40 backdrop-blur-sm flex flex-col items-center justify-start py-2 shadow-lg group-hover:border-wafuu-kincha transition-colors">
                   <div className="w-[2.5px] h-3 bg-gradient-to-b from-wafuu-shu to-wafuu-kincha rounded-full animate-scroll-down-flow" />
@@ -143,14 +143,15 @@ export const Home: React.FC<HomeProps> = ({
               </button>
             </div>
           )}
-        </div>
-        <div className="hidden sm:block w-full h-screen relative pointer-events-none select-none" />
 
-        {/* ダーク→ライト切り替えの和紙ウェーブSVG */}
-        <div className="relative -mt-1">
-          <svg viewBox="0 0 1440 90" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block" preserveAspectRatio="none">
-            <path d="M0,0 C360,75 720,90 1080,50 C1260,30 1380,10 1440,0 L1440,90 L0,90 Z" fill="#FAF8F5" />
-          </svg>
+          {/* 画面の下地の半円の弧（ポスター空間と企画検索エリアを優雅に繋ぐウェーブカーブ：オープニング終了時にヘッダーやスクロール案内と同時出現） */}
+          {isIntroFinished && (
+            <div className="absolute -bottom-[1px] left-0 right-0 w-full z-20 pointer-events-none overflow-hidden animate-arc-appear">
+              <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[36px] sm:h-[80px] block" preserveAspectRatio="none">
+                <path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="#FAF8F5" />
+              </svg>
+            </div>
+          )}
         </div>
 
         {/* =========================================================================================
@@ -325,11 +326,8 @@ export const Home: React.FC<HomeProps> = ({
                   2026年 市川学園 なずな祭
                 </p>
                 <h2 className="text-5xl sm:text-7xl lg:text-8xl font-black text-wafuu-sumi tracking-wider font-serif leading-none">
-                  <span className="text-wafuu-shu">百輝</span>夜行
+                  百<span className="text-wafuu-shu">輝</span>夜行
                 </h2>
-                <p className="text-base sm:text-lg text-wafuu-kincha font-serif tracking-wider mt-2">
-                  〜極夜を彩る、百の魂と赤い和傘〜
-                </p>
               </div>
 
               {/* 遷移ボタン */}
@@ -337,7 +335,7 @@ export const Home: React.FC<HomeProps> = ({
                 onClick={() => onSelectTab && onSelectTab('info')}
                 className="mt-4 group inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-wafuu-sumi text-white hover:bg-wafuu-shu font-bold text-sm sm:text-base transition-all duration-300 shadow-md hover:shadow-lg font-serif tracking-wider"
               >
-                <span>テーマの想いを読む</span>
+                <span>詳しくはこちら</span>
                 <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </button>
 
@@ -358,40 +356,67 @@ export const Home: React.FC<HomeProps> = ({
                 </h2>
               </div>
               <button
-                onClick={() => onNavigateGuidancePage && onNavigateGuidancePage('precautions')}
-                className="px-6 py-2.5 rounded-xl bg-[#2C3E55] text-white hover:bg-wafuu-shu transition-colors font-bold text-sm flex items-center gap-2 self-start sm:self-center shrink-0 shadow-sm"
+                onClick={() => onSelectTab && onSelectTab('news')}
+                className="px-6 py-2.5 rounded-xl bg-[#2C3E55] text-white hover:bg-wafuu-shu transition-colors font-bold text-sm flex items-center gap-2 self-start sm:self-center shrink-0 shadow-sm group"
               >
-                <span>重要なお願い・詳しくはこちら</span>
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                <span>詳しくはこちら</span>
+                <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </button>
             </div>
 
-            <div className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 ease-out delay-150 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {announcements.length === 0 ? (
-                <div className="md:col-span-3 bg-white p-12 text-center rounded-3xl border border-wafuu-ekasumi/70 shadow-sm space-y-3 font-serif">
-                  <div className="w-12 h-12 rounded-full bg-wafuu-sumi/5 flex items-center justify-center mx-auto text-wafuu-kincha">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                  </div>
-                  <p className="font-bold text-wafuu-sumi text-base sm:text-lg">現在配信中の最新お知らせはありません。</p>
-                  <p className="text-xs sm:text-sm text-wafuu-sumi/60 font-sans">実行委員会からの更新・ご案内が届き次第、こちらに掲載されます。</p>
-                </div>
-              ) : (
-                announcements.map((ann) => (
-                  <div key={ann.id} className="bg-white p-6 sm:p-7 rounded-2xl border border-wafuu-ekasumi/70 shadow-sm space-y-4 flex flex-col justify-between">
-                    <div className="space-y-2.5">
-                      <div className="flex items-center justify-between text-xs text-wafuu-text-sub font-mono">
-                        <span>{new Date(ann.created_at).toLocaleDateString()}</span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-wafuu-shu/15 text-wafuu-shu font-bold">
-                          {ann.category || 'お知らせ'}
-                        </span>
+            {(() => {
+              const publishedHomeAnnouncements = (announcements || [])
+                .filter((a) => a.is_published)
+                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                .slice(0, 3);
+
+              return (
+                <div className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 ease-out delay-150 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {publishedHomeAnnouncements.length === 0 ? (
+                    <div className="md:col-span-3 bg-white p-12 text-center rounded-3xl border border-wafuu-ekasumi/70 shadow-sm space-y-3 font-serif">
+                      <div className="w-12 h-12 rounded-full bg-wafuu-sumi/5 flex items-center justify-center mx-auto text-wafuu-kincha">
+                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                       </div>
-                      <h4 className="font-bold text-lg text-wafuu-sumi leading-snug">{ann.title}</h4>
-                      <p className="text-xs sm:text-sm text-wafuu-sumi/75 leading-relaxed font-sans whitespace-pre-line">{ann.content}</p>
+                      <p className="font-bold text-wafuu-sumi text-base sm:text-lg">現在配信中の最新お知らせはありません。</p>
+                      <p className="text-xs sm:text-sm text-wafuu-sumi/60 font-sans">実行委員会からの更新・ご案内が届き次第、こちらに掲載されます。</p>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
+                  ) : (
+                    publishedHomeAnnouncements.map((ann) => {
+                      let badge = { label: '一般お知らせ', className: 'bg-blue-500/15 text-blue-700 border border-blue-500/30' };
+                      if (ann.category === 'urgent') badge = { label: '緊急・重要', className: 'bg-rose-500/15 text-rose-700 border border-rose-500/30 font-bold' };
+                      if (ann.category === 'stage') badge = { label: 'ステージ予定', className: 'bg-amber-500/15 text-amber-800 border border-amber-500/30 font-bold' };
+
+                      return (
+                        <div
+                          key={ann.id}
+                          onClick={() => setSelectedAnnouncement(ann)}
+                          className="bg-white p-6 sm:p-7 rounded-2xl border border-wafuu-ekasumi/70 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer space-y-4 flex flex-col justify-between group"
+                        >
+                          <div className="space-y-2.5">
+                            <div className="flex items-center justify-between text-xs text-wafuu-text-sub font-mono">
+                              <span>{new Date(ann.created_at).toLocaleDateString()}</span>
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-serif ${badge.className}`}>
+                                {badge.label}
+                              </span>
+                            </div>
+                            <h4 className="font-bold text-lg text-wafuu-sumi leading-snug group-hover:text-wafuu-shu transition-colors line-clamp-2">
+                              {ann.title}
+                            </h4>
+                            <p className="text-xs sm:text-sm text-wafuu-sumi/75 leading-relaxed font-sans line-clamp-3">
+                              {ann.content}
+                            </p>
+                          </div>
+                          <div className="pt-3 border-t border-wafuu-ekasumi/50 flex items-center justify-end text-xs font-bold text-wafuu-sumi/70 group-hover:text-wafuu-shu transition-colors gap-1">
+                            <span>詳細を見る</span>
+                            <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </section>
 
@@ -446,7 +471,6 @@ export const Home: React.FC<HomeProps> = ({
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
                       ご来場の際の<br />注意点
                     </span>
-                    <span className="text-xs sm:text-sm text-wafuu-sumi/60 group-hover:text-white/90 font-sans mt-2 underline">詳しくはこちら</span>
                   </div>
                 </div>
               </button>
@@ -468,7 +492,6 @@ export const Home: React.FC<HomeProps> = ({
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
                       アクセス・キャン<br />パスマップ
                     </span>
-                    <span className="text-xs sm:text-sm text-wafuu-sumi/60 group-hover:text-white/90 font-sans mt-2 underline">詳しくはこちら</span>
                   </div>
                 </div>
               </button>
@@ -491,7 +514,6 @@ export const Home: React.FC<HomeProps> = ({
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
                       総合案内所<br />（本館2階窓口）
                     </span>
-                    <span className="text-xs sm:text-sm text-wafuu-sumi/60 group-hover:text-white/90 font-sans mt-2 underline">詳しくはこちら</span>
                   </div>
                 </div>
               </button>
@@ -514,7 +536,6 @@ export const Home: React.FC<HomeProps> = ({
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
                       落とし物<br />掲示板
                     </span>
-                    <span className="text-xs sm:text-sm text-wafuu-sumi/60 group-hover:text-white/90 font-sans mt-2 underline">詳しくはこちら</span>
                   </div>
                 </div>
               </button>
@@ -529,17 +550,11 @@ export const Home: React.FC<HomeProps> = ({
                     <div className="hexagon-decor-ring" />
                     <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#2C3E55] text-white flex items-center justify-center shrink-0 shadow-md mb-4 group-hover:bg-wafuu-shu transition-colors">
                       {/* Q & A 吹き出しアイコン */}
-                      <svg className="w-8 h-8 sm:w-10 sm:h-10 hover-icon-z-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="9" cy="9" r="6" fill="currentColor" fillOpacity="0.8" />
-                        <text x="6" y="12" fontSize="9" fill="#FAF8F5" fontFamily="serif" fontWeight="bold">Q</text>
-                        <circle cx="15" cy="15" r="6" fill="#FAF8F5" stroke="currentColor" strokeWidth="1.8" />
-                        <text x="12" y="18" fontSize="9" fill="#2C3E55" fontFamily="serif" fontWeight="bold">A</text>
-                      </svg>
+                      <FaqCustomIcon />
                     </div>
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
                       よくある<br />ご質問 (FAQ)
                     </span>
-                    <span className="text-xs sm:text-sm text-wafuu-sumi/60 group-hover:text-white/90 font-sans mt-2 underline">詳しくはこちら</span>
                   </div>
                 </div>
               </button>
@@ -562,7 +577,6 @@ export const Home: React.FC<HomeProps> = ({
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
                       ごみ分別の<br />お願い
                     </span>
-                    <span className="text-xs sm:text-sm text-wafuu-sumi/60 group-hover:text-white/90 font-sans mt-2 underline">詳しくはこちら</span>
                   </div>
                 </div>
               </button>
@@ -608,7 +622,7 @@ export const Home: React.FC<HomeProps> = ({
                   onClick={() => onSelectTab && onSelectTab('info')}
                   className="px-6 py-2.5 rounded-xl bg-[#2C3E55] text-white hover:bg-wafuu-shu font-bold text-sm transition-colors flex items-center gap-2 self-start sm:self-center shrink-0 shadow-sm"
                 >
-                  <span>テーマ「百輝夜行」ストーリーを読む</span>
+                  <span>テーマ「百輝夜行」について</span>
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </button>
               </div>
@@ -638,8 +652,8 @@ export const Home: React.FC<HomeProps> = ({
               </div>
 
               <div className="pt-4 flex flex-wrap items-center justify-between gap-4 text-xs text-wafuu-text-sub font-mono border-t border-wafuu-sumi/10">
-                <span>主催：2026年度 なずな祭実行委員会本部 ／ 生徒会役員会</span>
-                <span>開催会場：千葉県市川市本北方2-38-1 市川学園キャンパス</span>
+                <span>主催：2026年度 なずな祭実行委員会</span>
+                <span>場所：千葉県市川市本北方2-38-1 市川学園市川中学校・高等学校</span>
               </div>
 
             </div>
@@ -647,6 +661,12 @@ export const Home: React.FC<HomeProps> = ({
         </section>
 
       </div>
+
+      {/* 共通詳細モーダル（#news内と同様に開く） */}
+      <AnnouncementDetailModal
+        announcement={selectedAnnouncement}
+        onClose={() => setSelectedAnnouncement(null)}
+      />
     </>
   );
 };

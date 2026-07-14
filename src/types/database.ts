@@ -1,7 +1,7 @@
 export type OrganizationCategory = 'class' | 'club' | 'volunteer';
 export type OrganizationGenre = 'food' | 'exhibition' | 'attraction' | 'stage';
 export type InventoryStatus = 'STATUS_AVAILABLE' | 'STATUS_FEW' | 'STATUS_SOLD_OUT' | 'STATUS_PREPARING';
-export type StageLocation = 'gym' | 'courtyard' | 'av_room';
+export type StageLocation = 'gym' | 'courtyard' | 'av_room' | 'kunieda_hall' | 'koga_arena' | 'n_stage';
 
 // NazunaGraph (Public Items API /api/items) インターフェース定義
 export interface NazunaGraphItemStatus {
@@ -74,6 +74,7 @@ export interface TimetableEvent {
   is_published: boolean;
   updated_at: string;
   organization_name?: string;
+  description?: string;
 }
 
 export type PyramidTierLevel = 'high' | 'upper' | 'middle' | 'normal' | 'embargoed';
@@ -96,7 +97,7 @@ export interface PyramidRelease {
 export interface VotePyramidData {
   class_id: string;
   pyramid_tier: PyramidTierLevel; // 'high': 高(頂点層), 'upper': 上(上層), 'middle': 中(中核層)
-  tier_label: '高' | '上' | '中' | '一般' | '集計ロック・非表示';
+  tier_label: '高' | '上' | '中' | '一般' | '集計ロック・非表示' | '集計準備中';
   release_title: string;
   is_embargoed: boolean;
   embargo_message?: string;
@@ -133,5 +134,13 @@ export interface AdminUser {
   role: AdminRole;
   display_name: string;
   created_at: string;
+}
+
+export interface PageSetting {
+  id: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'guidance' | 'policy' | string;
+  title: string;
+  is_public: boolean;
+  custom_message?: string;
+  updated_at: string;
 }
 

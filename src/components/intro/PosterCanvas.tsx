@@ -66,7 +66,7 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
         width: '100%',
         height: '100%',
         overflow: 'hidden',
-        backgroundColor: isMobileOrPortrait ? '#F7F3ED' : '#050711',
+        backgroundColor: '#050711',
         transform: 'translateZ(0)',
       }}
     >
@@ -99,7 +99,7 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                 top: `${layer.topPct}%`,
                 width: `${layer.widthPct}%`,
                 height: `${layer.heightPct}%`,
-                opacity: 0,
+                opacity: idx === 0 ? 1 : 0,
                 display: isTemporarilyDisabled ? 'none' : undefined,
                 mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
                 pointerEvents: 'none',

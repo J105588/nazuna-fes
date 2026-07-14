@@ -235,7 +235,7 @@ export const SchoolInfoPage: React.FC = () => {
                   <span>ステージ公演の爆発力</span>
                 </div>
                 <p className="text-xs sm:text-sm text-wafuu-kinari/80 leading-relaxed">
-                  第一体育館・中庭ステージで巻き起こるダンスと音楽の熱狂。観覧者と演者が一体となる感動の波。
+                  古賀記念アリーナ・Nステ会場・國枝記念国際ホールで巻き起こるダンスと音楽と演劇の熱狂。観覧者と演者が一体となる感動の波。
                 </p>
               </div>
 

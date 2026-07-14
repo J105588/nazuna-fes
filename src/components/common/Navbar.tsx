@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BurgerMenu } from './BurgerMenu';
+import type { PageSetting } from '../../types/database';
 
 /*
   ========================================================================
@@ -8,12 +9,13 @@ import { BurgerMenu } from './BurgerMenu';
 */
 
 interface NavbarProps {
-  currentTab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy';
+  currentTab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy';
   isIntroFinished?: boolean;
-  onSelectTab: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
+  onSelectTab: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
   onSelectGenreQuick?: (genre: string) => void;
   onSelectStageQuick?: (stage: string) => void;
   onOpenMapModal?: () => void;
+  pageSettings?: PageSetting[];
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -21,7 +23,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   isIntroFinished = true,
   onSelectTab,
   onSelectGenreQuick,
-  onOpenMapModal
+  onOpenMapModal,
+  pageSettings
 }) => {
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
 
@@ -32,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       {/* 上部固定モダン和風ヘッダーバー (城に近い和風な色：漆喰白・白鷺城しらさぎじょうの白壁を想起させる生成り白グラデーション＋藍と朱の上質アクセント) */}
-      <header className="fixed top-0 left-0 right-0 z-[80] animate-header-slide-down backdrop-blur-xl bg-gradient-to-r from-[#FBF9F5]/95 via-[#FAF6F0]/95 to-[#FBF9F5]/95 text-[#2C3E55] shadow-[0_4px_25px_rgba(44,62,85,0.12)] border-b border-wafuu-ekasumi/80">
+      <header className="fixed top-0 left-0 right-0 z-[100] animate-header-slide-down backdrop-blur-xl bg-gradient-to-r from-[#FBF9F5]/95 via-[#FAF6F0]/95 to-[#FBF9F5]/95 text-[#2C3E55] shadow-[0_4px_25px_rgba(44,62,85,0.12)] border-b border-wafuu-ekasumi/80">
         {/* 上部の極細 朱＆金茶＆藍アクセントライン */}
         <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-wafuu-shu via-[#D4AF37] to-wafuu-ai opacity-90" />
 
@@ -106,6 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         onSelectTab={onSelectTab}
         onSelectGenreQuick={onSelectGenreQuick}
         onOpenMapModal={onOpenMapModal}
+        pageSettings={pageSettings}
       />
     </>
   );

@@ -33,9 +33,6 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
 
         {/* ヘッダー */}
         <div className="text-center space-y-4 border-b border-wafuu-sumi/10 pb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-wafuu-shu/10 border border-wafuu-shu/30 text-xs font-serif font-bold text-wafuu-shu tracking-widest">
-            <span>公式方針・規約一覧</span>
-          </div>
           <h1 className="text-3xl sm:text-5xl font-black text-wafuu-sumi tracking-wider">
             公式規約 ＆ 情報掲載指針
           </h1>
