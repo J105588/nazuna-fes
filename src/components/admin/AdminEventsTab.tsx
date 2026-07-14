@@ -10,7 +10,8 @@ import {
   X,
   Plus,
   Filter,
-  ChevronDown
+  ChevronDown,
+  Users
 } from 'lucide-react';
 import type { TimetableEvent, TimetableDay, StageLocation } from '../../types/database';
 
@@ -26,6 +27,7 @@ export interface AdminEventsTabProps {
     stage_location: StageLocation;
     description?: string;
     organization_id?: string;
+    organization_name?: string;
   }) => Promise<void>;
   onSaveEvent: (
     id: string,
@@ -37,6 +39,7 @@ export interface AdminEventsTabProps {
       stage_location: StageLocation;
       description?: string;
       organization_id?: string;
+      organization_name?: string;
     }
   ) => Promise<void>;
   onDeleteEvent: (id: string, title: string) => void;
@@ -69,6 +72,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
     location: StageLocation;
     description: string;
     organization_id: string;
+    organization_name: string;
   }>({
     title: '',
     day_id: days[0]?.id || 'day-1',
@@ -76,7 +80,8 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
     end_time: '',
     location: 'courtyard',
     description: '',
-    organization_id: ''
+    organization_id: '',
+    organization_name: ''
   });
 
   // 演目編集モーダルの状態
@@ -89,6 +94,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
     location: StageLocation;
     description: string;
     organization_id: string;
+    organization_name: string;
   }>({
     title: '',
     day_id: 'day-1',
@@ -96,7 +102,8 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
     end_time: '',
     location: 'courtyard',
     description: '',
-    organization_id: ''
+    organization_id: '',
+    organization_name: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -119,8 +126,9 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
       start_time: formatDatetimeLocal(evt.start_time),
       end_time: formatDatetimeLocal(evt.end_time),
       location: evt.stage_location || 'courtyard',
-      description: '',
-      organization_id: evt.organization_id || ''
+      description: evt.description || '',
+      organization_id: evt.organization_id || '',
+      organization_name: evt.organization_name || ''
     });
   };
 
@@ -136,7 +144,8 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
         end_time: new Date(createForm.end_time).toISOString(),
         stage_location: createForm.location,
         description: createForm.description || undefined,
-        organization_id: createForm.organization_id || undefined
+        organization_id: createForm.organization_id || undefined,
+        organization_name: createForm.organization_name || undefined
       });
       setShowCreateModal(false);
       setCreateForm({
@@ -146,7 +155,8 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
         end_time: '',
         location: 'courtyard',
         description: '',
-        organization_id: ''
+        organization_id: '',
+        organization_name: ''
       });
     } finally {
       setIsSubmitting(false);
@@ -165,7 +175,8 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
         end_time: new Date(editForm.end_time).toISOString(),
         stage_location: editForm.location,
         description: editForm.description || undefined,
-        organization_id: editForm.organization_id || undefined
+        organization_id: editForm.organization_id || undefined,
+        organization_name: editForm.organization_name || undefined
       });
       setEditingEvent(null);
     } finally {
@@ -183,12 +194,12 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
   const getLocationBadge = (loc: StageLocation) => {
     switch (loc) {
       case 'gym':
-        return { label: '古賀記念アリーナ', bg: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' };
+        return { label: '古賀記念アリーナ', bg: 'bg-indigo-500/15 text-indigo-700 border-indigo-500/30' };
       case 'av_room':
-        return { label: '國枝記念国際ホール', bg: 'bg-purple-500/10 text-purple-400 border-purple-500/20' };
+        return { label: '國枝記念国際ホール', bg: 'bg-purple-500/15 text-purple-700 border-purple-500/30' };
       case 'courtyard':
       default:
-        return { label: 'Nステ会場', bg: 'bg-blue-500/10 text-blue-400 border-blue-500/20' };
+        return { label: 'Nステ会場', bg: 'bg-blue-500/15 text-blue-700 border-blue-500/30' };
     }
   };
 
@@ -220,10 +231,11 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setShowDayManager(!showDayManager)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border flex items-center gap-1.5 ${showDayManager
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border flex items-center gap-1.5 ${
+              showDayManager
                 ? 'bg-blue-600 text-white border-blue-600 shadow-md'
                 : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border-slate-300 shadow-sm'
-              }`}
+            }`}
           >
             <span>日にち (DAY) 設定</span>
             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showDayManager ? 'rotate-180 text-blue-600' : ''}`} />
@@ -301,14 +313,14 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
 
       {/* タブ＆フィルタツールバー */}
       <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-md">
-        {/* 日にち選択セグメント */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0 border-b md:border-b-0 border-slate-200">
           <button
             onClick={() => setSelectedDayId('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${selectedDayId === 'all'
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+              selectedDayId === 'all'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 border border-blue-500/30'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
+            }`}
           >
             すべての日にち
           </button>
@@ -316,10 +328,11 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
             <button
               key={d.id}
               onClick={() => setSelectedDayId(d.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${selectedDayId === d.id
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                selectedDayId === d.id
                   ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 border border-blue-500/30'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                }`}
+              }`}
             >
               <span>{d.label}</span>
               <span className="text-[10px] font-mono opacity-80">({d.date_string})</span>
@@ -327,7 +340,6 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
           ))}
         </div>
 
-        {/* ステージ場所フィルタ */}
         <div className="flex items-center gap-2 w-full md:w-auto justify-end">
           <Filter className="w-3.5 h-3.5 text-blue-600 shrink-0" />
           <span className="text-xs text-slate-700 font-semibold shrink-0">場所:</span>
@@ -344,7 +356,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
         </div>
       </div>
 
-      {/* 演目タイムラインリスト */}
+      {/* 演目タイムテーブルリスト (表形式表示) */}
       {filteredEvents.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3 shadow-sm">
           <Clock className="w-8 h-8 text-slate-400 mx-auto" />
@@ -352,174 +364,215 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
           <p className="text-xs text-slate-600">条件に合致する演目がないか、まだ登録されていません。</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {filteredEvents.map((evt) => {
-            const isPub = Boolean(evt.is_published);
-            const locBadge = getLocationBadge(evt.stage_location);
-            const dayInfo = days.find((d) => d.id === evt.day_id);
-            const startTimeStr = new Date(evt.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const endTimeStr = new Date(evt.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                  <th className="py-3.5 px-4">時間</th>
+                  <th className="py-3.5 px-4">日にち</th>
+                  <th className="py-3.5 px-4">ステージ会場</th>
+                  <th className="py-3.5 px-4">団体・サークル名</th>
+                  <th className="py-3.5 px-4">演目タイトル</th>
+                  <th className="py-3.5 px-4 text-center">状態</th>
+                  <th className="py-3.5 px-4 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 text-xs text-slate-800">
+                {filteredEvents.map((evt) => {
+                  const isPub = Boolean(evt.is_published);
+                  const locBadge = getLocationBadge(evt.stage_location);
+                  const dayInfo = days.find((d) => d.id === evt.day_id);
+                  const startTimeStr = new Date(evt.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  const endTimeStr = new Date(evt.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            return (
-              <div
-                key={evt.id}
-                className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-blue-500 hover:shadow-md group"
-              >
-                <div className="flex items-start sm:items-center gap-4 min-w-0">
-                  {/* 時刻表示ボックス */}
-                  <div className="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center shrink-0 min-w-[5.5rem]">
-                    <div className="text-xs font-mono font-black text-blue-600 tracking-tight">{startTimeStr}</div>
-                    <div className="text-[10px] font-mono text-slate-400 my-0.5">〜</div>
-                    <div className="text-xs font-mono font-bold text-slate-800 tracking-tight">{endTimeStr}</div>
-                  </div>
-
-                  <div className="space-y-1.5 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-semibold border ${locBadge.bg}`}>
-                        {locBadge.label}
-                      </span>
-                      {dayInfo && (
-                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-mono border border-slate-200">
-                          {dayInfo.label}
+                  return (
+                    <tr key={evt.id} className="hover:bg-slate-50/80 transition-colors group">
+                      <td className="py-3.5 px-4 font-mono font-bold whitespace-nowrap">
+                        <span className="text-blue-600">{startTimeStr}</span>
+                        <span className="text-slate-400 mx-1">〜</span>
+                        <span>{endTimeStr}</span>
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        {dayInfo ? (
+                          <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200">
+                            {dayInfo.label}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">-</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className={`px-2.5 py-0.5 rounded-lg font-semibold border ${locBadge.bg}`}>
+                          {locBadge.label}
                         </span>
-                      )}
-                    </div>
-                    <h4 className="font-bold text-base text-slate-900 truncate group-hover:text-blue-600 transition-colors">
-                      {evt.title}
-                    </h4>
-                  </div>
-                </div>
+                      </td>
+                      <td className="py-3.5 px-4 font-medium text-slate-700">
+                        {evt.organization_name ? (
+                          <span className="flex items-center gap-1 text-slate-900 font-semibold">
+                            <Users className="w-3.5 h-3.5 text-blue-600" />
+                            {evt.organization_name}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 italic">未指定</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                        {evt.title}
+                      </td>
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          isPub ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'
+                        }`}>
+                          {isPub ? '公開中' : '非公開'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleOpenEdit(evt)}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all border border-slate-300"
+                            title="編集"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
 
-                {/* 操作アクション */}
-                <div className="flex items-center gap-2 self-end sm:self-center shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-200 w-full sm:w-auto justify-end">
-                  <button
-                    onClick={() => handleOpenEdit(evt)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-medium transition-all border border-slate-300"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>編集</span>
-                  </button>
+                          <button
+                            onClick={() => onTogglePublish(evt.id, isPub)}
+                            className={`p-2 rounded-xl transition-all border ${
+                              isPub
+                                ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/25'
+                                : 'bg-red-500/15 text-red-600 border-red-500/30 hover:bg-red-500/25'
+                            }`}
+                            title={isPub ? "非公開にする" : "公開する"}
+                          >
+                            {isPub ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                          </button>
 
-                  <button
-                    onClick={() => onTogglePublish(evt.id, isPub)}
-                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-all border ${isPub
-                        ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/25'
-                        : 'bg-red-500/15 text-red-600 border-red-500/30 hover:bg-red-500/25'
-                      }`}
-                  >
-                    {isPub ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                    <span>{isPub ? '公開中' : '非公開'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => onDeleteEvent(evt.id, evt.title)}
-                    className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 transition-all border border-slate-300"
-                    title="削除"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                          <button
+                            onClick={() => onDeleteEvent(evt.id, evt.title)}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 transition-all border border-slate-300"
+                            title="削除"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* 新規ステージ演目登録モーダル */}
+      {/* 新規ステージ演目登録モーダル (半透明の黒背景) */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
-            className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
+            className="bg-slate-900/95 border border-slate-700/80 text-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-700/80 pb-4">
               <div>
-                <span className="text-xs font-mono text-blue-600 block uppercase tracking-wider">New Stage Event</span>
-                <h3 className="font-bold text-lg text-slate-900">新規ステージ演目の追加</h3>
+                <span className="text-xs font-mono text-blue-400 block uppercase tracking-wider">New Stage Event</span>
+                <h3 className="font-bold text-lg text-white">新規ステージ演目の追加</h3>
               </div>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-800 p-1 rounded-lg">
+              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-white p-1 rounded-lg">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">演目タイトル</label>
+                <label className="text-xs font-medium text-slate-300">演目タイトル (必須)</label>
                 <input
                   type="text"
                   value={createForm.title}
                   onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
                   placeholder="例: 軽音楽部 ライブステージ"
-                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                   required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-300">団体・サークル名 (organization_name)</label>
+                <input
+                  type="text"
+                  value={createForm.organization_name}
+                  onChange={(e) => setCreateForm({ ...createForm, organization_name: e.target.value })}
+                  placeholder="例: 軽音楽部・ダンス部・有志バンド"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">開催日</label>
+                  <label className="text-xs font-medium text-slate-300">開催日</label>
                   <select
                     value={createForm.day_id}
                     onChange={(e) => setCreateForm({ ...createForm, day_id: e.target.value })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                   >
                     {days.map((d) => (
-                      <option key={d.id} value={d.id}>
+                      <option key={d.id} value={d.id} className="bg-slate-900 text-white">
                         {d.label} ({d.date_string})
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">ステージ場所</label>
+                  <label className="text-xs font-medium text-slate-300">ステージ場所</label>
                   <select
                     value={createForm.location}
                     onChange={(e) => setCreateForm({ ...createForm, location: e.target.value as StageLocation })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                   >
-                    <option value="av_room">國枝記念国際ホール</option>
-                    <option value="gym">古賀記念アリーナ</option>
-                    <option value="courtyard">Nステ会場</option>
+                    <option value="av_room" className="bg-slate-900 text-white">國枝記念国際ホール</option>
+                    <option value="gym" className="bg-slate-900 text-white">古賀記念アリーナ</option>
+                    <option value="courtyard" className="bg-slate-900 text-white">Nステ会場</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">開始日時</label>
+                  <label className="text-xs font-medium text-slate-300">開始日時</label>
                   <input
                     type="datetime-local"
                     value={createForm.start_time}
                     onChange={(e) => setCreateForm({ ...createForm, start_time: e.target.value })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                     required
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">終了日時</label>
+                  <label className="text-xs font-medium text-slate-300">終了日時</label>
                   <input
                     type="datetime-local"
                     value={createForm.end_time}
                     onChange={(e) => setCreateForm({ ...createForm, end_time: e.target.value })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                     required
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/80">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-medium transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all border border-slate-700"
                 >
                   キャンセル
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg shadow-blue-600/20"
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg shadow-blue-600/30"
                 >
                   {isSubmitting ? '登録処理中...' : '演目を登録する'}
                 </button>
@@ -529,102 +582,113 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
         </div>
       )}
 
-      {/* 演目編集モーダル */}
+      {/* 演目編集モーダル (半透明の黒背景) */}
       {editingEvent && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
-            className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
+            className="bg-slate-900/95 border border-slate-700/80 text-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-700/80 pb-4">
               <div>
-                <span className="text-xs font-mono text-blue-600 block uppercase tracking-wider">Edit Event</span>
-                <h3 className="font-bold text-lg text-slate-900">演目編集: {editingEvent.title}</h3>
+                <span className="text-xs font-mono text-blue-400 block uppercase tracking-wider">Edit Event</span>
+                <h3 className="font-bold text-lg text-white">演目編集: {editingEvent.title}</h3>
               </div>
-              <button onClick={() => setEditingEvent(null)} className="text-slate-400 hover:text-slate-800 p-1 rounded-lg">
+              <button onClick={() => setEditingEvent(null)} className="text-slate-400 hover:text-white p-1 rounded-lg">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">演目タイトル</label>
+                <label className="text-xs font-medium text-slate-300">演目タイトル (必須)</label>
                 <input
                   type="text"
                   value={editForm.title}
                   onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                   required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-300">団体・サークル名 (organization_name)</label>
+                <input
+                  type="text"
+                  value={editForm.organization_name}
+                  onChange={(e) => setEditForm({ ...editForm, organization_name: e.target.value })}
+                  placeholder="例: 軽音楽部・ダンス部・有志バンド"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">開催日</label>
+                  <label className="text-xs font-medium text-slate-300">開催日</label>
                   <select
                     value={editForm.day_id}
                     onChange={(e) => setEditForm({ ...editForm, day_id: e.target.value })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                   >
                     {days.map((d) => (
-                      <option key={d.id} value={d.id}>
+                      <option key={d.id} value={d.id} className="bg-slate-900 text-white">
                         {d.label} ({d.date_string})
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">ステージ場所</label>
+                  <label className="text-xs font-medium text-slate-300">ステージ場所</label>
                   <select
                     value={editForm.location}
                     onChange={(e) => setEditForm({ ...editForm, location: e.target.value as StageLocation })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                   >
-                    <option value="av_room">國枝記念国際ホール</option>
-                    <option value="gym">古賀記念アリーナ</option>
-                    <option value="courtyard">Nステ会場</option>
+                    <option value="av_room" className="bg-slate-900 text-white">國枝記念国際ホール</option>
+                    <option value="gym" className="bg-slate-900 text-white">古賀記念アリーナ</option>
+                    <option value="courtyard" className="bg-slate-900 text-white">Nステ会場</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">開始日時</label>
+                  <label className="text-xs font-medium text-slate-300">開始日時</label>
                   <input
                     type="datetime-local"
                     value={editForm.start_time}
                     onChange={(e) => setEditForm({ ...editForm, start_time: e.target.value })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                     required
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">終了日時</label>
+                  <label className="text-xs font-medium text-slate-300">終了日時</label>
                   <input
                     type="datetime-local"
                     value={editForm.end_time}
                     onChange={(e) => setEditForm({ ...editForm, end_time: e.target.value })}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 transition-all shadow-xs"
                     required
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/80">
                 <button
                   type="button"
                   onClick={() => setEditingEvent(null)}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-medium transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all border border-slate-700"
                 >
                   キャンセル
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg shadow-blue-600/20"
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-lg shadow-blue-600/30"
                 >
-                  {isSubmitting ? '保存中...' : '変更を保存する'}
+                  {isSubmitting ? '更新処理中...' : '変更を保存する'}
                 </button>
               </div>
             </form>

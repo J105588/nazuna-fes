@@ -54,7 +54,7 @@ export const AdminPagesTab: React.FC<AdminPagesTabProps> = ({
             <span>ページ単位の公開・準備中設定</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            サイト上の各主要ページの公開状況をリアルタイムで切替できます。非公開（準備中）に設定したページに一般ユーザーがアクセスした際は、専用の和風ご案内画面とメッセージが表示されます。
+            サイト上の各主要ページの公開状況をリアルタイムで切替できます。非公開（準備中）に設定したページに一般ユーザーがアクセスした際は、案内画面とメッセージが表示されます。
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">

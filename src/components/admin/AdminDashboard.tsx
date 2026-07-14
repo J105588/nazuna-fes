@@ -298,6 +298,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     stage_location: StageLocation;
     description?: string;
     organization_id?: string;
+    organization_name?: string;
   }) => {
     try {
       await createTimetableEventInDB(data);
@@ -318,6 +319,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       stage_location: StageLocation;
       description?: string;
       organization_id?: string;
+      organization_name?: string;
     }
   ) => {
     try {

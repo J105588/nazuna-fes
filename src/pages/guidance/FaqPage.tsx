@@ -17,34 +17,43 @@ export const FaqPage: React.FC<FaqPageProps> = () => {
         </div>
 
         <div className="space-y-6 text-sm sm:text-base font-sans">
-          <div className="p-6 rounded-3xl bg-[#FAF8F5] space-y-2 border border-wafuu-ekasumi/50 shadow-sm">
+          <div className="p-6 rounded-3xl bg-[#FAF8F5] space-y-3 border border-wafuu-ekasumi/50 shadow-sm">
             <h4 className="font-bold text-[#2C3E55] flex items-center gap-2.5 text-base font-serif">
               <span className="w-6 h-6 rounded-lg bg-[#2C3E55] text-white flex items-center justify-center text-xs font-mono shrink-0">Q</span>
               <span>途中退場や再入場は可能ですか？</span>
             </h4>
-            <p className="pl-8 text-xs sm:text-sm text-wafuu-sumi/80 leading-relaxed">
-              はい、可能です。正門にて事前にご登録いただいたQRコードをご提示いただくことで、開催時間内であれば何度でも再入場いただけます。
-            </p>
+            <div className="flex items-start gap-2.5 pl-1">
+              <span className="w-6 h-6 rounded-lg bg-wafuu-shu text-white flex items-center justify-center text-xs font-mono shrink-0 mt-0.5 shadow-2xs">A</span>
+              <p className="text-xs sm:text-sm text-wafuu-sumi/90 leading-relaxed flex-1">
+                はい、可能です。正門にて事前にご登録いただいたQRコードをご提示いただくことで、開催時間内であれば何度でも再入場いただけます。
+              </p>
+            </div>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#FAF8F5] space-y-2 border border-wafuu-ekasumi/50 shadow-sm">
+          <div className="p-6 rounded-3xl bg-[#FAF8F5] space-y-3 border border-wafuu-ekasumi/50 shadow-sm">
             <h4 className="font-bold text-[#2C3E55] flex items-center gap-2.5 text-base font-serif">
               <span className="w-6 h-6 rounded-lg bg-[#2C3E55] text-white flex items-center justify-center text-xs font-mono shrink-0">Q</span>
               <span>校内での飲食ルールについて教えてください。</span>
             </h4>
-            <p className="pl-8 text-xs sm:text-sm text-wafuu-sumi/80 leading-relaxed">
-              歩行中の飲食はご遠慮ください。指定された飲食エリア、または指定の休憩教室でのお食事にご協力をお願いいたします。
-            </p>
+            <div className="flex items-start gap-2.5 pl-1">
+              <span className="w-6 h-6 rounded-lg bg-wafuu-shu text-white flex items-center justify-center text-xs font-mono shrink-0 mt-0.5 shadow-2xs">A</span>
+              <p className="text-xs sm:text-sm text-wafuu-sumi/90 leading-relaxed flex-1">
+                歩行中の飲食はご遠慮ください。指定された飲食エリア、または指定の休憩教室でのお食事にご協力をお願いいたします。
+              </p>
+            </div>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#FAF8F5] space-y-2 border border-wafuu-ekasumi/50 shadow-sm">
+          <div className="p-6 rounded-3xl bg-[#FAF8F5] space-y-3 border border-wafuu-ekasumi/50 shadow-sm">
             <h4 className="font-bold text-[#2C3E55] flex items-center gap-2.5 text-base font-serif">
               <span className="w-6 h-6 rounded-lg bg-[#2C3E55] text-white flex items-center justify-center text-xs font-mono shrink-0">Q</span>
               <span>落とし物をした場合はどこへ行けばよいですか？</span>
             </h4>
-            <p className="pl-8 text-xs sm:text-sm text-wafuu-sumi/80 leading-relaxed">
-              まずは<strong>「落とし物掲示板」</strong>をご確認ください。該当する品物が見つかった場合は、スマートフォン画面をご提示の上、<strong>「本館2階 総合案内所」</strong>までお越しください。
-            </p>
+            <div className="flex items-start gap-2.5 pl-1">
+              <span className="w-6 h-6 rounded-lg bg-wafuu-shu text-white flex items-center justify-center text-xs font-mono shrink-0 mt-0.5 shadow-2xs">A</span>
+              <p className="text-xs sm:text-sm text-wafuu-sumi/90 leading-relaxed flex-1">
+                まずは<strong className="text-wafuu-shu font-bold">「落とし物掲示板」</strong>をご確認ください。該当する品物が見つかった場合は、スマートフォン画面をご提示の上、<strong className="text-wafuu-kincha font-bold">「本館2階 総合案内所」</strong>までお越しください。
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -46,7 +46,7 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {}
+    onConfirm: () => { }
   });
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -127,7 +127,7 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
     setConfirmModal({
       isOpen: true,
       title: '管理者アカウントの削除確認',
-      message: `「${name}」の管理者アカウントを完全に削除しますか？\n削除すると、このユーザーは統合管理ポータルにアクセスできなくなります。`,
+      message: `「${name}」の管理者アカウントを完全に削除しますか？\n削除すると、このユーザーは管理画面にアクセスできなくなります。`,
       onConfirm: async () => {
         setConfirmModal((prev) => ({ ...prev, isOpen: false }));
         try {
@@ -159,91 +159,115 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
         onClose={() => setToastMessage(null)}
       />
 
-      {/* 新規ユーザー登録フォーム */}
-      <form
-        onSubmit={handleCreateUser}
-        className="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-md"
-      >
-        <div className="flex items-center justify-between border-b border-slate-200 pb-3.5">
-          <div>
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <UserPlus className="w-4 h-4 text-indigo-600" />
-              <span>新規管理者アカウントの追加</span>
-            </h3>
-            <p className="text-xs text-slate-600 mt-1">
-              実行委員会または関係教職員に新しい管理権限を付与します。
-            </p>
+      {/* 新規ユーザー登録フォーム (Superadminのみ表示・実行可能) */}
+      {currentUser?.role === 'superadmin' ? (
+        <form
+          onSubmit={handleCreateUser}
+          className="bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-md"
+        >
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3.5">
+            <div>
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                <UserPlus className="w-4 h-4 text-indigo-600" />
+                <span>新規管理者アカウントの追加 (Superadmin専用)</span>
+              </h3>
+              <p className="text-xs text-slate-600 mt-1">
+                どんなメールアドレスでもSupabase Authおよびadmin_usersに新規アカウントとして登録・連携可能です。
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={loadUsers}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-xs flex items-center gap-1.5 border border-slate-200 shadow-xs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <span>リスト同期</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700">メールアドレス (必須)</label>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="admin@nazuna.jp"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700">担当者・所属名 (必須)</label>
+              <input
+                type="text"
+                value={newDisplayName}
+                onChange={(e) => setNewDisplayName(e.target.value)}
+                placeholder="例: 実行委員会 本部・山田"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700">初期パスワード (任意)</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="••••••••••••"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700">権限レベル</label>
+              <select
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value as AdminRole)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+              >
+                <option value="admin">通常 (Admin)</option>
+                <option value="superadmin">統括管理 (Superadmin)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={isSubmitting || !newEmail || !newDisplayName}
+              className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:opacity-90 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-md"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>{isSubmitting ? '登録処理中...' : 'アカウントを作成して追加'}</span>
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-6 flex items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-amber-900">新規アカウント追加制限</h3>
+              <p className="text-xs text-amber-800 mt-0.5">
+                新規アカウントの追加・登録は Superadmin（統括管理者）権限を持つユーザーのみ実行できます。
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={loadUsers}
-            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-xs flex items-center gap-1.5 border border-slate-200 shadow-xs"
+            className="px-3 py-1.5 rounded-xl bg-white hover:bg-amber-100 text-amber-900 transition-all text-xs flex items-center gap-1.5 border border-amber-300 shadow-xs shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>リスト同期</span>
           </button>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700">メールアドレス (必須)</label>
-            <input
-              type="email"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              placeholder="admin@nazuna.jp"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
-              required
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700">担当者・所属名 (必須)</label>
-            <input
-              type="text"
-              value={newDisplayName}
-              onChange={(e) => setNewDisplayName(e.target.value)}
-              placeholder="例: 実行委員会 本部・山田"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
-              required
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700">初期パスワード (任意)</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="••••••••••••"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700">権限レベル</label>
-            <select
-              value={newRole}
-              onChange={(e) => setNewRole(e.target.value as AdminRole)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
-            >
-              <option value="admin">業務担当 (Admin)</option>
-              <option value="superadmin">統括管理 (Superadmin)</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="flex justify-end pt-2">
-          <button
-            type="submit"
-            disabled={isSubmitting || !newEmail || !newDisplayName}
-            className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:opacity-90 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-md"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>{isSubmitting ? '登録処理中...' : 'アカウントを作成して追加'}</span>
-          </button>
-        </div>
-      </form>
+      )}
 
       {/* 登録済み管理者一覧 */}
       <div className="space-y-4">
@@ -253,7 +277,7 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
             <span>登録済み管理者一覧 ({users.length}名)</span>
           </h3>
           <span className="text-xs text-slate-500">
-            Superadmin はすべてのアカウントおよび権限を管理できます。
+            Superadmin は自分の権限を変更できません。
           </span>
         </div>
 
@@ -298,11 +322,15 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
                         <select
                           value={editForm.role}
                           onChange={(e) => setEditForm({ ...editForm, role: e.target.value as AdminRole })}
-                          className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500"
+                          disabled={isCurrent && isSuper}
+                          className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed"
                         >
-                          <option value="admin">業務担当 (Admin)</option>
+                          <option value="admin">通常 (Admin)</option>
                           <option value="superadmin">統括管理 (Superadmin)</option>
                         </select>
+                        {isCurrent && isSuper && (
+                          <span className="text-[10px] text-rose-600 block mt-0.5">※自身の Superadmin 権限は変更できません</span>
+                        )}
                       </div>
                     </div>
 
@@ -333,11 +361,10 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
                 >
                   <div className="flex items-start gap-3.5 min-w-0">
                     <div
-                      className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-xs shadow-xs ${
-                        isSuper
-                          ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                          : 'bg-slate-100 text-slate-700 border border-slate-200'
-                      }`}
+                      className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-xs shadow-xs ${isSuper
+                        ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                        : 'bg-slate-100 text-slate-700 border border-slate-200'
+                        }`}
                     >
                       {isSuper ? <Shield className="w-5 h-5" /> : <UserCheck className="w-5 h-5" />}
                     </div>
@@ -352,11 +379,10 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
                           </span>
                         )}
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border ${
-                            isSuper
-                              ? 'bg-amber-50 text-amber-700 border-amber-200'
-                              : 'bg-slate-100 text-slate-700 border-slate-200'
-                          }`}
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border ${isSuper
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-slate-100 text-slate-700 border-slate-200'
+                            }`}
                         >
                           {isSuper ? 'SUPERADMIN' : 'ADMIN'}
                         </span>
@@ -380,7 +406,9 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
                     <select
                       value={u.role}
                       onChange={(e) => handleRoleChange(u.id, e.target.value as AdminRole)}
-                      className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-indigo-500 transition-all"
+                      disabled={(isCurrent && isSuper) || currentUser?.role !== 'superadmin'}
+                      title={isCurrent && isSuper ? "自身のSuperadmin権限は変更できません" : "権限変更"}
+                      className="bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-indigo-500 transition-all disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
                     >
                       <option value="admin">Admin</option>
                       <option value="superadmin">Superadmin</option>
@@ -388,9 +416,9 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ curren
 
                     <button
                       onClick={() => handleDeleteUserClick(u.id, u.display_name)}
-                      disabled={isCurrent}
-                      className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 disabled:opacity-30 text-slate-500 hover:text-red-600 transition-all border border-slate-200"
-                      title="削除"
+                      disabled={isCurrent || currentUser?.role !== 'superadmin'}
+                      className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 disabled:opacity-30 text-slate-500 hover:text-red-600 transition-all border border-slate-200 disabled:cursor-not-allowed"
+                      title={isCurrent ? "自身のアカウントは削除できません" : "削除"}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

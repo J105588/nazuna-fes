@@ -65,7 +65,7 @@ export function startNazunaGraphPeriodicSync(ownerIds: string[], intervalMs = 45
 
   periodicSyncTimer = setInterval(() => {
     ownerIds.forEach(id => {
-      fetchNazunaGraphItems({ owner_id: id, _background_refresh: true }).catch(() => {});
+      fetchNazunaGraphItems({ owner_id: id, _background_refresh: true }).catch(() => { });
     });
   }, intervalMs);
 }
@@ -98,7 +98,7 @@ export async function fetchNazunaGraphItems(options: {
   if (!options._background_refresh && nazunaGraphCache[cacheKey] && (now - nazunaGraphCache[cacheKey].timestamp < STALE_TTL_MS)) {
     if (!nazunaGraphCache[cacheKey].isUpdating) {
       nazunaGraphCache[cacheKey].isUpdating = true;
-      fetchNazunaGraphItems({ ...options, _background_refresh: true }).catch(() => {});
+      fetchNazunaGraphItems({ ...options, _background_refresh: true }).catch(() => { });
     }
     return nazunaGraphCache[cacheKey].data;
   }
@@ -221,9 +221,9 @@ export async function fetchVotePyramid(orgId: string): Promise<VotePyramidData> 
       class_id: orgId,
       pyramid_tier: 'embargoed',
       tier_label: '集計準備中',
-      release_title: '開示スケジュール準備中',
+      release_title: '開示準備中',
       is_embargoed: true,
-      embargo_message: '結果開示スケジュールをお待ちください。'
+      embargo_message: '結果開示をお待ちください。'
     };
   }
 

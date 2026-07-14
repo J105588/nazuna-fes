@@ -58,30 +58,30 @@ export const InfoDeskPage: React.FC<InfoDeskPageProps> = ({ onNavigateTab }) => 
           </div>
 
           {/* 落とし物との接続バナー */}
-          <div className="p-8 rounded-3xl bg-gradient-to-r from-[#1E293B] to-[#0F172A] text-white space-y-5 shadow-xl border border-wafuu-ai/40 relative overflow-hidden mt-6">
-            <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
-              <Search className="w-64 h-64 -mr-12 -mb-12 text-white" />
+          <div className="p-8 rounded-3xl bg-gradient-to-br from-[#FFFDF9] via-[#FAF6EE] to-[#F5EFE6] border-2 border-wafuu-kincha/60 text-wafuu-sumi space-y-5 shadow-lg relative overflow-hidden mt-6">
+            <div className="absolute right-0 bottom-0 opacity-[0.07] pointer-events-none">
+              <Search className="w-64 h-64 -mr-12 -mb-12 text-wafuu-kincha" />
             </div>
 
             <div className="space-y-2 relative z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-wafuu-shu/20 border border-wafuu-shu/40 text-xs font-bold text-[#FF9E9E]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-wafuu-shu/10 border border-wafuu-shu/30 text-xs font-bold text-wafuu-shu">
                 <span>落とし物・遺失物についてのお知らせ</span>
               </div>
-              <h4 className="text-xl sm:text-2xl font-black font-serif tracking-wide">
+              <h4 className="text-xl sm:text-2xl font-black font-serif tracking-wide text-wafuu-sumi">
                 落とし物は「落とし物掲示板」から検索が可能です
               </h4>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#E2E8F0]/80 leading-relaxed max-w-3xl relative z-10 font-serif">
-              校内での落とし物・お忘れ物は、実行委員より<strong>『落とし物掲示板』</strong>へ随時配信されております。<br />
-              お探しの品物がある場合は、総合案内所でお並びいただく前に、まずは<strong>『落とし物掲示板』</strong>をご確認ください。
+            <p className="text-xs sm:text-sm text-wafuu-sumi/80 leading-relaxed max-w-3xl relative z-10 font-serif">
+              校内での落とし物・お忘れ物は、実行委員より<strong className="text-wafuu-shu font-bold">『落とし物掲示板』</strong>へ随時配信されております。<br />
+              お探しの品物がある場合は、総合案内所でお並びいただく前に、まずは<strong className="text-wafuu-shu font-bold">『落とし物掲示板』</strong>をご確認ください。
             </p>
 
             <div className="pt-2 relative z-10">
               <button
                 type="button"
                 onClick={() => onNavigateTab && onNavigateTab('lostfound')}
-                className="py-3.5 px-8 rounded-2xl font-bold text-sm bg-wafuu-kincha hover:bg-[#E5C158] text-[#121A2C] transition-all shadow-lg flex items-center gap-3 active:scale-95"
+                className="py-3.5 px-8 rounded-2xl font-bold text-sm bg-wafuu-kincha hover:bg-[#E5C158] text-[#121A2C] transition-all shadow-md flex items-center gap-3 active:scale-95"
               >
                 <span>落とし物掲示板へ移動</span>
                 <ArrowRight className="w-4 h-4" />

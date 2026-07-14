@@ -56,10 +56,6 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2.5">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold tracking-wide shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping" />
-              <span>なずな祭 管理システム</span>
-            </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
               お疲れ様です、{currentUser?.display_name || 'no-user'} さん
             </h2>

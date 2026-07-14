@@ -127,7 +127,25 @@ export const App: React.FC = () => {
   const [timetableEvents, setTimetableEvents] = useState<TimetableEvent[]>(mockTimetableEvents);
   const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
   const [lostItems, setLostItems] = useState<LostItem[]>(mockLostItems);
-  const [pageSettings, setPageSettings] = useState<PageSetting[]>(mockPageSettings);
+  const [pageSettings, setPageSettings] = useState<PageSetting[]>(() => {
+    try {
+      const cached = localStorage.getItem('nazuna_cached_page_settings');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return mockPageSettings;
+  });
+  const [isSettingsLoaded, setIsSettingsLoaded] = useState<boolean>(() => {
+    try {
+      return !!localStorage.getItem('nazuna_cached_page_settings');
+    } catch {
+      return false;
+    }
+  });
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
 
   const [genreQuick, setGenreQuick] = useState<string>('all');
@@ -142,23 +160,32 @@ export const App: React.FC = () => {
   useEffect(() => {
     // 初回マウント時にSupabase DBから正確に動的取得
     async function loadFromDB() {
-      const orgs = await fetchOrganizationsFromDB();
-      const evts = await fetchTimetableEventsFromDB();
-      const anns = await fetchAnnouncementsFromDB();
-      const losts = await fetchLostItemsFromDB();
-      const pages = await fetchPageSettingsFromDB();
+      try {
+        const orgs = await fetchOrganizationsFromDB();
+        const evts = await fetchTimetableEventsFromDB();
+        const anns = await fetchAnnouncementsFromDB();
+        const losts = await fetchLostItemsFromDB();
+        const pages = await fetchPageSettingsFromDB();
 
-      if (orgs.length > 0) setOrganizations(orgs);
-      if (evts.length > 0) setTimetableEvents(evts);
-      if (anns.length > 0) setAnnouncements(anns);
-      if (losts.length > 0) setLostItems(losts);
-      if (pages.length > 0) setPageSettings(pages);
+        if (orgs.length > 0) setOrganizations(orgs);
+        if (evts.length > 0) setTimetableEvents(evts);
+        if (anns.length > 0) setAnnouncements(anns);
+        if (losts.length > 0) setLostItems(losts);
+        if (pages.length > 0) {
+          setPageSettings(pages);
+          try {
+            localStorage.setItem('nazuna_cached_page_settings', JSON.stringify(pages));
+          } catch {}
+        }
 
-      if (supabase) {
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          setIsAdminLoggedIn(!!session?.user);
-        } catch {}
+        if (supabase) {
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            setIsAdminLoggedIn(!!session?.user);
+          } catch {}
+        }
+      } finally {
+        setIsSettingsLoaded(true);
       }
     }
     loadFromDB();
@@ -168,7 +195,13 @@ export const App: React.FC = () => {
       (newEvts: TimetableEvent[]) => setTimetableEvents(newEvts),
       (newAnns: Announcement[]) => setAnnouncements(newAnns),
       (newLosts: LostItem[]) => setLostItems(newLosts),
-      (newPages: PageSetting[]) => setPageSettings(newPages)
+      (newPages: PageSetting[]) => {
+        setPageSettings(newPages);
+        try {
+          localStorage.setItem('nazuna_cached_page_settings', JSON.stringify(newPages));
+        } catch {}
+        setIsSettingsLoaded(true);
+      }
     );
 
     let authUnsubscribe: (() => void) | undefined;
@@ -305,6 +338,17 @@ export const App: React.FC = () => {
                 isAdminLoggedIn={isAdminLoggedIn}
                 isHiddenPage={true}
               />
+            </main>
+          );
+        }
+
+        if (!isSettingsLoaded && currentTab !== 'home') {
+          return (
+            <main className="w-full pt-20 min-h-[70vh] flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 rounded-full border-2 border-slate-300 border-t-[#C5A059] animate-spin" />
+                <p className="text-xs text-slate-400 font-mono tracking-wider">ページ状態を確認中...</p>
+              </div>
             </main>
           );
         }

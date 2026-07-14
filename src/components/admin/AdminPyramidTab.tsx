@@ -508,19 +508,19 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
 
       {/* 新規開示タイミング作成モーダル */}
       {isCreating && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
-            className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
+            className="bg-slate-900/95 border border-slate-700/80 text-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-700/80 pb-4">
               <div>
-                <span className="text-xs font-mono text-indigo-600 block uppercase tracking-wider">New Schedule</span>
-                <h3 className="font-bold text-lg text-slate-900">新規ピラミッド開示タイミングの追加</h3>
+                <span className="text-xs font-mono text-indigo-400 block uppercase tracking-wider">New Schedule</span>
+                <h3 className="font-bold text-lg text-white">新規ピラミッド開示タイミングの追加</h3>
               </div>
               <button
                 onClick={() => setIsCreating(false)}
-                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-all"
+                className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -528,46 +528,46 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
 
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">開示タイトル</label>
+                <label className="text-xs font-medium text-slate-300">開示タイトル</label>
                 <input
                   type="text"
                   value={createForm.title}
                   onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
                   placeholder="例: 中間発表2, 最終結果発表"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">開示予定時刻</label>
+                <label className="text-xs font-medium text-slate-300">開示予定時刻</label>
                 <input
                   type="datetime-local"
                   value={createForm.scheduledTime}
                   onChange={(e) => setCreateForm({ ...createForm, scheduledTime: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-indigo-500 transition-all"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">ロック中の表示メッセージ</label>
+                <label className="text-xs font-medium text-slate-300">ロック中の表示メッセージ</label>
                 <input
                   type="text"
                   value={createForm.embargoMessage}
                   onChange={(e) => setCreateForm({ ...createForm, embargoMessage: e.target.value })}
                   placeholder="例: 15:00 頃に順位と結果を公開します"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
                   required
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/80">
                 <button
                   type="button"
                   onClick={() => setIsCreating(false)}
                   disabled={isCreatingSaving}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all border border-slate-200"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all border border-slate-700"
                 >
                   キャンセル
                 </button>

@@ -261,56 +261,56 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
         </div>
       )}
 
-      {/* 新規登録ドロワー/モーダル */}
+      {/* 新規登録ドロワー/モーダル (半透明の黒背景) */}
       {showCreateDrawer && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
-            className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
+            className="bg-slate-900/95 border border-slate-700/80 text-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-700/80 pb-4">
               <div>
-                <span className="text-xs font-mono text-emerald-600 block uppercase tracking-wider">New Lost Item</span>
-                <h3 className="font-bold text-lg text-slate-900">拾得物の新規登録</h3>
+                <span className="text-xs font-mono text-emerald-400 block uppercase tracking-wider">New Lost Item</span>
+                <h3 className="font-bold text-lg text-white">拾得物の新規登録</h3>
               </div>
-              <button onClick={() => setShowCreateDrawer(false)} className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+              <button onClick={() => setShowCreateDrawer(false)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">拾得品目・特徴</label>
+                <label className="text-xs font-medium text-slate-300">拾得品目・特徴</label>
                 <input
                   type="text"
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
                   placeholder="例: 黒い折り畳み傘, 水色のスマートフォン"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">拾得場所</label>
+                <label className="text-xs font-medium text-slate-300">拾得場所</label>
                 <input
                   type="text"
                   value={foundPlace}
                   onChange={(e) => setFoundPlace(e.target.value)}
                   placeholder="例: 第一体育館 入口付近, 中庭ベンチ"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">保管・引き取り窓口</label>
+                <label className="text-xs font-medium text-slate-300">保管・引き取り窓口</label>
                 <input
                   type="text"
                   value={storageLocation}
                   onChange={(e) => setStorageLocation(e.target.value)}
                   placeholder="例: 本館2階総合案内所"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all"
                   required
                 />
                 {/* 窓口サジェスト */}
@@ -320,7 +320,7 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
                       key={sug}
                       type="button"
                       onClick={() => setStorageLocation(sug)}
-                      className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-[10px] text-slate-700 border border-slate-200 transition-colors"
+                      className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 border border-slate-700 transition-colors"
                     >
                       {sug}
                     </button>
@@ -329,27 +329,27 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">写真画像URL (任意)</label>
+                <label className="text-xs font-medium text-slate-300">写真画像URL (任意)</label>
                 <input
                   type="text"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://example.com/photo.jpg"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-emerald-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-emerald-500 transition-all"
                 />
                 {imageUrl && (
-                  <div className="mt-2 h-24 w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+                  <div className="mt-2 h-24 w-full rounded-xl overflow-hidden bg-slate-800 border border-slate-700 flex items-center justify-center">
                     <img src={imageUrl} alt="preview" className="h-full object-contain" />
                   </div>
                 )}
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/80">
                 <button
                   type="button"
                   onClick={() => setShowCreateDrawer(false)}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all border border-slate-200"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all border border-slate-700"
                 >
                   キャンセル
                 </button>

@@ -113,14 +113,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       {/* PCサイドバー (中〜大画面用) */}
       <aside className="w-64 bg-white flex-col justify-between p-4 fixed top-0 bottom-0 left-0 z-40 hidden md:flex select-none border-r border-slate-200 shadow-sm">
         <div className="space-y-6 overflow-y-auto no-scrollbar pb-4">
-          {/* ブランドロゴ */}
           <div className="flex items-center gap-3 px-2 py-1">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-base shadow-md tracking-tighter">
-              N
-            </div>
             <div>
               <h1 className="font-bold text-sm tracking-tight text-slate-900 flex items-center gap-1.5">
-                <span>統合管理ポータル</span>
+                <span>管理画面</span>
               </h1>
               <p className="text-[10px] text-blue-600 font-mono tracking-wider uppercase">Nazuna Fes 2026</p>
             </div>
@@ -219,7 +215,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <div className="p-3.5 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="min-w-0">
-              <span className="font-bold text-sm text-slate-900 block truncate">管理ポータル</span>
+              <span className="font-bold text-sm text-slate-900 block truncate">管理画面</span>
               <span className="text-[10px] text-blue-600 font-mono block truncate">
                 {currentUser?.display_name || 'no-user'} ({isSuper ? 'Superadmin' : 'Admin'})
               </span>

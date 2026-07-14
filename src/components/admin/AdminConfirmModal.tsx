@@ -33,20 +33,20 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
     switch (variant) {
       case 'danger':
         return {
-          iconBg: 'bg-red-50 border-red-200 text-red-600',
+          iconBg: 'bg-red-500/15 border-red-500/30 text-red-400',
           confirmBtn: 'bg-red-600 hover:bg-red-500 text-white shadow-md',
           icon: <ShieldAlert className="w-6 h-6" />
         };
       case 'warning':
         return {
-          iconBg: 'bg-amber-50 border-amber-200 text-amber-600',
+          iconBg: 'bg-amber-500/15 border-amber-500/30 text-amber-400',
           confirmBtn: 'bg-amber-600 hover:bg-amber-500 text-white shadow-md',
           icon: <AlertTriangle className="w-6 h-6" />
         };
       case 'info':
       default:
         return {
-          iconBg: 'bg-blue-50 border-blue-200 text-blue-600',
+          iconBg: 'bg-blue-500/15 border-blue-500/30 text-blue-400',
           confirmBtn: 'bg-blue-600 hover:bg-blue-500 text-white shadow-md',
           icon: <Info className="w-6 h-6" />
         };
@@ -56,9 +56,9 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
   const styles = getVariantStyles();
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm select-none animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md select-none animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-6 transform animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md bg-slate-900/95 border border-slate-700/80 text-white rounded-3xl p-6 shadow-2xl space-y-6 transform animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
@@ -67,29 +67,29 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
               {styles.icon}
             </div>
             <div>
-              <h3 className="font-bold text-lg text-slate-900 tracking-tight">{title}</h3>
-              <p className="text-xs text-slate-500 mt-0.5">確認が必要な操作です</p>
+              <h3 className="font-bold text-lg text-white tracking-tight">{title}</h3>
+              <p className="text-xs text-slate-400 mt-0.5">確認が必要な操作です</p>
             </div>
           </div>
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-all"
+            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 leading-relaxed">
+        <div className="p-4 rounded-xl bg-slate-800/90 border border-slate-700/80 text-sm text-slate-200 leading-relaxed">
           {message}
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-200">
+        <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-700/80">
           <button
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs transition-all border border-slate-200 disabled:opacity-50"
+            className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-all border border-slate-700 disabled:opacity-50"
           >
             {cancelLabel}
           </button>

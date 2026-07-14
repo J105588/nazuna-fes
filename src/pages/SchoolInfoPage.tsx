@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, Compass, Flame, ArrowDown, ShieldCheck, ArrowRight, Eye, Star } from 'lucide-react';
+import { HyakkiToHyakkaiShowcase } from '../components/info/HyakkiToHyakkaiShowcase';
 
 export const SchoolInfoPage: React.FC = () => {
   const [activeAct, setActiveAct] = useState<number>(1);
@@ -19,31 +20,30 @@ export const SchoolInfoPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-14 sm:py-20 relative z-10 space-y-24">
         
         {/* ==========================================================
-            ヒーロータイトル・テーマ解説「百輝夜行」ポータル
+            【メイン】タイポグラフィ・トランスフォーム・ショーケース（3案インタラクティブ体験）
         ========================================================== */}
-        <div className="text-center space-y-7 relative pt-6 pb-12 border-b border-white/10">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-wafuu-shu/20 via-wafuu-kincha/20 to-wafuu-ai/20 border border-wafuu-kincha/40 text-xs font-bold text-[#FFE895] tracking-[0.25em] uppercase font-mono shadow-lg backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-wafuu-kincha animate-spin" style={{ animationDuration: '6s' }} />
-            <span>THEME STORY & CONCEPT OF NAZUNA FESTIVAL 2026</span>
-          </div>
+        <section className="pt-2">
+          <HyakkiToHyakkaiShowcase />
+        </section>
 
-          <div className="space-y-3">
-            <span className="text-sm sm:text-base tracking-[0.3em] text-wafuu-kincha block font-bold">
-              第76回 なずな祭 公式テーマ解説ストーリー
+        {/* ==========================================================
+            四幕ストーリー：クイックナビゲーション＆導入
+        ========================================================== */}
+        <div className="text-center space-y-6 pt-8 border-t border-white/10">
+          <div className="space-y-2">
+            <span className="text-xs sm:text-sm tracking-[0.3em] text-wafuu-kincha block font-bold">
+              第76回 なずな祭 公式ストーリー詳細
             </span>
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-widest font-serif drop-shadow-md">
-              「百輝夜行」
-            </h1>
+            <h3 className="text-2xl sm:text-4xl font-black text-white tracking-widest font-serif">
+              「百輝夜行」四幕の物語
+            </h3>
           </div>
-
-          <p className="text-sm sm:text-lg text-wafuu-kinari/85 max-w-3xl mx-auto leading-relaxed font-serif tracking-wide pt-2">
-            古来の言い伝へにおける『百鬼夜行』――夜闇をゆくあやかし達の行進を、<br className="hidden sm:block" />
-            私たちは一人ひとりの個性が光り輝く『百輝夜行』へと昇華させました。<br />
-            ここにつづるのは、なずな祭が繰り広げる四幕の輝きの物語です。
+          <p className="text-xs sm:text-sm text-wafuu-kinari/80 max-w-2xl mx-auto font-serif leading-relaxed">
+            ここで紐解かれるのは、宵闇からパレードの結実まで、なずな祭が辿る四つの幕（アクト）です。
           </p>
 
           {/* 4幕クイックナビゲーションバー */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-6 font-sans">
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-4 font-sans">
             {[
               { act: 1, title: '第一幕：宵闇と静寂', color: 'from-[#131D2E] to-[#1E2E4A]', border: 'border-wafuu-ai' },
               { act: 2, title: '第二幕：和傘と一筆の閃光', color: 'from-[#6E1418] to-[#9E1B22]', border: 'border-wafuu-shu' },
@@ -69,7 +69,7 @@ export const SchoolInfoPage: React.FC = () => {
             ))}
           </div>
 
-          <div className="pt-6 text-wafuu-kincha/60 animate-bounce flex justify-center">
+          <div className="pt-4 text-wafuu-kincha/60 animate-bounce flex justify-center">
             <ArrowDown className="w-6 h-6" />
           </div>
         </div>

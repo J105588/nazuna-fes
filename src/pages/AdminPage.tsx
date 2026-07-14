@@ -105,6 +105,41 @@ export const AdminPage: React.FC<AdminPageProps> = ({
     };
   }, []);
 
+  // 管理画面の自動タイムアウト (30分無操作で自動ログアウト)
+  useEffect(() => {
+    if (!role) return;
+
+    const TIMEOUT_MS = 30 * 60 * 1000; // 30分
+    let lastActivity = Date.now();
+
+    const resetActivity = () => {
+      lastActivity = Date.now();
+    };
+
+    const activityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+    activityEvents.forEach((evt) => window.addEventListener(evt, resetActivity));
+
+    const checkInterval = setInterval(async () => {
+      if (Date.now() - lastActivity > TIMEOUT_MS) {
+        clearInterval(checkInterval);
+        activityEvents.forEach((evt) => window.removeEventListener(evt, resetActivity));
+        if (supabase) {
+          try {
+            await supabase.auth.signOut();
+          } catch { }
+        }
+        setRole(null);
+        setCurrentUser(null);
+        alert('長時間の無操作状態が続いたため、セキュリティ保護のために自動タイムアウト（ログアウト）しました。再度ログインしてください。');
+      }
+    }, 15000);
+
+    return () => {
+      clearInterval(checkInterval);
+      activityEvents.forEach((evt) => window.removeEventListener(evt, resetActivity));
+    };
+  }, [role]);
+
   const handleLoginSuccess = (userOrRole: any) => {
     if (typeof userOrRole === 'object' && userOrRole !== null && userOrRole.role) {
       setCurrentUser(userOrRole as AdminUser);

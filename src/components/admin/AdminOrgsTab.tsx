@@ -510,25 +510,25 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
         </div>
       )}
 
-      {/* 団体情報編集・作成ドロワー/モーダル */}
+      {/* 団体情報編集・作成ドロワー/モーダル (半透明の黒背景) */}
       {(editingOrg || isCreatingOrg) && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div
-            className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200"
+            className="bg-slate-900/95 border border-slate-700/80 text-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-700/80 pb-4">
               <div>
-                <span className="text-xs font-mono text-blue-600 block uppercase tracking-wider">
+                <span className="text-xs font-mono text-blue-400 block uppercase tracking-wider">
                   {isCreatingOrg ? 'New Organization' : 'Edit Organization'}
                 </span>
-                <h3 className="font-bold text-lg text-slate-900">
+                <h3 className="font-bold text-lg text-white">
                   {isCreatingOrg ? '新規出展団体の登録' : `団体・企画の編集: ${editingOrg?.name}`}
                 </h3>
               </div>
               <button
                 onClick={() => { setEditingOrg(null); setIsCreatingOrg(false); }}
-                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-all"
+                className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -536,75 +536,75 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
 
             <form onSubmit={isCreatingOrg ? handleSaveCreate : handleSaveEdit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">団体・企画名</label>
+                <label className="text-xs font-medium text-slate-300">団体・企画名</label>
                 <input
                   type="text"
                   value={orgForm.name}
                   onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
                   placeholder="例: 3年A組「赤い和傘と極夜の謎解き迷宮」"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">教室コード</label>
+                  <label className="text-xs font-medium text-slate-300">教室コード</label>
                   <input
                     type="text"
                     value={orgForm.room_code}
                     onChange={(e) => setOrgForm({ ...orgForm, room_code: e.target.value })}
                     placeholder="例: 3A, 3-3, 102"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-all"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">フロア情報</label>
+                  <label className="text-xs font-medium text-slate-300">フロア情報</label>
                   <input
                     type="text"
                     value={orgForm.floor_info}
                     onChange={(e) => setOrgForm({ ...orgForm, floor_info: e.target.value })}
                     placeholder="例: 本館3階 北側教室"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">種別</label>
+                  <label className="text-xs font-medium text-slate-300">種別</label>
                   <select
                     value={orgForm.category}
                     onChange={(e) => setOrgForm({ ...orgForm, category: e.target.value as OrganizationCategory })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
                   >
-                    <option value="class">クラス企画</option>
-                    <option value="club">部活動・委員会</option>
-                    <option value="volunteer">有志企画</option>
+                    <option value="class" className="bg-slate-900 text-white">クラス企画</option>
+                    <option value="club" className="bg-slate-900 text-white">部活動・委員会</option>
+                    <option value="volunteer" className="bg-slate-900 text-white">有志企画</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">ジャンル</label>
+                  <label className="text-xs font-medium text-slate-300">ジャンル</label>
                   <select
                     value={orgForm.genre}
                     onChange={(e) => setOrgForm({ ...orgForm, genre: e.target.value as OrganizationGenre })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
                   >
-                    <option value="attraction">アトラクション</option>
-                    <option value="food">喫茶・食品</option>
-                    <option value="exhibition">展示・アート</option>
-                    <option value="stage">ステージ</option>
+                    <option value="attraction" className="bg-slate-900 text-white">アトラクション</option>
+                    <option value="food" className="bg-slate-900 text-white">喫茶・食品</option>
+                    <option value="exhibition" className="bg-slate-900 text-white">展示・アート</option>
+                    <option value="stage" className="bg-slate-900 text-white">ステージ</option>
                   </select>
                 </div>
               </div>
 
               {orgForm.genre === 'food' && (
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4">
+                <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <Coffee className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                    <Coffee className="w-5 h-5 text-blue-400 mt-0.5 shrink-0" />
                     <div>
-                      <span className="text-xs font-bold text-slate-900 block">NazunaGraph メニュー在庫API連携</span>
-                      <span className="text-[11px] text-slate-600 leading-relaxed block mt-0.5">
+                      <span className="text-xs font-bold text-white block">NazunaGraph メニュー在庫API連携</span>
+                      <span className="text-[11px] text-slate-400 leading-relaxed block mt-0.5">
                         オンにすると定時リクエスト＆キャッシュにより、メニューや混雑状況が自動同期されます。
                       </span>
                     </div>
@@ -613,14 +613,14 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     type="checkbox"
                     checked={orgForm.use_menu_api}
                     onChange={(e) => setOrgForm({ ...orgForm, use_menu_api: e.target.checked })}
-                    className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 bg-white cursor-pointer shrink-0"
+                    className="w-5 h-5 rounded border-slate-600 text-blue-600 focus:ring-blue-500 bg-slate-900 cursor-pointer shrink-0"
                   />
                 </div>
               )}
 
               {orgForm.genre === 'food' && orgForm.use_menu_api && (
-                <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-2">
-                  <label className="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
+                <div className="p-4 rounded-2xl bg-indigo-950/60 border border-indigo-700/60 space-y-2">
+                  <label className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
                     <span>NazunaGraph 独立クラスID (`menu_owner_id`)</span>
                   </label>
                   <input
@@ -628,42 +628,42 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     value={orgForm.menu_owner_id}
                     onChange={(e) => setOrgForm({ ...orgForm, menu_owner_id: e.target.value })}
                     placeholder="例: 3-3, 3-A, 2-C (空白時は通常のクラスコードから自動取得)"
-                    className="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-indigo-500 transition-all"
+                    className="w-full bg-slate-900/90 border border-indigo-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-indigo-400 transition-all"
                   />
-                  <p className="text-[11px] text-indigo-700 leading-relaxed">
+                  <p className="text-[11px] text-indigo-300/90 leading-relaxed">
                     ※ NazunaGraphAPIがオンにされたとき、クラスIDは通常の出展団体UUIDや部屋番号ではなく独立したものになります。3-3のような形式で入力することで、当該パラメータを付与してデータを取得します。
                   </p>
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">紹介説明文</label>
+                <label className="text-xs font-medium text-slate-300">紹介説明文</label>
                 <textarea
                   rows={4}
                   value={orgForm.description}
                   onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
                   placeholder="企画の特徴や来場者へのアピールポイントを入力してください。"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all leading-relaxed"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all leading-relaxed"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700">メイン画像URL</label>
+                <label className="text-xs font-medium text-slate-300">メイン画像URL</label>
                 <input
                   type="text"
                   value={orgForm.image_url}
                   onChange={(e) => setOrgForm({ ...orgForm, image_url: e.target.value })}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-all"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/80">
                 <button
                   type="button"
                   onClick={() => { setEditingOrg(null); setIsCreatingOrg(false); }}
                   disabled={isSaving}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all border border-slate-200"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all border border-slate-700"
                 >
                   キャンセル
                 </button>
