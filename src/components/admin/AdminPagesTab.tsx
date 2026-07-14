@@ -44,29 +44,6 @@ export const AdminPagesTab: React.FC<AdminPagesTabProps> = ({
     }
   };
 
-  const getPageDescription = (id: string): string => {
-    switch (id) {
-      case 'home':
-        return '総合トップページ・お知らせサマリー・オープニング演出等';
-      case 'exhibitions':
-        return 'クラス・部活動・有志等の出し物・展示の企画一覧ページ';
-      case 'timetable':
-        return '体育館・中庭等各ステージの演目タイムテーブルページ';
-      case 'map':
-        return '校内キャンパスマップおよび外部案内マップページ';
-      case 'info':
-        return '2026年度なずな祭テーマ「百輝夜行」紹介・学校案内ページ';
-      case 'lostfound':
-        return '遺失物・拾得物の検索および総合案内所への返却状況ページ';
-      case 'guidance':
-        return 'アクセス窓口・ご来場者様向け諸注意・よくある質問ページ';
-      case 'policy':
-        return '撮影規約・プライバシーポリシーおよび利用規約ページ';
-      default:
-        return '個別公開管理ページ';
-    }
-  };
-
   return (
     <div className="space-y-6 animate-fade-in">
       {/* ヘッダー・一括操作ボタン */}
@@ -107,21 +84,19 @@ export const AdminPagesTab: React.FC<AdminPagesTabProps> = ({
           return (
             <div
               key={page.id}
-              className={`bg-white rounded-2xl p-5 border transition-all duration-200 flex flex-col justify-between shadow-xs ${
-                page.is_public
-                  ? 'border-slate-200/80 hover:border-blue-300'
-                  : 'border-amber-300/80 bg-amber-50/20 hover:border-amber-400'
-              }`}
+              className={`bg-white rounded-2xl p-5 border transition-all duration-200 flex flex-col justify-between shadow-xs ${page.is_public
+                ? 'border-slate-200/80 hover:border-blue-300'
+                : 'border-amber-300/80 bg-amber-50/20 hover:border-amber-400'
+                }`}
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
-                        page.is_public
-                          ? 'bg-blue-50 text-blue-600 border border-blue-200/60'
-                          : 'bg-amber-100 text-amber-700 border border-amber-300/60'
-                      }`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${page.is_public
+                        ? 'bg-blue-50 text-blue-600 border border-blue-200/60'
+                        : 'bg-amber-100 text-amber-700 border border-amber-300/60'
+                        }`}
                     >
                       {page.is_public ? <Globe className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
                     </div>
@@ -136,34 +111,27 @@ export const AdminPagesTab: React.FC<AdminPagesTabProps> = ({
                   {/* トグルスイッチ */}
                   <div className="flex items-center gap-2 shrink-0">
                     <span
-                      className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
-                        page.is_public
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : 'bg-amber-50 text-amber-700 border-amber-200'
-                      }`}
+                      className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${page.is_public
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                        }`}
                     >
                       {page.is_public ? '公開中' : '準備中（非公開）'}
                     </span>
                     <button
                       onClick={() => onTogglePublic(page.id, !page.is_public)}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
-                        page.is_public ? 'bg-blue-600' : 'bg-slate-300'
-                      }`}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${page.is_public ? 'bg-blue-600' : 'bg-slate-300'
+                        }`}
                       title={page.is_public ? '非公開（準備中）に切り替える' : '公開する'}
                       aria-label={page.is_public ? '公開中' : '準備中'}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                          page.is_public ? 'translate-x-5' : 'translate-x-0'
-                        }`}
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${page.is_public ? 'translate-x-5' : 'translate-x-0'
+                          }`}
                       />
                     </button>
                   </div>
                 </div>
-
-                <p className="text-xs text-slate-600 mb-4 ml-1">
-                  {getPageDescription(page.id)}
-                </p>
 
                 {/* カスタム準備中メッセージ */}
                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80">
