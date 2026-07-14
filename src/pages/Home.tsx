@@ -490,7 +490,7 @@ export const Home: React.FC<HomeProps> = ({
                       </svg>
                     </div>
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
-                      アクセス・キャン<br />パスマップ
+                      校内マップ
                     </span>
                   </div>
                 </div>

@@ -54,8 +54,8 @@ export const GuidanceDetailPage: React.FC<GuidanceDetailPageProps> = ({
 
   const navItems: { id: GuidanceSectionId; label: string; badge: string; icon: React.ReactNode }[] = [
     { id: 'precautions', label: 'ご来場の際の注意点', badge: 'お願い', icon: <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-wafuu-shu" /> },
-    { id: 'campus-map', label: 'アクセス・立体マップ', badge: 'マップ', icon: <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-wafuu-ai" /> },
-    { id: 'info-desk', label: '総合案内所（本館2階）', badge: '窓口', icon: <Compass className="w-6 h-6 sm:w-7 sm:h-7 text-wafuu-kincha" /> },
+    { id: 'campus-map', label: '校内マップ', badge: 'マップ', icon: <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-wafuu-ai" /> },
+    { id: 'info-desk', label: '総合案内所', badge: '窓口', icon: <Compass className="w-6 h-6 sm:w-7 sm:h-7 text-wafuu-kincha" /> },
     { id: 'faq', label: 'よくあるご質問 (FAQ)', badge: 'Q&A', icon: <FaqCustomIcon className="w-6 h-6 sm:w-7 sm:h-7 text-[#2C3E55]" /> },
     { id: 'waste-rules', label: 'ごみ分別ルール', badge: 'エコ', icon: <Recycle className="w-6 h-6 sm:w-7 sm:h-7 text-[#1E6B47]" /> },
   ];
