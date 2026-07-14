@@ -23,6 +23,8 @@ dist-ssr
 *.eps
 パンフレット用*/
 パンフレット用*
+パンフレット用 1/
+パンフレット用 1.psd
 
 # Test renders & temporary build/export scripts
 test_*.png
