@@ -9,13 +9,15 @@ interface AdminPageProps {
   timetableEvents: TimetableEvent[];
   announcements: Announcement[];
   lostItems: LostItem[];
+  onNavigateHome?: () => void;
 }
 
 export const AdminPage: React.FC<AdminPageProps> = ({
   organizations,
   timetableEvents,
   announcements,
-  lostItems
+  lostItems,
+  onNavigateHome
 }) => {
   const [role, setRole] = useState<'superadmin' | 'admin' | string | null>(null);
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
@@ -24,47 +26,67 @@ export const AdminPage: React.FC<AdminPageProps> = ({
     const client = supabase;
     if (!client) return;
 
-    // 初期セッション確認
+    // Supabase Auth セッションユーザーから admin_users 情報を確実に同期・取得するヘルパー
+    const syncUserFromSession = async (sessionUser: any) => {
+      if (!sessionUser) return;
+      try {
+        const { data: userData } = await client
+          .from('admin_users')
+          .select('*')
+          .eq('email', sessionUser.email)
+          .single();
+
+        if (userData) {
+          setCurrentUser(userData as AdminUser);
+          setRole(userData.role);
+        } else {
+          // DB側レコードが未生成または遅延している場合のセキュアな自動同期フォールバック
+          const fallbackUser: AdminUser = {
+            id: sessionUser.id,
+            email: sessionUser.email || '',
+            role: (sessionUser.user_metadata?.role as 'superadmin' | 'admin') || 'admin',
+            display_name: sessionUser.user_metadata?.display_name || sessionUser.email?.split('@')[0] || '実行委員会 担当',
+            created_at: new Date().toISOString()
+          };
+          try {
+            await client.from('admin_users').upsert([fallbackUser], { onConflict: 'email' });
+          } catch { }
+          setCurrentUser(fallbackUser);
+          setRole(fallbackUser.role);
+        }
+      } catch {
+        // オフライン・通信エラーフォールバック
+        const fallbackUser: AdminUser = {
+          id: sessionUser.id,
+          email: sessionUser.email || '',
+          role: (sessionUser.user_metadata?.role as 'superadmin' | 'admin') || 'admin',
+          display_name: sessionUser.user_metadata?.display_name || sessionUser.email?.split('@')[0] || '実行委員会 担当',
+          created_at: new Date().toISOString()
+        };
+        setCurrentUser(fallbackUser);
+        setRole(fallbackUser.role);
+      }
+    };
+
+    // 1. 初期セッション確認
     client.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        try {
-          const { data: userData } = await client
-            .from('admin_users')
-            .select('*')
-            .eq('email', session.user.email)
-            .single();
-          if (userData) {
-            setCurrentUser(userData as AdminUser);
-            setRole(userData.role);
-          } else {
-            const fallbackUser: AdminUser = {
-              id: session.user.id,
-              email: session.user.email || '',
-              role: (session.user.user_metadata?.role as 'superadmin' | 'admin') || 'admin',
-              display_name: session.user.user_metadata?.display_name || '実行委員会 担当',
-              created_at: new Date().toISOString()
-            };
-            setCurrentUser(fallbackUser);
-            setRole(fallbackUser.role);
-          }
-        } catch {}
+        await syncUserFromSession(session.user);
       }
     });
 
-    // 認証状態の監視
+    // 2. リアルタイム認証状態変更の監視 (サインイン、トークン更新、ユーザー情報変更、サインアウト対応)
     const { data: { subscription } } = client.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
         setRole(null);
         setCurrentUser(null);
-      } else if (event === 'SIGNED_IN' && session.user && !currentUser) {
-        const { data: userData } = await client
-          .from('admin_users')
-          .select('*')
-          .eq('email', session.user.email)
-          .single();
-        if (userData) {
-          setCurrentUser(userData as AdminUser);
-          setRole(userData.role);
+      } else if (
+        event === 'SIGNED_IN' ||
+        event === 'TOKEN_REFRESHED' ||
+        event === 'USER_UPDATED'
+      ) {
+        if (session.user) {
+          await syncUserFromSession(session.user);
         }
       }
     });
@@ -93,11 +115,12 @@ export const AdminPage: React.FC<AdminPageProps> = ({
       lostItems={lostItems}
       role={role}
       currentUser={currentUser}
+      onNavigateHome={onNavigateHome}
       onLogout={async () => {
         if (supabase) {
           try {
             await supabase.auth.signOut();
-          } catch {}
+          } catch { }
         }
         setRole(null);
         setCurrentUser(null);

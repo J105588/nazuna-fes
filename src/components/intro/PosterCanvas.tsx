@@ -81,7 +81,6 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
           width: isMobileOrPortrait ? 'min(100vw, 100vh * (2480 / 3508))' : 'max(100vw, 100vh * (2480 / 3508))',
           height: isMobileOrPortrait ? 'min(100vh, 100vw * (3508 / 2480))' : 'max(100vh, 100vw * (3508 / 2480))',
           pointerEvents: 'none',
-          willChange: 'filter, transform',
         }}
       >
         {MANIFEST.slice(0, TEXT_START_INDEX).map((layer, idx) => {
@@ -105,7 +104,6 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                 mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
                 pointerEvents: 'none',
                 transform: 'translateZ(0)',
-                willChange: 'transform, opacity',
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
               }}
@@ -125,7 +123,6 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
           width: isMobileOrPortrait ? 'min(100vw, 100vh * (2480 / 3508))' : '100vw',
           height: isMobileOrPortrait ? 'min(100vh, 100vw * (3508 / 2480))' : '100vh',
           pointerEvents: 'none',
-          willChange: 'filter, transform',
         }}
       >
         {MANIFEST.slice(TEXT_START_INDEX).map((layer, relativeIdx) => {
@@ -152,7 +149,6 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                       mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
                       pointerEvents: 'none',
                       transform: 'translateZ(0)',
-                      willChange: 'transform, opacity',
                       backfaceVisibility: 'hidden',
                       WebkitBackfaceVisibility: 'hidden',
                     }
@@ -169,7 +165,6 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                       mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
                       pointerEvents: 'none',
                       transform: 'translateZ(0)',
-                      willChange: 'transform, opacity',
                       backfaceVisibility: 'hidden',
                       WebkitBackfaceVisibility: 'hidden',
                     }

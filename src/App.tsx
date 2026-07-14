@@ -63,11 +63,11 @@ export const App: React.FC = () => {
           return true;
         }
       }
-    } catch (e) {}
+    } catch {}
     return false;
   };
 
-  const [isIntroFinished, setIsIntroFinished] = useState<boolean>(() => checkShouldSkipIntro());
+  const [isIntroFinished, setIsIntroFinished] = useState<boolean>(false);
   const [introKey] = useState(0);
   const [isShojiFinished, setIsShojiFinished] = useState<boolean>(() => checkShouldSkipIntro());
 
@@ -158,6 +158,23 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  if (currentTab === 'admin') {
+    return (
+      <div className="admin-portal min-h-screen w-full bg-[#F8FAFC] text-slate-800 font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden">
+        <AdminPage
+          organizations={organizations}
+          timetableEvents={timetableEvents}
+          announcements={announcements}
+          lostItems={lostItems}
+          onNavigateHome={() => {
+            setCurrentTab('home');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-wafuu-kinari text-wafuu-sumi font-sans selection:bg-wafuu-shu selection:text-white flex flex-col justify-between">
       
@@ -168,29 +185,27 @@ export const App: React.FC = () => {
             setIsShojiFinished(true);
             try {
               localStorage.setItem('last_shoji_played_time', Date.now().toString());
-            } catch (e) {}
+            } catch {}
           }}
           key={introKey}
         />
       )}
 
-      {/* モダン和風ナビゲーション (管理画面では非表示) */}
-      {currentTab !== 'admin' && (
-        <Navbar
-          currentTab={currentTab}
-          isIntroFinished={isIntroFinished}
-          onSelectTab={(tab) => {
-            setCurrentTab(tab);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onSelectGenreQuick={handleSelectGenreQuick}
-          onSelectStageQuick={handleSelectStageQuick}
-          onOpenMapModal={() => {
-            setCurrentTab('map');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-        />
-      )}
+      {/* モダン和風ナビゲーション */}
+      <Navbar
+        currentTab={currentTab}
+        isIntroFinished={isIntroFinished}
+        onSelectTab={(tab) => {
+          setCurrentTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onSelectGenreQuick={handleSelectGenreQuick}
+        onSelectStageQuick={handleSelectStageQuick}
+        onOpenMapModal={() => {
+          setCurrentTab('map');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
 
       {/* メインコンテンツ切り替え */}
       {currentTab === 'home' && (
@@ -200,11 +215,12 @@ export const App: React.FC = () => {
           initialGenre={genreQuick}
           introKey={introKey}
           isShojiFinished={isShojiFinished}
+          isIntroFinished={isIntroFinished}
           onIntroComplete={() => {
             setIsIntroFinished(true);
             try {
               localStorage.setItem('last_shoji_played_time', Date.now().toString());
-            } catch (e) {}
+            } catch {}
           }}
           onSelectTab={(tab) => {
             setCurrentTab(tab);
@@ -216,8 +232,8 @@ export const App: React.FC = () => {
             } else {
               setActiveGuidanceSection(section);
               setCurrentTab('guidance');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onNavigatePolicyPage={(section) => {
             setActivePolicySection(section);
@@ -265,16 +281,6 @@ export const App: React.FC = () => {
           <LostFoundPage lostItems={lostItems} />
         </main>
       )}
-      {currentTab === 'admin' && (
-        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <AdminPage
-            organizations={organizations}
-            timetableEvents={timetableEvents}
-            announcements={announcements}
-            lostItems={lostItems}
-          />
-        </main>
-      )}
       {currentTab === 'guidance' && (
         <main className="w-full">
           <GuidanceDetailPage
@@ -292,16 +298,14 @@ export const App: React.FC = () => {
         </main>
       )}
 
-      {/* フッター (管理画面では非表示) */}
-      {currentTab !== 'admin' && (
-        <Footer
-          onNavigatePolicyPage={(section) => {
-            setActivePolicySection(section);
-            setCurrentTab('policy');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-        />
-      )}
+      {/* フッター */}
+      <Footer
+        onNavigatePolicyPage={(section) => {
+          setActivePolicySection(section);
+          setCurrentTab('policy');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
     </div>
   );
 };

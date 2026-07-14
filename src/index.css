@@ -43,6 +43,16 @@
     --color-bg-deep: #050711;
     --color-red-primary: #E51937;
     --color-gold-primary: #F5D061;
+
+    /* サイバー・ダークグラスモフィズム（管理画面・夜行演出用） */
+    --wafuu-cyber-bg:      #080C16;
+    --wafuu-cyber-panel:   rgba(15, 23, 42, 0.75);
+    --wafuu-cyber-border:  rgba(51, 65, 85, 0.6);
+    --wafuu-cyber-blue:    #3B82F6;
+    --wafuu-cyber-indigo:  #6366F1;
+    --wafuu-cyber-amber:   #F59E0B;
+    --wafuu-cyber-emerald: #10B981;
+    --wafuu-cyber-rose:    #F43F5E;
   }
 
   body {
@@ -191,6 +201,243 @@
   .wamodern-panel-hover:hover { @apply wafuu-panel-hover; }
   .btn-wamodern-red { @apply btn-wafuu-shu; }
   .btn-wamodern-gold { @apply btn-wafuu-kincha; }
+
+  /* =========================================================
+     サイバー×グラスモフィズム (通常時＆夜行モード専用)
+     ========================================================= */
+  .glass-panel-dark {
+    background: rgba(13, 19, 34, 0.88) !important;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.1) !important;
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .glass-card-hover {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .glass-card-hover:hover {
+    border-color: rgba(99, 102, 241, 0.55);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px -12px rgba(99, 102, 241, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .cyber-input {
+    background: rgba(7, 10, 18, 0.9);
+    border: 1px solid rgba(71, 85, 105, 0.8);
+    color: #FFFFFF;
+    border-radius: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+  .cyber-input:focus {
+    outline: none;
+    border-color: #6366F1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+  }
+
+  .glow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    transition: all 0.3s ease;
+  }
+  .glow-pill-blue {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60A5FA;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+  }
+  .glow-pill-purple {
+    background: rgba(99, 102, 241, 0.15);
+    color: #A5B4FC;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+  }
+  .glow-pill-amber {
+    background: rgba(245, 158, 11, 0.15);
+    color: #FCD34D;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+  }
+  .glow-pill-emerald {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34D399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+  }
+  .glow-pill-rose {
+    background: rgba(244, 63, 92, 0.15);
+    color: #FB7185;
+    border: 1px solid rgba(244, 63, 92, 0.4);
+    box-shadow: 0 0 12px rgba(244, 63, 92, 0.2);
+  }
+
+  /* =========================================================
+     明るくて見やすい管理画面ポータル専用配色 (.admin-portal)
+     高視認性・ホワイトカード・スレートテキスト・シャープ境界
+     ========================================================= */
+  .admin-portal .glass-panel-dark {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.95) !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
+    color: #0F172A !important;
+  }
+
+  .admin-portal .glass-card-hover:hover {
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 12px 28px -6px rgba(59, 130, 246, 0.14) !important;
+    transform: translateY(-2px);
+  }
+
+  .admin-portal .cyber-input {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #0F172A !important;
+    border-radius: 0.875rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+  }
+  .admin-portal .cyber-input:focus {
+    outline: none;
+    border-color: #3B82F6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+  }
+
+  /* 管理画面バッジ類の明るく美しい発色 */
+  .admin-portal .glow-pill-blue {
+    background: #EFF6FF !important;
+    color: #1D4ED8 !important;
+    border-color: #BFDBFE !important;
+    box-shadow: none !important;
+  }
+  .admin-portal .glow-pill-purple {
+    background: #EEF2FF !important;
+    color: #4338CA !important;
+    border-color: #C7D2FE !important;
+    box-shadow: none !important;
+  }
+  .admin-portal .glow-pill-amber {
+    background: #FFFBEB !important;
+    color: #B45309 !important;
+    border-color: #FDE68A !important;
+    box-shadow: none !important;
+  }
+  .admin-portal .glow-pill-emerald {
+    background: #ECFDF5 !important;
+    color: #047857 !important;
+    border-color: #A7F3D0 !important;
+    box-shadow: none !important;
+  }
+  .admin-portal .glow-pill-rose {
+    background: #FFF1F2 !important;
+    color: #BE123C !important;
+    border-color: #FECDD3 !important;
+    box-shadow: none !important;
+  }
+
+  /* 管理画面内のユーティリティクラス（暗い背景・境界）の明るいホワイトカードへの自動一転補正 */
+  .admin-portal [class*="bg-slate-900"],
+  .admin-portal [class*="bg-slate-950"] {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+    color: #0F172A !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .admin-portal [class*="border-slate-800"],
+  .admin-portal [class*="border-slate-700"] {
+    border-color: #E2E8F0 !important;
+  }
+
+  /* 入力欄およびセレクトボックスの配色最適化 */
+  .admin-portal select,
+  .admin-portal input[type="text"],
+  .admin-portal input[type="email"],
+  .admin-portal input[type="password"],
+  .admin-portal input[type="date"],
+  .admin-portal input[type="time"],
+  .admin-portal input[type="number"],
+  .admin-portal textarea {
+    background-color: #FFFFFF !important;
+    border-color: #CBD5E1 !important;
+    color: #0F172A !important;
+  }
+  .admin-portal select:focus,
+  .admin-portal input:focus,
+  .admin-portal textarea:focus {
+    border-color: #3B82F6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+  }
+  .admin-portal option {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+  }
+
+  /* テキスト文字色の高視認性（濃色スレート）最適化 */
+  .admin-portal :not(button):not([class*="bg-gradient"]):not([class*="bg-blue-"]):not([class*="bg-indigo-"]):not([class*="bg-red-"]):not([class*="bg-emerald-"]) > [class*="text-white"],
+  .admin-portal [class*="text-slate-100"],
+  .admin-portal [class*="text-slate-200"] {
+    color: #0F172A !important;
+  }
+  .admin-portal [class*="text-slate-300"],
+  .admin-portal [class*="text-slate-400"] {
+    color: #475569 !important;
+  }
+  .admin-portal [class*="text-slate-500"] {
+    color: #64748B !important;
+  }
+
+  /* カラーボタン内部の白文字は確実に保護 */
+  .admin-portal button[class*="bg-gradient"] [class*="text-white"],
+  .admin-portal button[class*="bg-blue-"] [class*="text-white"],
+  .admin-portal button[class*="bg-indigo-"] [class*="text-white"],
+  .admin-portal button[class*="bg-red-"] [class*="text-white"],
+  .admin-portal button[class*="bg-emerald-"] [class*="text-white"],
+  .admin-portal button[class*="text-white"] {
+    color: #FFFFFF !important;
+  }
+
+  /* インタラクティブ要素（ボタン・タブ・行）のホバー状態の明るくクリアな自動補正 */
+  .admin-portal [class*="hover:bg-slate-800"]:hover,
+  .admin-portal [class*="hover:bg-slate-900"]:hover,
+  .admin-portal [class*="hover:bg-slate-950"]:hover {
+    background-color: #F1F5F9 !important;
+    color: #0F172A !important;
+    border-color: #CBD5E1 !important;
+  }
+  .admin-portal :not(button)[class*="hover:text-white"]:hover,
+  .admin-portal :not(button)[class*="hover:text-slate-200"]:hover {
+    color: #0F172A !important;
+  }
+  .admin-portal button[class*="bg-gradient"]:hover,
+  .admin-portal button[class*="bg-blue"]:hover {
+    color: #FFFFFF !important;
+  }
+
+  .wafuu-card-luxury {
+    background: var(--wafuu-surface);
+    border: 1px solid rgba(196, 162, 101, 0.35);
+    box-shadow: 0 8px 30px rgba(30, 30, 30, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .wafuu-card-luxury::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--wafuu-shu), var(--wafuu-kincha));
+  }
 }
 
 /* 和柄パターン: 麻の葉 */
@@ -379,7 +626,10 @@
 @keyframes headerSlideDown {
   0% {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-36px);
+  }
+  40% {
+    opacity: 0.85;
   }
   100% {
     opacity: 1;
@@ -388,5 +638,86 @@
 }
 
 .animate-header-slide-down {
-  animation: headerSlideDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: headerSlideDown 1.3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+/* =========================================================
+   オープニング終了後：ヘッダー出現と同調するスクロール促進アニメーション
+   ========================================================= */
+@keyframes scrollGuideAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(32px) scale(0.95);
+  }
+  40% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-header-slide-down,
+.animate-scroll-guide-appear {
+  will-change: transform, opacity;
+}
+
+.animate-scroll-guide-appear {
+  animation: scrollGuideAppear 1.3s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes scrollDownFlow {
+  0% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+
+.animate-scroll-down-flow {
+  animation: scrollDownFlow 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* =========================================================
+   マイクロアニメーション (Phase 3 グロー＆スライド効果)
+   ========================================================= */
+@keyframes fadeInSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in-slide {
+  animation: fadeInSlide 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
 }

@@ -17,6 +17,7 @@ interface HomeProps {
   initialGenre?: string;
   introKey?: number;
   isShojiFinished?: boolean;
+  isIntroFinished?: boolean;
   onIntroComplete?: () => void;
   onSelectTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
   onNavigateGuidancePage?: (section: GuidanceSectionId) => void;
@@ -30,6 +31,7 @@ export const Home: React.FC<HomeProps> = ({
   initialGenre = 'all',
   introKey = 0,
   isShojiFinished = true,
+  isIntroFinished = true,
   onIntroComplete,
   onSelectTab,
   onNavigateGuidancePage,
@@ -39,10 +41,24 @@ export const Home: React.FC<HomeProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState(initialGenre);
   const [selectedFloor] = useState('all');
+  const [showScrollGuide, setShowScrollGuide] = useState(true);
 
   useEffect(() => {
     if (initialGenre) setSelectedGenre(initialGenre);
   }, [initialGenre]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      if (scrollY > 50) {
+        setShowScrollGuide(false);
+      } else {
+        setShowScrollGuide(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // ========================================================================
   // スクロール連動アニメーション用の IntersectionObserver 設定
@@ -56,6 +72,7 @@ export const Home: React.FC<HomeProps> = ({
           if (entry.isIntersecting) {
             entry.target.classList.add('opacity-100', 'translate-y-0');
             entry.target.classList.remove('opacity-0', 'translate-y-12');
+            observerRef.current?.unobserve(entry.target);
           }
         });
       },
@@ -81,7 +98,52 @@ export const Home: React.FC<HomeProps> = ({
       <div className="relative z-10 w-full font-serif">
 
         {/* ファーストビュー: ポスター鑑賞空間（スマホは115vh、PCは2画面分） */}
-        <div id="hero-poster" className="w-full h-[115vh] sm:h-screen relative pointer-events-none select-none" />
+        <div id="hero-poster" className="w-full h-[115vh] sm:h-screen relative pointer-events-none select-none">
+          {/* =========================================================
+              オープニング終了後：ヘッダーと同時に出現するスクロール促進アニメーション
+              ========================================================= */}
+          {isIntroFinished && (
+            <div
+              className={`absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 transition-opacity duration-500 pointer-events-auto ${
+                showScrollGuide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <button
+                onClick={() => {
+                  const target = document.getElementById('exhibitions-search');
+                  if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+                  }
+                }}
+                className="flex flex-col items-center gap-2 group focus:outline-none animate-scroll-guide-appear"
+                title="下にスクロールして企画を見る"
+                aria-label="下にスクロールして企画を見る"
+              >
+                <span className="text-[11px] sm:text-xs font-mono font-bold tracking-[0.25em] text-[#EDE8DF] group-hover:text-wafuu-kincha transition-colors drop-shadow-md">
+                  SCROLL DOWN
+                </span>
+                
+                {/* 縦飾りライン＆下向き矢印 */}
+                <div className="w-6 h-12 sm:w-7 sm:h-14 rounded-full border border-wafuu-ekasumi/60 bg-wafuu-sumi/40 backdrop-blur-sm flex flex-col items-center justify-start py-2 shadow-lg group-hover:border-wafuu-kincha transition-colors">
+                  <div className="w-[2.5px] h-3 bg-gradient-to-b from-wafuu-shu to-wafuu-kincha rounded-full animate-scroll-down-flow" />
+                  <svg
+                    className="w-3.5 h-3.5 text-[#EDE8DF] mt-auto group-hover:translate-y-0.5 transition-transform"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
         <div className="hidden sm:block w-full h-screen relative pointer-events-none select-none" />
 
         {/* ダーク→ライト切り替えの和紙ウェーブSVG */}

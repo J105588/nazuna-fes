@@ -32,7 +32,29 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
   const posterRef = useRef<PosterRefs | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isHeroInView, setIsHeroInView] = useState(true);
   const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    const checkVisibility = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').split('?')[0].toLowerCase();
+      const isHome = !hash || hash === 'home';
+      if (!isHome) {
+        setIsHeroInView(false);
+        return;
+      }
+      const scrollY = window.scrollY || window.pageYOffset;
+      setIsHeroInView(scrollY < window.innerHeight * 1.8);
+    };
+
+    checkVisibility();
+    window.addEventListener('scroll', checkVisibility, { passive: true });
+    window.addEventListener('hashchange', checkVisibility);
+    return () => {
+      window.removeEventListener('scroll', checkVisibility);
+      window.removeEventListener('hashchange', checkVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -45,16 +67,14 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     const bgTranslateY = isMobile ? '-50%' : '-45%';
 
     if (bgContainerRef.current) {
-      gsap.set(bgContainerRef.current, {
-        clearProps: 'filter,willChange',
-        transform: `translate(-50%, ${bgTranslateY}) scale(1) translateZ(0)`
-      });
+      bgContainerRef.current.style.filter = 'none';
+      bgContainerRef.current.style.willChange = 'auto';
+      bgContainerRef.current.style.transform = `translate(-50%, ${bgTranslateY}) scale(1) translateZ(0)`;
     }
     if (textContainerRef.current) {
-      gsap.set(textContainerRef.current, {
-        clearProps: 'filter,willChange',
-        transform: 'translate(-50%, -50%) scale(1) translateZ(0)'
-      });
+      textContainerRef.current.style.filter = 'none';
+      textContainerRef.current.style.willChange = 'auto';
+      textContainerRef.current.style.transform = 'translate(-50%, -50%) scale(1) translateZ(0)';
     }
 
     layerRefs.current.forEach((el, idx) => {
@@ -63,6 +83,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
         el.style.opacity = String(layer ? layer.opacity : 1);
         el.style.transform = 'translateZ(0) scale(1)';
         el.style.filter = 'none';
+        el.style.willChange = 'auto';
       }
     });
   }, []);
@@ -149,12 +170,15 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     // ★障子が開いた！ここからシネマティックかつ超軽量の演出開始
     if (tlRef.current) tlRef.current.kill();
 
+    if (bgContainerRef.current) gsap.set(bgContainerRef.current, { willChange: 'filter, transform' });
+    if (textContainerRef.current) gsap.set(textContainerRef.current, { willChange: 'filter, transform' });
+    layerRefs.current.forEach((el) => {
+      if (el) gsap.set(el, { willChange: 'transform, opacity' });
+    });
+
     const tl = gsap.timeline({
       onComplete: () => {
         showAllLayers();
-        layerRefs.current.forEach((el) => {
-          if (el) gsap.set(el, { clearProps: 'willChange,transform' });
-        });
         onCompleteRef.current?.();
       },
     });
@@ -231,7 +255,9 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
         backgroundColor: '#050711',
       }}
     >
-      <PosterCanvas ref={posterRef} />
+      <div style={{ visibility: isHeroInView ? 'visible' : 'hidden', width: '100%', height: '100%' }}>
+        <PosterCanvas ref={posterRef} />
+      </div>
     </div>
   );
 };

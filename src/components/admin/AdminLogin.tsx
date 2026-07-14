@@ -10,7 +10,9 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('認証に失敗しました。正しいメールアドレスとパスワードを入力してください。');
+  const [errorMessage, setErrorMessage] = useState(
+    '認証に失敗しました。正しいメールアドレスとパスワードを入力してください。'
+  );
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,39 +26,42 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
         onLoginSuccess(user);
       } else {
         setError(true);
-        setErrorMessage('アカウントが見つからないか、パスワードが正しくありません。実行委員会に権限情報をご確認ください。');
+        setErrorMessage(
+          'アカウントが見つからないか、パスワードが正しくありません。実行委員会に権限情報をご確認ください。'
+        );
       }
-    } catch (err) {
+    } catch {
       setError(true);
-      setErrorMessage('サーバー認証処理中にエラーが発生しました。通信環境およびSupabase設定をお確かめの上、再度お試しください。');
+      setErrorMessage(
+        'サーバー認証処理中にエラーが発生しました。通信環境およびSupabase設定をお確かめの上、再度お試しください。'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans select-none">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-8 space-y-8 shadow-2xl">
+    <div className="admin-portal min-h-screen bg-[#F8FAFC] text-slate-800 flex items-center justify-center p-4 font-sans select-none relative overflow-hidden">
+      {/* モダン背景グロー効果 */}
+      <div className="absolute top-1/4 left-1/3 -mt-32 -ml-32 w-96 h-96 bg-blue-400/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 -mb-32 -mr-32 w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-8 sm:p-10 space-y-8 shadow-xl relative z-10">
         {/* ログインヘッダー */}
-        <div className="text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mx-auto text-blue-400 shadow-sm">
-            <ShieldAlert className="w-6 h-6" />
+        <div className="text-center space-y-3.5">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center mx-auto text-white shadow-md">
+            <ShieldAlert className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="font-bold text-xl text-white tracking-tight">
-              統合管理ポータル ログイン
-            </h1>
-            <p className="text-xs text-slate-400 mt-1">
-              なずな祭 2026 管理システム
-            </p>
+            <h1 className="font-black text-2xl text-slate-900 tracking-tight">管理ポータル</h1>
           </div>
         </div>
 
         {/* メイン認証フォーム */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-blue-400" />
+            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-blue-600" />
               <span>メールアドレス</span>
             </label>
             <input
@@ -66,15 +71,15 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 setEmail(e.target.value);
                 setError(false);
               }}
-              placeholder="admin@nazuna.jp"
-              className="w-full bg-slate-950 text-white placeholder-slate-600 text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
+              placeholder="メールアドレス"
+              className="w-full bg-slate-50 text-slate-900 placeholder-slate-400 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <KeyRound className="w-3.5 h-3.5 text-blue-400" />
+            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <KeyRound className="w-3.5 h-3.5 text-blue-600" />
               <span>パスワード</span>
             </label>
             <input
@@ -84,38 +89,40 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 setPassword(e.target.value);
                 setError(false);
               }}
-              placeholder="••••••••••••"
-              className="w-full bg-slate-950 text-white placeholder-slate-600 text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
+              placeholder="パスワード"
+              className="w-full bg-slate-50 text-slate-900 placeholder-slate-400 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
               required
             />
           </div>
 
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-start gap-2.5 shadow-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-3 shadow-2xs animate-in shake duration-200">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+              <span className="leading-relaxed">{errorMessage}</span>
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading || !email || !password}
-            className={`w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all ${
-              loading || !email || !password
-                ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                : 'bg-blue-600 hover:bg-blue-500 text-white'
-            }`}
+            className={`w-full py-3.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all ${loading || !email || !password
+              ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+              : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white'
+              }`}
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>{loading ? 'ログイン処理中...' : '管理画面へログイン'}</span>
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                <span>認証処理中...</span>
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="w-4 h-4" />
+                <span>ログイン</span>
+              </>
+            )}
           </button>
         </form>
-
-        <div className="pt-4 border-t border-slate-800 text-center">
-          <p className="text-[11px] text-slate-500">
-            アカウントの発行や権限の変更は統括管理者までお問い合わせください。
-          </p>
-        </div>
       </div>
     </div>
   );
