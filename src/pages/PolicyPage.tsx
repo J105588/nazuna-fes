@@ -34,10 +34,10 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
         {/* ヘッダー */}
         <div className="text-center space-y-4 border-b border-wafuu-sumi/10 pb-8">
           <h1 className="text-3xl sm:text-5xl font-black text-wafuu-sumi tracking-wider">
-            公式規約 ＆ 情報掲載指針
+            各種規約 ＆ 情報掲載指針
           </h1>
           <p className="text-sm sm:text-base text-wafuu-sumi/75 max-w-2xl mx-auto leading-relaxed">
-            市川中学校・高等学校 2026年度なずな祭実行委員会が制定する公式方針・規約および個人情報・撮影に関する規定一覧です。
+            市川中学校・高等学校 2026年度なずな祭実行委員会が制定する各種方針・規約および個人情報・撮影に関する規定一覧です。
           </p>
         </div>
 
@@ -134,11 +134,11 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
 
               <div className="space-y-6 text-sm sm:text-base font-sans">
                 <p>
-                  2026年度なずな祭実行委員会（以下「当委員会」）は、当公式サイトにおけるユーザーの個人情報保護について、「個人情報の保護に関する法律」および関連法令を遵守し、以下の通り厳格に管理いたします。
+                  2026年度なずな祭実行委員会（以下「当委員会」）は、当サイトにおけるユーザーの個人情報保護について、「個人情報の保護に関する法律」および関連法令を遵守し、以下の通り厳格に管理いたします。
                 </p>
                 <div className="space-y-4">
                   <h4 className="font-bold text-lg text-wafuu-sumi border-b border-wafuu-sumi/10 pb-2">1. 取得する情報および利用目的</h4>
-                  <p>当公式サイトでのお問い合わせや遺失物照会時等においてご提供いただいた氏名、連絡先（メールアドレス等）の個人情報は、お問い合わせへの回答、行事運営に関する安全連絡のみに利用し、目的外利用は一切行いません。</p>
+                  <p>当サイトでのお問い合わせや遺失物照会時等においてご提供いただいた氏名、連絡先（メールアドレス等）の個人情報は、お問い合わせへの回答、行事運営に関する安全連絡のみに利用し、目的外利用は一切行いません。</p>
                 </div>
                 <div className="space-y-4">
                   <h4 className="font-bold text-lg text-wafuu-sumi border-b border-wafuu-sumi/10 pb-2">2. 第三者提供の制限</h4>
@@ -161,7 +161,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
               <div className="space-y-6 text-sm sm:text-base font-sans">
                 <div className="space-y-4">
                   <h4 className="font-bold text-lg text-wafuu-sumi border-b border-wafuu-sumi/10 pb-2">1. 著作権および知的財産権</h4>
-                  <p>当公式サイトに掲載されている全コンテンツ（ポスター原画、和紙イラスト、テキスト、SVG意匠、プログラム等）の著作権は、2026年度なずな祭実行委員会および市川中学校・高等学校に帰属します。私的利用以外の複製・転載を禁止します。</p>
+                  <p>当サイトに掲載されている全コンテンツ（ポスター原画、和紙イラスト、テキスト、SVG意匠、プログラム等）の著作権は、2026年度なずな祭実行委員会および市川中学校・高等学校に帰属します。私的利用以外の複製・転載を禁止します。</p>
                 </div>
                 <div className="space-y-4">
                   <h4 className="font-bold text-lg text-wafuu-sumi border-b border-wafuu-sumi/10 pb-2">2. 免責事項</h4>
@@ -185,9 +185,9 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
                 <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-wafuu-ekasumi/40 space-y-3">
                   <h4 className="font-bold text-lg font-serif border-b pb-2">メインポータル</h4>
                   <ul className="space-y-2">
-                    <li><button onClick={() => onNavigateTab && onNavigateTab('home')} className="hover:text-wafuu-shu font-bold">・ トップページ（百輝夜行ポータル）</button></li>
+                    <li><button onClick={() => onNavigateTab && onNavigateTab('home')} className="hover:text-wafuu-shu font-bold">・ トップページ</button></li>
                     <li><button onClick={() => onNavigateTab && onNavigateTab('timetable')} className="hover:text-wafuu-shu font-bold">・ ステージタイムテーブル</button></li>
-                    <li><button onClick={() => onNavigateTab && onNavigateTab('info')} className="hover:text-wafuu-shu font-bold">・ テーマ「百輝夜行」公式ストーリー</button></li>
+                    <li><button onClick={() => onNavigateTab && onNavigateTab('info')} className="hover:text-wafuu-shu font-bold">・ テーマ「百輝夜行」について</button></li>
                   </ul>
                 </div>
 

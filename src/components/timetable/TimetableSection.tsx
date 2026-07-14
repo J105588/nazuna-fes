@@ -100,7 +100,7 @@ export const TimetableSection: React.FC<TimetableSectionProps> = ({ events }) =>
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-serif font-bold text-wafuu-shu tracking-widest mb-1.5">
             <Calendar className="w-4 h-4" />
-            <span>公式ステージ進行表</span>
+            <span>ステージ進行表</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-wafuu-sumi tracking-wider font-serif">
             ステージタイムテーブル
@@ -121,8 +121,8 @@ export const TimetableSection: React.FC<TimetableSectionProps> = ({ events }) =>
                   key={day.id}
                   onClick={() => setSelectedDayId(day.id)}
                   className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-serif font-bold text-xs sm:text-sm flex items-center gap-2 border ${isSelected
-                      ? 'bg-wafuu-shu text-white border-wafuu-shu shadow-md scale-[1.03]'
-                      : 'bg-white hover:bg-[#FAF8F5] text-wafuu-sumi border-wafuu-sumi/20 hover:border-wafuu-shu/60'
+                    ? 'bg-wafuu-shu text-white border-wafuu-shu shadow-md scale-[1.03]'
+                    : 'bg-white hover:bg-[#FAF8F5] text-wafuu-sumi border-wafuu-sumi/20 hover:border-wafuu-shu/60'
                     }`}
                 >
                   <Clock className={`w-4 h-4 ${isSelected ? 'text-[#F5D061]' : 'text-wafuu-sumi/40'}`} />
@@ -174,8 +174,8 @@ export const TimetableSection: React.FC<TimetableSectionProps> = ({ events }) =>
                     {/* ステージ1〜3を横断する区切り線 */}
                     <div
                       className={`absolute left-[80px] sm:left-[90px] right-0 ${isHourly
-                          ? 'border-t border-wafuu-sumi/25'
-                          : 'border-t border-dashed border-wafuu-sumi/12'
+                        ? 'border-t border-wafuu-sumi/25'
+                        : 'border-t border-dashed border-wafuu-sumi/12'
                         }`}
                       style={{ top: `${idx * SLOT_HEIGHT}px` }}
                     />

@@ -77,14 +77,13 @@ export const GuidanceDetailPage: React.FC<GuidanceDetailPageProps> = ({
             ご来場者ガイド ＆ 総合案内所
           </h1>
           <p className="text-sm sm:text-base text-wafuu-sumi/80 max-w-2xl mx-auto leading-relaxed font-sans">
-            第76回なずな祭「百輝夜行」へようこそ。安心・安全に文化祭をお楽しみいただくための公式ご案内窓口およびすべての注意事項・ガイドラインを独立項目として掲載しております。
+            2026年度なずな祭「百輝夜行」へようこそ。安心・安全に文化祭をお楽しみいただくためのご案内窓口およびすべての注意事項・ガイドラインを掲載しております。
           </p>
         </div>
 
         {/* クイックアンカー目次（切り替えではなく、各独立セクションへのジャンプリンク） */}
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2 text-xs font-mono font-bold text-wafuu-sumi/60">
-            <span>INDEX NAVIGATION</span>
             <span>↓ タップで各セクションへ移動</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 font-sans">

@@ -79,7 +79,7 @@ export const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ announceme
             実行委員会からのお知らせ
           </h1>
           <p className="text-sm sm:text-base text-wafuu-sumi/75 max-w-2xl mx-auto leading-relaxed font-sans">
-            なずな祭実行委員会が配信する公式速報・ご案内一覧です。新しい項目が上部に表示されます。各項目をクリックすると、本文詳細のモーダルをご確認いただけます。
+            なずな祭実行委員会からのお知らせです。新しい項目が上部に表示されます。各項目をクリックすると、本文詳細のモーダルをご確認いただけます。
           </p>
 
           {/* カテゴリフィルタータブ */}
@@ -93,11 +93,10 @@ export const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ announceme
               <button
                 key={tab.id}
                 onClick={() => setActiveCategoryFilter(tab.id)}
-                className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 border ${
-                  activeCategoryFilter === tab.id
-                    ? 'bg-[#2C3E55] text-white border-[#2C3E55] shadow-md scale-[1.03]'
-                    : 'bg-white/80 hover:bg-white text-wafuu-sumi/80 border-wafuu-ekasumi/80 hover:border-wafuu-sumi/30 shadow-2xs'
-                }`}
+                className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 border ${activeCategoryFilter === tab.id
+                  ? 'bg-[#2C3E55] text-white border-[#2C3E55] shadow-md scale-[1.03]'
+                  : 'bg-white/80 hover:bg-white text-wafuu-sumi/80 border-wafuu-ekasumi/80 hover:border-wafuu-sumi/30 shadow-2xs'
+                  }`}
               >
                 {tab.label}
               </button>
