@@ -82,7 +82,7 @@ export const LostFoundPage: React.FC<LostFoundPageProps> = ({ lostItems }) => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono pt-1 text-wafuu-kinari/70">
           <div className="flex items-center gap-2">
             <Compass className="w-4 h-4 text-wafuu-kincha" />
-            <span>窓口場所: 本館2階 総合案内所 （正面大階段上がって2階中央）</span>
+            <span>窓口場所: 本館2階 総合案内所</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-wafuu-kincha" />

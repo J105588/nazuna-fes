@@ -10,7 +10,6 @@ export const WasteRulesPage: React.FC<WasteRulesPageProps> = () => {
     <section id="waste-rules" className="w-full scroll-mt-28">
       <div className="bg-white/95 backdrop-blur-md p-6 sm:p-10 rounded-3xl border border-wafuu-ekasumi shadow-sm font-sans space-y-8">
         <div className="border-b border-wafuu-sumi/15 pb-5">
-          <span className="text-xs font-mono font-bold text-[#1E6B47] block tracking-widest uppercase">ECO RULES & WASTE SEPARATION</span>
           <h2 className="text-2xl sm:text-4xl font-black text-wafuu-sumi mt-1 font-serif">
             ごみ分別のお願い
           </h2>

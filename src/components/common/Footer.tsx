@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = () => {
                 ICHIKAWA GAKUEN NAZUNA FESTIVAL 2026
               </span>
               <h2 className="text-lg sm:text-xl font-bold text-wafuu-sumi tracking-wider font-serif">
-                市川中学校・高等学校 なずな祭実行委員会
+                市川中学校・高等学校 なずな祭
               </h2>
             </div>
           </div>

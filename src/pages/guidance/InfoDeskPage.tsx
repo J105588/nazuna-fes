@@ -18,15 +18,11 @@ export const InfoDeskPage: React.FC<InfoDeskPageProps> = ({ onNavigateTab }) => 
               <span>本館2階 総合案内所</span>
             </h2>
           </div>
-          <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-wafuu-sumi text-white text-xs font-bold shrink-0 shadow-sm">
-            <Compass className="w-4 h-4 text-wafuu-kincha" />
-            <span>本館正面大階段を上がって2階中央</span>
-          </div>
         </div>
 
         <div className="space-y-6">
           <p className="text-sm sm:text-base text-wafuu-sumi/80 leading-relaxed font-serif">
-            なずな祭当日は、<strong>「本館2階 総合案内所」</strong>にて実行委員会役員が常駐し、ご来場の皆様をトータルサポートしております。ご不明点やお困りごとがございましたら、お気軽にお立ち寄りください。
+            なずな祭当日は、<strong>「本館2階 総合案内所」</strong>にて実行委員が常駐し、ご来場の皆様をサポートしております。ご不明点やお困りごとがございましたら、お気軽にお立ち寄りください。
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2 font-sans">
@@ -36,7 +32,7 @@ export const InfoDeskPage: React.FC<InfoDeskPageProps> = ({ onNavigateTab }) => 
                 <span>企画場所・経路案内</span>
               </div>
               <p className="text-xs text-wafuu-sumi/70 leading-relaxed">
-                校内マップで見つからない企画やステージの開催教室・最短移動ルートをご案内いたします。
+                校内マップの見方がわからないなどの場合に、ルートをご案内いたします。
               </p>
             </div>
 
@@ -72,13 +68,13 @@ export const InfoDeskPage: React.FC<InfoDeskPageProps> = ({ onNavigateTab }) => 
                 <span>落とし物・遺失物についてのお知らせ</span>
               </div>
               <h4 className="text-xl sm:text-2xl font-black font-serif tracking-wide">
-                落とし物は「専用の落とし物掲示板」から検索が可能です
+                落とし物は「落とし物掲示板」から検索が可能です
               </h4>
             </div>
 
             <p className="text-xs sm:text-sm text-[#E2E8F0]/80 leading-relaxed max-w-3xl relative z-10 font-serif">
-              校内での落とし物・お忘れ物は、実行委員より<strong>『落とし物掲示板』</strong>へリアルタイムで配信されております。<br />
-              お探しの品物がある場合は、総合案内所でお並びいただく前に、まずはオンライン掲示板をご確認ください。
+              校内での落とし物・お忘れ物は、実行委員より<strong>『落とし物掲示板』</strong>へ随時配信されております。<br />
+              お探しの品物がある場合は、総合案内所でお並びいただく前に、まずは<strong>『落とし物掲示板』</strong>をご確認ください。
             </p>
 
             <div className="pt-2 relative z-10">
