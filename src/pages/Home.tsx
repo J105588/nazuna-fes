@@ -512,7 +512,7 @@ export const Home: React.FC<HomeProps> = ({
                       </svg>
                     </div>
                     <span className="text-base sm:text-lg lg:text-xl font-black font-serif text-[#2C3E55] group-hover:text-white leading-tight">
-                      総合案内所<br />（本館2階窓口）
+                      総合案内所
                     </span>
                   </div>
                 </div>
