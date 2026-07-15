@@ -77,14 +77,15 @@ export const App: React.FC = () => {
 
   const [isIntroFinished, setIsIntroFinished] = useState<boolean>(() => {
     const initialTab = getTabFromUrl();
-    // 初期ロードが home 以外の画面（またはスキップ判定時）は、オープニング演出待ちを行わず最初からヘッダー等を表示
-    if (initialTab !== 'home' || checkShouldSkipIntro()) {
+    // 初期ロードが home 以外の画面の場合は、オープニング演出待ちを行わず最初からヘッダー等を表示
+    if (initialTab !== 'home') {
       return true;
     }
     return false;
   });
-  const [introKey] = useState(0);
+  const [introKey, setIntroKey] = useState<number>(0);
   const [isShojiFinished, setIsShojiFinished] = useState<boolean>(() => checkShouldSkipIntro());
+  const [isShojiOpeningStarted, setIsShojiOpeningStarted] = useState<boolean>(() => checkShouldSkipIntro());
 
   useEffect(() => {
     // home 以外の画面に遷移・リロードした際は確実にヘッダーを表示する
@@ -139,13 +140,7 @@ export const App: React.FC = () => {
     } catch {}
     return mockPageSettings;
   });
-  const [isSettingsLoaded, setIsSettingsLoaded] = useState<boolean>(() => {
-    try {
-      return !!localStorage.getItem('nazuna_cached_page_settings');
-    } catch {
-      return false;
-    }
-  });
+  const [isSettingsLoaded, setIsSettingsLoaded] = useState<boolean>(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
 
   const [genreQuick, setGenreQuick] = useState<string>('all');
@@ -236,6 +231,14 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // ホームに戻った際にポスターの重ねる演出が再度正しく流れるようリセット＆キー更新
+  const handleNavigateToHome = () => {
+    setIsIntroFinished(false);
+    setIntroKey((prev) => prev + 1);
+    setCurrentTab('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (currentTab === 'admin') {
     return (
       <div className="admin-portal min-h-screen w-full bg-[#F8FAFC] text-slate-800 font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden">
@@ -244,10 +247,7 @@ export const App: React.FC = () => {
           timetableEvents={timetableEvents}
           announcements={announcements}
           lostItems={lostItems}
-          onNavigateHome={() => {
-            setCurrentTab('home');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          onNavigateHome={handleNavigateToHome}
         />
       </div>
     );
@@ -259,8 +259,12 @@ export const App: React.FC = () => {
       {/* 42層ポスター＆和紙・霧の障子オープニングアニメーション */}
       {!isShojiFinished && (
         <ShojiOpening
+          onOpenStart={() => {
+            setIsShojiOpeningStarted(true);
+          }}
           onComplete={() => {
             setIsShojiFinished(true);
+            setIsShojiOpeningStarted(true);
             try {
               localStorage.setItem('last_shoji_played_time', Date.now().toString());
             } catch {}
@@ -269,7 +273,7 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* 緊急速報・重要お知らせの全画面強制表示モーダル */}
+      {/* 緊急速報・重要お知らせの全画面強制表示モーダル（オープニング演出完了後にのみポップアップ） */}
       <UrgentAnnouncementModal
         announcements={announcements}
         isIntroFinished={isIntroFinished}
@@ -279,13 +283,17 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* モダン和風ナビゲーション */}
+      {/* モダン和風ナビゲーション（オープニング演出完了後にGPUトランジションで出現） */}
       <Navbar
         currentTab={currentTab === 'not_found' ? 'home' : currentTab}
         isIntroFinished={isIntroFinished}
         onSelectTab={(tab) => {
-          setCurrentTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (tab === 'home') {
+            handleNavigateToHome();
+          } else {
+            setCurrentTab(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
         }}
         onSelectGenreQuick={handleSelectGenreQuick}
         onSelectStageQuick={handleSelectStageQuick}
@@ -302,10 +310,7 @@ export const App: React.FC = () => {
           return (
             <main className="w-full pt-20 flex-1 flex flex-col justify-center">
               <NotFoundView
-                onNavigateHome={() => {
-                  setCurrentTab('home');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onNavigateHome={handleNavigateToHome}
                 onNavigateAdmin={() => {
                   setCurrentTab('admin');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -323,25 +328,6 @@ export const App: React.FC = () => {
           !activePageSetting.is_public &&
           currentTab !== 'home';
 
-        if (isCurrentPageMaintenance) {
-          return (
-            <main className="w-full pt-20 flex-1 flex flex-col justify-center">
-              <NotFoundView
-                onNavigateHome={() => {
-                  setCurrentTab('home');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                onNavigateAdmin={() => {
-                  setCurrentTab('admin');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                isAdminLoggedIn={isAdminLoggedIn}
-                isHiddenPage={true}
-              />
-            </main>
-          );
-        }
-
         if (!isSettingsLoaded && currentTab !== 'home') {
           return (
             <main className="w-full pt-20 min-h-[70vh] flex flex-col items-center justify-center">
@@ -349,6 +335,23 @@ export const App: React.FC = () => {
                 <div className="w-8 h-8 rounded-full border-2 border-slate-300 border-t-[#C5A059] animate-spin" />
                 <p className="text-xs text-slate-400 font-mono tracking-wider">ページ状態を確認中...</p>
               </div>
+            </main>
+          );
+        }
+
+        if (isCurrentPageMaintenance) {
+          return (
+            <main className="w-full pt-20 flex-1 flex flex-col justify-center">
+              <NotFoundView
+                onNavigateHome={handleNavigateToHome}
+                onNavigateAdmin={() => {
+                  setCurrentTab('admin');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                isAdminLoggedIn={isAdminLoggedIn}
+                isHiddenPage={true}
+                customMessage={activePageSetting?.custom_message}
+              />
             </main>
           );
         }
@@ -362,6 +365,7 @@ export const App: React.FC = () => {
                 initialGenre={genreQuick}
                 introKey={introKey}
                 isShojiFinished={isShojiFinished}
+                isShojiOpeningStarted={isShojiOpeningStarted}
                 isIntroFinished={isIntroFinished}
                 onIntroComplete={() => {
                   setIsIntroFinished(true);
@@ -453,14 +457,16 @@ export const App: React.FC = () => {
         );
       })()}
 
-      {/* フッター */}
-      <Footer
-        onNavigatePolicyPage={(section) => {
-          setActivePolicySection(section);
-          setCurrentTab('policy');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-      />
+      {/* フッター（オープニング演出完了後にのみ実行） */}
+      {isIntroFinished && (
+        <Footer
+          onNavigatePolicyPage={(section) => {
+            setActivePolicySection(section);
+            setCurrentTab('policy');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      )}
     </div>
   );
 };

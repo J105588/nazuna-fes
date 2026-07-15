@@ -35,7 +35,11 @@ export interface PosterRefs {
   layerRefs: React.RefObject<(HTMLImageElement | null)[]>;
 }
 
-export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
+export interface PosterCanvasProps {
+  skipAnimation?: boolean;
+}
+
+export const PosterCanvas = forwardRef<PosterRefs, PosterCanvasProps>(({ skipAnimation = false }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const bgContainerRef = useRef<HTMLDivElement | null>(null);
   const textContainerRef = useRef<HTMLDivElement | null>(null);
@@ -84,7 +88,7 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
         }}
       >
         {MANIFEST.slice(0, TEXT_START_INDEX).map((layer, idx) => {
-          const isTemporarilyDisabled = layer.name === 'レイヤー 39';
+          const cssBlendMode = (layer.blendMode ? layer.blendMode.replace(/\s+/g, '-') : 'normal') as React.CSSProperties['mixBlendMode'];
           return (
             <img
               key={layer.filename}
@@ -99,9 +103,8 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                 top: `${layer.topPct}%`,
                 width: `${layer.widthPct}%`,
                 height: `${layer.heightPct}%`,
-                opacity: idx === 0 ? 1 : 0,
-                display: isTemporarilyDisabled ? 'none' : undefined,
-                mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
+                opacity: skipAnimation ? layer.opacity : (idx === 0 ? 1 : 0),
+                mixBlendMode: cssBlendMode || 'normal',
                 pointerEvents: 'none',
                 transform: 'translateZ(0)',
                 backfaceVisibility: 'hidden',
@@ -127,7 +130,7 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
       >
         {MANIFEST.slice(TEXT_START_INDEX).map((layer, relativeIdx) => {
           const idx = TEXT_START_INDEX + relativeIdx;
-          const isTemporarilyDisabled = layer.name === 'レイヤー 39';
+          const cssBlendMode = (layer.blendMode ? layer.blendMode.replace(/\s+/g, '-') : 'normal') as React.CSSProperties['mixBlendMode'];
           return (
             <img
               key={layer.filename}
@@ -144,9 +147,8 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                       top: `${layer.topPct}%`,
                       width: `${layer.widthPct}%`,
                       height: `${layer.heightPct}%`,
-                      opacity: 0,
-                      display: isTemporarilyDisabled ? 'none' : undefined,
-                      mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
+                      opacity: skipAnimation ? layer.opacity : 0,
+                      mixBlendMode: cssBlendMode || 'normal',
                       pointerEvents: 'none',
                       transform: 'translateZ(0)',
                       backfaceVisibility: 'hidden',
@@ -160,9 +162,8 @@ export const PosterCanvas = forwardRef<PosterRefs, object>((_props, ref) => {
                         : { left: `calc(4vw + ${(layer.left / 3508) * 100}vh)` }),
                       width: `${layer.heightPct * (layer.width / layer.height)}vh`,
                       height: `${layer.heightPct}%`,
-                      opacity: 0,
-                      display: isTemporarilyDisabled ? 'none' : undefined,
-                      mixBlendMode: (layer.blendMode as React.CSSProperties['mixBlendMode']) || 'normal',
+                      opacity: skipAnimation ? layer.opacity : 0,
+                      mixBlendMode: cssBlendMode || 'normal',
                       pointerEvents: 'none',
                       transform: 'translateZ(0)',
                       backfaceVisibility: 'hidden',

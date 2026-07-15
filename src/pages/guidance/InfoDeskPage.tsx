@@ -81,7 +81,7 @@ export const InfoDeskPage: React.FC<InfoDeskPageProps> = ({ onNavigateTab }) => 
               <button
                 type="button"
                 onClick={() => onNavigateTab && onNavigateTab('lostfound')}
-                className="py-3.5 px-8 rounded-2xl font-bold text-sm bg-wafuu-kincha hover:bg-[#E5C158] text-[#121A2C] transition-all shadow-md flex items-center gap-3 active:scale-95"
+                className="py-3.5 px-8 rounded-2xl font-bold text-sm bg-[#2C3E55] hover:bg-wafuu-shu text-white transition-all shadow-md flex items-center gap-3 active:scale-95"
               >
                 <span>落とし物掲示板へ移動</span>
                 <ArrowRight className="w-4 h-4" />

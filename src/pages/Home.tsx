@@ -19,6 +19,7 @@ interface HomeProps {
   initialGenre?: string;
   introKey?: number;
   isShojiFinished?: boolean;
+  isShojiOpeningStarted?: boolean;
   isIntroFinished?: boolean;
   onIntroComplete?: () => void;
   onSelectTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
@@ -33,6 +34,7 @@ export const Home: React.FC<HomeProps> = ({
   initialGenre = 'all',
   introKey = 0,
   isShojiFinished = true,
+  isShojiOpeningStarted = false,
   isIntroFinished = true,
   onIntroComplete,
   onSelectTab,
@@ -88,6 +90,64 @@ export const Home: React.FC<HomeProps> = ({
     return () => observerRef.current?.disconnect();
   }, [organizations, announcements]);
 
+  // ========================================================================
+  // テーマ「百輝夜行」の「輝」文字のスクロール連動パララックス＆慣性物理効果
+  // （常にループで動くのではなく、スクロールした際にスクロール位置・速度へ反応して優雅に傾斜・上下・伸縮し静止する）
+  // ========================================================================
+  const kagayakiRef = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    let targetY = 0;
+    let currentY = 0;
+    let targetRotate = -12; // 初期の絶妙な傾き(-12deg)を維持
+    let currentRotate = -12;
+    let targetScale = 1;
+    let currentScale = 1;
+    let lastScrollY = window.scrollY;
+
+    const handleScrollMotion = () => {
+      const scrollY = window.scrollY;
+      const velocity = scrollY - lastScrollY;
+      lastScrollY = scrollY;
+
+      if (kagayakiRef.current) {
+        const rect = kagayakiRef.current.getBoundingClientRect();
+        const viewportCenter = window.innerHeight / 2;
+        const elemCenter = rect.top + rect.height / 2;
+        // 画面中央と要素中央の相対距離 (-1〜1の範囲)
+        const distanceFromCenter = (elemCenter - viewportCenter) / window.innerHeight;
+
+        // スクロール速度(velocity)と画面相対位置(distanceFromCenter)により、スクロール時だけシャープかつ滑らかに動かす
+        targetY = distanceFromCenter * -35 + velocity * -0.65;
+        targetRotate = -12 + distanceFromCenter * 20 + velocity * 0.45;
+        targetScale = Math.max(1, 1.18 - Math.abs(distanceFromCenter) * 0.3) + Math.min(0.12, Math.abs(velocity) * 0.007);
+      }
+    };
+
+    const updateLoop = () => {
+      // 慣性（lerp）にて60FPSで目標値へ滑らかに収束。スクロール停止時は完全に静止する。
+      currentY += (targetY - currentY) * 0.12;
+      currentRotate += (targetRotate - currentRotate) * 0.12;
+      currentScale += (targetScale - currentScale) * 0.12;
+
+      if (kagayakiRef.current) {
+        kagayakiRef.current.style.transform = `rotate(${currentRotate.toFixed(2)}deg) translateY(${currentY.toFixed(2)}px) scale(${currentScale.toFixed(3)})`;
+      }
+
+      animationFrameId = requestAnimationFrame(updateLoop);
+    };
+
+    window.addEventListener('scroll', handleScrollMotion, { passive: true });
+    animationFrameId = requestAnimationFrame(updateLoop);
+    handleScrollMotion();
+
+    return () => {
+      window.removeEventListener('scroll', handleScrollMotion);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   return (
     <>
       {/* ===============================================
@@ -98,64 +158,65 @@ export const Home: React.FC<HomeProps> = ({
         {/* ファーストビュー: ポスター鑑賞空間（スマホは100svh、PCは1画面分の完璧な高さ） */}
         <div id="hero-poster" className="w-full h-[100svh] sm:h-screen relative pointer-events-none select-none bg-[#050711] overflow-hidden">
           {/* ポスター＆霧結晶演出（ページと一緒にスクロール＆超軽量化） */}
-          <OpeningIntro startTrigger={isShojiFinished} key={introKey} onComplete={onIntroComplete} />
+          <OpeningIntro startTrigger={isShojiOpeningStarted || isShojiFinished} skipAnimation={isIntroFinished && isShojiFinished} key={introKey} onComplete={onIntroComplete} />
 
           {/* =========================================================
               オープニング終了後：ヘッダーと同時に出現するスクロール促進アニメーション
               ========================================================= */}
-          {isIntroFinished && (
-            <div
-              className={`absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 transition-opacity duration-500 pointer-events-auto ${showScrollGuide ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
+          <div
+            className={`absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 transition-all duration-700 ease-out pointer-events-auto ${
+              isIntroFinished && showScrollGuide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+            }`}
+          >
+            <button
+              onClick={() => {
+                const target = document.getElementById('exhibitions-search');
+                if (target) {
+                  target.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+                }
+              }}
+              className="flex flex-col items-center gap-2 group focus:outline-none animate-scroll-guide-appear"
+              title="下にスクロールして企画を見る"
+              aria-label="下にスクロールして企画を見る"
             >
-              <button
-                onClick={() => {
-                  const target = document.getElementById('exhibitions-search');
-                  if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-                  }
-                }}
-                className="flex flex-col items-center gap-2 group focus:outline-none animate-scroll-guide-appear"
-                title="下にスクロールして企画を見る"
-                aria-label="下にスクロールして企画を見る"
-              >
-                <span className="text-[11px] sm:text-xs font-mono font-bold tracking-[0.25em] text-[#EDE8DF] group-hover:text-wafuu-kincha transition-colors drop-shadow-md">
-                  SCROLL DOWN
-                </span>
+              <span className="text-[11px] sm:text-xs font-mono font-bold tracking-[0.25em] text-[#EDE8DF] group-hover:text-wafuu-kincha transition-colors drop-shadow-md">
+                SCROLL DOWN
+              </span>
 
-                {/* 縦飾りライン＆下向き矢印 */}
-                <div className="w-6 h-12 sm:w-7 sm:h-14 rounded-full border border-wafuu-ekasumi/60 bg-wafuu-sumi/40 backdrop-blur-sm flex flex-col items-center justify-start py-2 shadow-lg group-hover:border-wafuu-kincha transition-colors">
-                  <div className="w-[2.5px] h-3 bg-gradient-to-b from-wafuu-shu to-wafuu-kincha rounded-full animate-scroll-down-flow" />
-                  <svg
-                    className="w-3.5 h-3.5 text-[#EDE8DF] mt-auto group-hover:translate-y-0.5 transition-transform"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </div>
-              </button>
-            </div>
-          )}
+              {/* 縦飾りライン＆下向き矢印 */}
+              <div className="w-6 h-12 sm:w-7 sm:h-14 rounded-full border border-wafuu-ekasumi/60 bg-wafuu-sumi/40 backdrop-blur-sm flex flex-col items-center justify-start py-2 shadow-lg group-hover:border-wafuu-kincha transition-colors">
+                <div className="w-[2.5px] h-3 bg-gradient-to-b from-wafuu-shu to-wafuu-kincha rounded-full animate-scroll-down-flow" />
+                <svg
+                  className="w-3.5 h-3.5 text-[#EDE8DF] mt-auto group-hover:translate-y-0.5 transition-transform"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+            </button>
+          </div>
 
-          {/* 画面の下地の半円の弧（ポスター空間と企画検索エリアを優雅に繋ぐウェーブカーブ：オープニング終了時にヘッダーやスクロール案内と同時出現） */}
-          {isIntroFinished && (
-            <div className="absolute -bottom-[1px] left-0 right-0 w-full z-20 pointer-events-none overflow-hidden animate-arc-appear">
-              <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[36px] sm:h-[80px] block" preserveAspectRatio="none">
-                <path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="#FAF8F5" />
-              </svg>
-            </div>
-          )}
+          {/* 画面の下地の半円の弧（ポスター空間と企画検索エリアを優雅に繋ぐウェーブカーブ） */}
+          <div
+            className={`absolute -bottom-[1px] left-0 right-0 w-full z-20 pointer-events-none overflow-hidden transition-opacity duration-700 ease-out ${
+              isIntroFinished ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[36px] sm:h-[80px] block" preserveAspectRatio="none">
+              <path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="#FAF8F5" />
+            </svg>
+          </div>
         </div>
 
         {/* =========================================================================================
-            【第2階層】 企画情報エリア（input_file_0.png 準拠：検索バー ＋ 質素な3大アイコン）
+            企画情報・会場案内・FAQ等のメインコンテンツ群（初期マウントによるカクつき根絶）
             ========================================================================================= */}
         <section id="exhibitions-search" className="w-full bg-[#FAF8F5] relative overflow-hidden py-16 sm:py-24 scroll-mt-20">
 
@@ -326,7 +387,7 @@ export const Home: React.FC<HomeProps> = ({
                   2026年 市川学園 なずな祭
                 </p>
                 <h2 className="text-5xl sm:text-7xl lg:text-8xl font-black text-wafuu-sumi tracking-wider font-serif leading-none">
-                  百<span className="text-wafuu-shu">輝</span>夜行
+                  百<span ref={kagayakiRef} className="inline-block text-wafuu-shu font-black drop-shadow-md cursor-default">輝</span>夜行
                 </h2>
               </div>
 

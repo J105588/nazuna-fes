@@ -11,7 +11,7 @@ export const FaqPage: React.FC<FaqPageProps> = () => {
       <div className="bg-white/95 backdrop-blur-md p-6 sm:p-10 rounded-3xl border border-wafuu-ekasumi shadow-sm font-sans space-y-8">
         <div className="border-b border-wafuu-sumi/15 pb-5">
           <h2 className="text-2xl sm:text-4xl font-black text-wafuu-sumi mt-1 font-serif flex items-center gap-3">
-            <span className="w-8 h-8 rounded-xl bg-[#2C3E55] text-white flex items-center justify-center text-lg font-mono shrink-0 shadow-sm">Q</span>
+            <span className="w-auto px-3 h-8 rounded-xl bg-[#2C3E55] text-white flex items-center justify-center text-sm font-mono font-bold shrink-0 shadow-sm">Q&A</span>
             <span>よくあるご質問 (FAQ)</span>
           </h2>
         </div>
@@ -51,7 +51,7 @@ export const FaqPage: React.FC<FaqPageProps> = () => {
             <div className="flex items-start gap-2.5 pl-1">
               <span className="w-6 h-6 rounded-lg bg-wafuu-shu text-white flex items-center justify-center text-xs font-mono shrink-0 mt-0.5 shadow-2xs">A</span>
               <p className="text-xs sm:text-sm text-wafuu-sumi/90 leading-relaxed flex-1">
-                まずは<strong className="text-wafuu-shu font-bold">「落とし物掲示板」</strong>をご確認ください。該当する品物が見つかった場合は、スマートフォン画面をご提示の上、<strong className="text-wafuu-kincha font-bold">「本館2階 総合案内所」</strong>までお越しください。
+                まずは<strong className="text-wafuu-shu font-bold">「落とし物掲示板」</strong>をご確認ください。該当する品物が見つかった場合は、スマートフォン画面をご提示の上、<strong className="text-[#2C3E55] font-black underline decoration-wafuu-kincha/60">「本館2階 総合案内所」</strong>までお越しください。
               </p>
             </div>
           </div>

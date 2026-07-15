@@ -3,20 +3,7 @@ import gsap from 'gsap';
 import { PosterCanvas, LAYERS, TEXT_START_INDEX } from './PosterCanvas';
 import type { PosterRefs } from './PosterCanvas';
 
-/*
-  ========================================================================
-  OpeningIntro - 「濃霧と結晶：オリジナル42層完全準拠の超軽量百輝夜行演出」
-  ========================================================================
-  
-  【演出を変えずに「重すぎる」を解決した驚異のハイブリッドレンダリング】
-  1. 個別42層のGPUハードウェア合成 (Scale + Opacity):
-     各画像は位置・不透明度・スケールのみをアニメーション。
-     ブラーシェーダーの重さをゼロにし、60FPSの滑らかさを確保。
-     
-  2. 親コンテナによるシネマティック霧ブラー:
-     ブラー計算を個別42枚から、親コンテナ2層（背景コンテナ＆文字コンテナ）へ
-     集約適用。濃霧から優雅に晴れ渡る立体の結晶化演出を完全保持しました。
-*/
+
 
 interface OpeningIntroProps {
   skipAnimation?: boolean;
@@ -95,9 +82,9 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
         return;
       }
       const imgs = posterRef.current.layerRefs.current.filter(Boolean) as HTMLImageElement[];
-      
+
       const decodePromises = imgs.map((img) => {
-        if (img.complete) return img.decode().catch(() => {});
+        if (img.complete) return img.decode().catch(() => { });
         return new Promise((resolve) => {
           img.onload = () => img.decode().then(resolve).catch(resolve);
           img.onerror = resolve;
@@ -121,7 +108,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     if (!isReady || !posterRef.current) return;
 
     if (skipAnimation || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      showAllLayers();
+      if (!skipAnimation) showAllLayers();
       onCompleteRef.current?.();
       return;
     }
@@ -131,12 +118,12 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
     const bgTranslateY = isMobile ? '-50%' : '-45%';
     const textTranslateY = '-50%';
 
-    // 【初期スタンバイ状態の設定】
+    // 【初期スタンバイ状態の設定：重いFBOブラーを避けて不透明度とスケールで優雅にスタンバイ】
     if (bgContainerRef.current) {
-      gsap.set(bgContainerRef.current, { filter: 'blur(16px) brightness(1)', transform: `translate(-50%, ${bgTranslateY}) scale(1.02) translateZ(0)` });
+      gsap.set(bgContainerRef.current, { filter: 'none', transform: `translate(-50%, ${bgTranslateY}) scale(1) translateZ(0)` });
     }
     if (textContainerRef.current) {
-      gsap.set(textContainerRef.current, { filter: 'blur(14px)', transform: `translate(-50%, ${textTranslateY}) scale(1.04) translateZ(0)` });
+      gsap.set(textContainerRef.current, { filter: 'none', transform: `translate(-50%, ${textTranslateY}) scale(1) translateZ(0)` });
     }
 
     layerRefs.current.forEach((el, idx) => {
@@ -147,13 +134,13 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
       if (layer.isText) {
         gsap.set(el, { opacity: 0, scale: 1.05, transformOrigin: 'center center', force3D: true });
       } else if (layer.isFog) {
-        gsap.set(el, { opacity: 0, scale: 1.08, transformOrigin: 'center center', force3D: true });
+        gsap.set(el, { opacity: 0, scale: 1.06, transformOrigin: 'center center', force3D: true });
       } else if (idx === 0) {
-        gsap.set(el, { opacity: 1, scale: 1.02, transformOrigin: 'center center', force3D: true });
+        gsap.set(el, { opacity: 1, scale: 1.0, transformOrigin: 'center center', force3D: true });
       } else if (idx < 8) {
-        gsap.set(el, { opacity: 0, scale: 1.04, transformOrigin: 'center 45%', force3D: true });
+        gsap.set(el, { opacity: 0, scale: 1.03, transformOrigin: 'center 45%', force3D: true });
       } else {
-        gsap.set(el, { opacity: 0, scale: 1.06, transformOrigin: 'center 45%', force3D: true });
+        gsap.set(el, { opacity: 0, scale: 1.04, transformOrigin: 'center 45%', force3D: true });
       }
     });
 
@@ -162,35 +149,26 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
       return;
     }
 
-    // ★障子が開いた！ここからシネマティックかつ超軽量の演出開始
+    // ★障子が開いた！ここからシネマティックかつ超軽量 (60FPS) の演出開始
     if (tlRef.current) tlRef.current.kill();
 
-    if (bgContainerRef.current) gsap.set(bgContainerRef.current, { willChange: 'filter, transform' });
-    if (textContainerRef.current) gsap.set(textContainerRef.current, { willChange: 'filter, transform' });
     layerRefs.current.forEach((el) => {
       if (el) gsap.set(el, { willChange: 'transform, opacity' });
     });
 
     const tl = gsap.timeline({
       onComplete: () => {
-        showAllLayers();
         onCompleteRef.current?.();
+        setTimeout(() => {
+          showAllLayers();
+        }, 150);
       },
     });
     tlRef.current = tl;
 
-    // 1. 背景コンテナ＆文字コンテナ全体の霧が晴れるようにブラー解消（GPU負荷1/20）
-    if (bgContainerRef.current) {
-      tl.to(bgContainerRef.current, {
-        filter: 'blur(0px) brightness(1)',
-        transform: `translate(-50%, ${bgTranslateY}) scale(1) translateZ(0)`,
-        duration: 2.3,
-        ease: 'power3.out',
-      }, 0);
-    }
-
-    // 2. 背景・和傘・イラスト層（0〜TEXT_START_INDEX-1）の立体ハードウェア出現
-    for (let i = 0; i < TEXT_START_INDEX; i++) {
+    // 背景・和傘・イラスト層（1〜TEXT_START_INDEX-1）の立体ハードウェア出現
+    // 過去の正規実装(9ffabb5)の設計通り、Z奥行きに準拠して 0.03秒間隔で美しく連続カスケードさせる
+    for (let i = 1; i < TEXT_START_INDEX; i++) {
       const el = layerRefs.current[i];
       if (!el) continue;
       const layer = LAYERS[i];
@@ -207,16 +185,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
       }, startDelay);
     }
 
-    // 3. タイポグラフィコンテナのブラー解消＆文字結晶化
-    if (textContainerRef.current) {
-      tl.to(textContainerRef.current, {
-        filter: 'blur(0px)',
-        transform: `translate(-50%, ${textTranslateY}) scale(1) translateZ(0)`,
-        duration: 1.5,
-        ease: 'power3.out',
-      }, 1.2);
-    }
-
+    // タイポグラフィ文字層（TEXT_START_INDEX〜41）の結晶化
     for (let i = TEXT_START_INDEX; i < LAYERS.length; i++) {
       const el = layerRefs.current[i];
       if (!el) continue;
@@ -251,7 +220,7 @@ export const OpeningIntro: React.FC<OpeningIntroProps> = ({
       }}
     >
       <div style={{ visibility: isHeroInView ? 'visible' : 'hidden', width: '100%', height: '100%' }}>
-        <PosterCanvas ref={posterRef} />
+        <PosterCanvas ref={posterRef} skipAnimation={skipAnimation} />
       </div>
     </div>
   );

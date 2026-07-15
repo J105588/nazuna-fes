@@ -35,8 +35,12 @@ export const GuidanceDetailPage: React.FC<GuidanceDetailPageProps> = ({
       }
     }
 
-    // 初期セクションへスムーズスクロール
+    // 初期ロード（または precautions セクション選択時）は画面最上部（トップヘッダーから）表示
     const timer = setTimeout(() => {
+      if (initialSection === 'precautions' || !initialSection) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       let targetId = initialSection as string;
       if (initialSection === 'barrier-free' || initialSection === 'press-coverage' || initialSection === 'pamphlet') {
         targetId = 'info-desk';

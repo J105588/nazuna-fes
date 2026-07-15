@@ -14,6 +14,7 @@ interface NotFoundViewProps {
   onNavigateAdmin?: () => void;
   isAdminLoggedIn?: boolean;
   isHiddenPage?: boolean;
+  customMessage?: string;
 }
 
 export const NotFoundView: React.FC<NotFoundViewProps> = ({
@@ -21,6 +22,7 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
   onNavigateAdmin,
   isAdminLoggedIn = false,
   isHiddenPage = false,
+  customMessage,
 }) => {
   return (
     <div className="min-h-[85vh] w-full flex flex-col items-center justify-center px-6 py-20 bg-[#FAF8F5] text-wafuu-sumi font-serif select-none relative overflow-hidden">
@@ -28,18 +30,20 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
       {/* 質素な背景アクセント（極薄の和紙市松模様） */}
       <div className="absolute inset-0 pattern-ichimatsu opacity-[0.15] pointer-events-none" />
 
-      {/* メインコンテンツ（404文字主体・質素な和風構成） */}
+      {/* メインコンテンツ（404または準備中文字主体・質素な和風構成） */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-lg mx-auto space-y-8 animate-fade-in">
         
-        {/* 主体となる「404」のタイポグラフィ ＋ 朱色の落款（ハンコ）風あしらい */}
+        {/* 主体となるタイポグラフィ ＋ 朱色の落款（ハンコ）風あしらい */}
         <div className="relative flex items-center justify-center my-4">
-          <span className="text-7xl sm:text-9xl font-black tracking-widest text-[#2C3E55] leading-none select-all font-serif">
-            404
+          <span className={`font-black tracking-widest text-[#2C3E55] leading-none select-all font-serif ${
+            isHiddenPage ? 'text-5xl sm:text-7xl py-2' : 'text-7xl sm:text-9xl'
+          }`}>
+            {isHiddenPage ? '準備中' : '404'}
           </span>
           {/* 朱色の落款風スタンプあしらい */}
           <div className="absolute -top-3 -right-6 sm:-top-4 sm:-right-8 w-10 h-10 sm:w-12 sm:h-12 border-2 border-wafuu-shu bg-wafuu-shu/10 rounded-sm flex items-center justify-center rotate-12 select-none pointer-events-none shadow-xs">
             <span className="text-[10px] sm:text-xs font-bold text-wafuu-shu leading-tight tracking-tighter text-center font-serif">
-              {isHiddenPage ? '準備中' : '迷い道'}
+              {isHiddenPage ? '非公開' : '迷い道'}
             </span>
           </div>
         </div>
@@ -54,8 +58,15 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
         {/* 質素で丁寧な日本語説明 */}
         <div className="space-y-3 font-sans">
           <h2 className="text-lg sm:text-xl font-serif font-bold tracking-wider text-[#2C3E55]">
-            {isHiddenPage ? '公開停止 ・ 準備中のページ' : 'ページが見つかりません'}
+            {isHiddenPage ? 'ただいま準備中です' : 'ページが見つかりません'}
           </h2>
+          {customMessage ? (
+            <div className="p-4 rounded-2xl bg-white/80 border border-wafuu-shu/30 shadow-xs max-w-md mx-auto my-3">
+              <p className="text-sm font-bold text-wafuu-shu font-serif leading-relaxed">
+                {customMessage}
+              </p>
+            </div>
+          ) : null}
           <p className="text-xs sm:text-sm text-wafuu-sumi/75 leading-relaxed max-w-md mx-auto">
             {isHiddenPage ? (
               <>

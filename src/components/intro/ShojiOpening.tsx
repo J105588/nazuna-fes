@@ -12,6 +12,7 @@ import gsap from 'gsap';
 
 interface ShojiOpeningProps {
   onComplete: () => void;
+  onOpenStart?: () => void;
 }
 
 /* 障子の格子パネル1枚（深め・濃い和紙テクスチャ + 重厚木枠） */
@@ -53,15 +54,8 @@ const ShojiPanel: React.FC<{ side: 'left' | 'right' }> = ({ side }) => {
         <div
           key={i}
           style={{
-            /* 深みのある古民家・未晒し和紙テクスチャ */
+            /* 深みのある古民家・未晒し和紙テクスチャ（重い1.5px斜めストライプを除去しグラデーションで完全再現） */
             background: `
-              repeating-linear-gradient(
-                ${35 + Math.random() * 20}deg,
-                transparent,
-                transparent 1.5px,
-                rgba(140, 120, 90, 0.1) 1.5px,
-                rgba(140, 120, 90, 0.1) 3px
-              ),
               radial-gradient(ellipse at ${30 + Math.random() * 40}% ${30 + Math.random() * 40}%, 
                 rgba(230, 215, 185, 0.3) 0%, transparent 75%),
               linear-gradient(170deg, #E2D2B5 0%, #D4C1A0 45%, #C9B491 100%)
@@ -117,14 +111,17 @@ const ShojiPanel: React.FC<{ side: 'left' | 'right' }> = ({ side }) => {
   );
 };
 
-export const ShojiOpening: React.FC<ShojiOpeningProps> = ({ onComplete }) => {
+export const ShojiOpening: React.FC<ShojiOpeningProps> = ({ onComplete, onOpenStart }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const bgOverlayRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
   const onCompleteRef = useRef(onComplete);
+  const onOpenStartRef = useRef(onOpenStart);
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
-  }, [onComplete]);
+    onOpenStartRef.current = onOpenStart;
+  }, [onComplete, onOpenStart]);
 
   const startAnimation = useCallback(() => {
     if (!containerRef.current) return;
@@ -149,7 +146,7 @@ export const ShojiOpening: React.FC<ShojiOpeningProps> = ({ onComplete }) => {
     });
 
     // Phase 0: 初期待機（0.4s）- 完全に閉じた状態
-    tl.set([leftPanel, rightPanel], { x: 0 });
+    tl.set([leftPanel, rightPanel], { x: 0, force3D: true });
 
     // Phase 1: 中央の隙間から金茶の光が漏れ出す（0.4s〜1.0s）
     if (lightBeam) {
@@ -158,6 +155,7 @@ export const ShojiOpening: React.FC<ShojiOpeningProps> = ({ onComplete }) => {
         scaleX: 1.6,
         duration: 0.6,
         ease: 'power2.out',
+        force3D: true,
       }, 0.4);
     }
 
@@ -166,35 +164,52 @@ export const ShojiOpening: React.FC<ShojiOpeningProps> = ({ onComplete }) => {
       x: '-105%',
       duration: 1.5,
       ease: 'power3.inOut',
+      force3D: true,
     }, 1.0);
 
     tl.to(rightPanel, {
       x: '105%',
       duration: 1.5,
       ease: 'power3.inOut',
+      force3D: true,
     }, 1.0);
 
-    // ★修正: 左右の障子が引き分かれ始める瞬間 (1.0s) に合わせ、隙間の光が扉の開きと同期してパッと横に広がりながら自然に霧散・消滅する
+    // ★修正: 左右の障子が引き分かれ始める瞬間 (1.0s) に合わせ、隙間の光が扉の開きと同期して消滅
     if (lightBeam) {
       tl.to(lightBeam, {
         opacity: 0,
         scaleX: 6.0,
         duration: 0.28,
         ease: 'power2.out',
+        force3D: true,
       }, 1.0);
     }
 
-    // ★重要★: 障子が左右に開ききったタイミング (2.4s) で次層のポスター演出を開始！
-    tl.call(() => {
-      onCompleteRef.current();
-    }, [], 2.4);
+    // 障子引き分けと合わせ、裏面の黒背景(bgOverlayRef)を穏やかに透過させ、まずは深層の静寂（背景層）を見せる
+    if (bgOverlayRef.current) {
+      tl.to(bgOverlayRef.current, {
+        opacity: 0,
+        duration: 0.85,
+        ease: 'power2.inOut',
+      }, 1.1);
+    }
 
-    // Phase 3: 障子コンテナ自体を透明化して消滅（2.5s〜2.8s）
+    // ★重要：障子が開いた絶妙なタイミング（間：2.0s）でポスター結晶化を開始し、「近すぎる」違和感を完全解消
+    tl.call(() => {
+      onOpenStartRef.current?.();
+    }, [], 2.0);
+
+    // ★重要★: 障子が完全に左右に開ききり、余韻を持たせたタイミング (2.8s) で障子終了処理
+    tl.call(() => {
+      onCompleteRef.current?.();
+    }, [], 2.8);
+
+    // Phase 3: 障子コンテナ自体を透明化して消滅（2.8s〜3.2s）
     tl.to(containerRef.current, {
       opacity: 0,
-      duration: 0.3,
+      duration: 0.4,
       ease: 'power2.in',
-    }, 2.5);
+    }, 2.8);
 
     return () => { tl.kill(); };
   }, []);
@@ -220,13 +235,16 @@ export const ShojiOpening: React.FC<ShojiOpeningProps> = ({ onComplete }) => {
         overflow: 'hidden',
       }}
     >
-      {/* 背景（障子が閉まっている間の奥の漆黒・濃黒） */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: '#050711',
-        zIndex: 0,
-      }} />
+      {/* 背景（障子が閉まっている間の奥の漆黒・濃黒、開く瞬間に滑らかに透過して裏側のポスターを露出） */}
+      <div
+        ref={bgOverlayRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: '#050711',
+          zIndex: 0,
+        }}
+      />
 
       {/* 中央の光ビーム（障子の隙間からの幻想的な金茶の光） */}
       <div

@@ -33,36 +33,42 @@ export const UrgentAnnouncementModal: React.FC<UrgentAnnouncementModalProps> = (
   useEffect(() => {
     if (!isIntroFinished) return;
 
-    const urgentList = announcements
-      .filter((a) => a.is_published && a.category === 'urgent')
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    // ヘッダー(Navbar)とスクロール促進(SCROLL DOWN)が完全に出現(約1.2秒)してから
+    // さらに一呼吸置いてから強制表示の通知モーダルを出すため、1800msの遅延を設定
+    const timer = setTimeout(() => {
+      const urgentList = announcements
+        .filter((a) => a.is_published && a.category === 'urgent')
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-    const currentIdsKey = urgentList.map((a) => a.id).join(',');
-    if (currentIdsKey === prevUrgentIdsRef.current && activeUrgentItems.length === 0) {
-      return;
-    }
-    prevUrgentIdsRef.current = currentIdsKey;
-
-    if (urgentList.length === 0) {
-      setActiveUrgentItems([]);
-      return;
-    }
-
-    try {
-      const dismissedRaw = sessionStorage.getItem('nazuna_dismissed_urgent_ids');
-      const dismissedIds: string[] = dismissedRaw ? JSON.parse(dismissedRaw) : [];
-
-      // 1つでも未読の緊急配信があれば表示
-      const unacknowledged = urgentList.filter((item) => !dismissedIds.includes(item.id));
-      if (unacknowledged.length > 0) {
-        setActiveUrgentItems(unacknowledged);
-        setCurrentIndex(0);
-      } else {
-        setActiveUrgentItems([]);
+      const currentIdsKey = urgentList.map((a) => a.id).join(',');
+      if (currentIdsKey === prevUrgentIdsRef.current && activeUrgentItems.length === 0) {
+        return;
       }
-    } catch {
-      setActiveUrgentItems(urgentList);
-    }
+      prevUrgentIdsRef.current = currentIdsKey;
+
+      if (urgentList.length === 0) {
+        setActiveUrgentItems([]);
+        return;
+      }
+
+      try {
+        const dismissedRaw = sessionStorage.getItem('nazuna_dismissed_urgent_ids');
+        const dismissedIds: string[] = dismissedRaw ? JSON.parse(dismissedRaw) : [];
+
+        // 1つでも未読の緊急配信があれば表示
+        const unacknowledged = urgentList.filter((item) => !dismissedIds.includes(item.id));
+        if (unacknowledged.length > 0) {
+          setActiveUrgentItems(unacknowledged);
+          setCurrentIndex(0);
+        } else {
+          setActiveUrgentItems([]);
+        }
+      } catch {
+        setActiveUrgentItems(urgentList);
+      }
+    }, 1800);
+
+    return () => clearTimeout(timer);
   }, [announcements, isIntroFinished]);
 
   const handleDismissAll = () => {
@@ -111,12 +117,12 @@ export const UrgentAnnouncementModal: React.FC<UrgentAnnouncementModalProps> = (
   return (
     <div
       onClick={handleDismissAll}
-      className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 select-none animate-fade-in font-serif"
+      className="fixed inset-0 z-[200] bg-black/85 flex items-center justify-center p-4 sm:p-6 select-none animate-fadeIn font-serif"
     >
       {/* 和風モーダル本体（生成り色の和紙調テクスチャ ＋ 朱＆金の和風装飾） */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-2xl rounded-3xl p-6 sm:p-10 shadow-[0_15px_50px_rgba(0,0,0,0.5)] border-2 border-[#D4AF37]/60 overflow-hidden text-[#2C3E55] animate-scale-up"
+        className="relative w-full max-w-2xl rounded-3xl p-6 sm:p-10 shadow-[0_15px_50px_rgba(0,0,0,0.5)] border-2 border-[#D4AF37]/60 overflow-hidden text-[#2C3E55] animate-modal-scale"
         style={{
           background: 'linear-gradient(135deg, #FAF8F5 0%, #F5F0E6 100%)',
         }}

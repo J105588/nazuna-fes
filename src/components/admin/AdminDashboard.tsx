@@ -650,6 +650,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               onDeleteEvent={handleDeleteEvent}
               onCreateDay={handleCreateDay}
               onDeleteDay={handleDeleteDay}
+              organizations={organizations}
             />
           )}
 

@@ -11,13 +11,16 @@ import {
   Plus,
   Filter,
   ChevronDown,
-  Users
+  Users,
+  Grid,
+  List
 } from 'lucide-react';
-import type { TimetableEvent, TimetableDay, StageLocation } from '../../types/database';
+import type { TimetableEvent, TimetableDay, StageLocation, Organization } from '../../types/database';
 
 export interface AdminEventsTabProps {
   timetableEvents: TimetableEvent[];
   days: TimetableDay[];
+  organizations?: Organization[];
   onTogglePublish: (id: string, current: boolean) => Promise<void>;
   onCreateEvent: (data: {
     title: string;
@@ -50,6 +53,7 @@ export interface AdminEventsTabProps {
 export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
   timetableEvents,
   days,
+  organizations = [],
   onTogglePublish,
   onCreateEvent,
   onSaveEvent,
@@ -59,6 +63,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
 }) => {
   const [selectedDayId, setSelectedDayId] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<'all' | StageLocation>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [showDayManager, setShowDayManager] = useState(false);
   const [dayForm, setDayForm] = useState({ date_string: '', label: '' });
 
@@ -340,28 +345,164 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
           ))}
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-          <Filter className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-          <span className="text-xs text-slate-700 font-semibold shrink-0">場所:</span>
-          <select
-            value={selectedLocation}
-            onChange={(e) => setSelectedLocation(e.target.value as any)}
-            className="bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-1.5 text-xs font-medium focus:outline-none focus:border-blue-600 transition-all shadow-xs"
-          >
-            <option value="all">すべてのステージ・会場</option>
-            <option value="av_room">國枝記念国際ホール</option>
-            <option value="gym">古賀記念アリーナ</option>
-            <option value="courtyard">Nステ会場</option>
-          </select>
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                viewMode === 'grid' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Grid className="w-3.5 h-3.5" />
+              <span>グリッド表 (フロント同等)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                viewMode === 'table' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>リスト表</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Filter className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span className="text-xs text-slate-700 font-semibold shrink-0">場所:</span>
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value as any)}
+              className="bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-1.5 text-xs font-medium focus:outline-none focus:border-blue-600 transition-all shadow-xs"
+            >
+              <option value="all">すべてのステージ・会場</option>
+              <option value="av_room">國枝記念国際ホール</option>
+              <option value="gym">古賀記念アリーナ</option>
+              <option value="courtyard">Nステ会場</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* 演目タイムテーブルリスト (表形式表示) */}
+      {/* 演目タイムテーブル表示 (グリッド or リスト) */}
       {filteredEvents.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3 shadow-sm">
           <Clock className="w-8 h-8 text-slate-400 mx-auto" />
           <h3 className="font-bold text-sm text-slate-800">表示するステージ演目がありません</h3>
           <p className="text-xs text-slate-600">条件に合致する演目がないか、まだ登録されていません。</p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div>
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                <Grid className="w-4 h-4 text-blue-600" />
+                <span>タイムテーブル表 (フロント画面と同等の3列構成)</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">各ステージの演目カードから、直接編集や公開ステータスの一発切り替えが可能です。</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {[
+              { id: 'av_room', label: '國枝記念国際ホール', bgHeader: 'bg-blue-600', borderHeader: 'border-blue-600' },
+              { id: 'gym', label: '古賀記念アリーナ', bgHeader: 'bg-indigo-600', borderHeader: 'border-indigo-600' },
+              { id: 'courtyard', label: 'Nステ会場', bgHeader: 'bg-purple-600', borderHeader: 'border-purple-600' }
+            ]
+              .filter((stg) => selectedLocation === 'all' || selectedLocation === stg.id)
+              .map((stg) => {
+                const stageEvts = filteredEvents
+                  .filter((e) => e.stage_location === stg.id || (stg.id === 'av_room' && (e.stage_location as string) === 'kunieda_hall'))
+                  .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
+                return (
+                  <div key={stg.id} className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-xs">
+                    <div className={`${stg.bgHeader} text-white px-4 py-3 font-bold text-xs flex items-center justify-between`}>
+                      <span>{stg.label}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">{stageEvts.length}件</span>
+                    </div>
+
+                    <div className="p-3 space-y-3 flex-1 overflow-y-auto max-h-[680px] divide-y divide-slate-200/70">
+                      {stageEvts.length === 0 ? (
+                        <div className="py-12 text-center text-slate-400 text-xs font-medium">
+                          演目登録なし
+                        </div>
+                      ) : (
+                        stageEvts.map((evt) => {
+                          const isPub = Boolean(evt.is_published);
+                          const startTimeStr = new Date(evt.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                          const endTimeStr = new Date(evt.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                          return (
+                            <div
+                              key={evt.id}
+                              className={`pt-3 first:pt-0 flex flex-col gap-2 transition-all ${
+                                !isPub ? 'opacity-75 bg-red-50/60 p-2 rounded-xl border border-red-200/80' : ''
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="font-mono font-bold text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                                  {startTimeStr} 〜 {endTimeStr}
+                                </div>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                                  isPub ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' : 'bg-red-100 text-red-700 border border-red-300'
+                                }`}>
+                                  {isPub ? '公開中' : '非公開'}
+                                </span>
+                              </div>
+
+                              <div className="font-bold text-sm text-slate-900 leading-snug">
+                                {evt.title}
+                              </div>
+
+                              {evt.organization_name && (
+                                <div className="text-xs text-slate-600 font-medium flex items-center gap-1.5 truncate bg-white px-2 py-1 rounded border border-slate-200">
+                                  <Users className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                                  <span className="truncate">{evt.organization_name}</span>
+                                </div>
+                              )}
+
+                              <div className="flex items-center justify-end gap-1.5 pt-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEdit(evt)}
+                                  className="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition-all border border-slate-300 text-xs font-bold flex items-center gap-1 shadow-2xs"
+                                >
+                                  <Edit3 className="w-3 h-3 text-blue-600" />
+                                  <span>編集</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => onTogglePublish(evt.id, isPub)}
+                                  className={`px-2.5 py-1 rounded-lg transition-all text-xs font-bold flex items-center gap-1 shadow-2xs border ${
+                                    isPub
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                                      : 'bg-red-50 text-red-700 border-red-300 hover:bg-red-100'
+                                  }`}
+                                >
+                                  {isPub ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                                  <span>{isPub ? '非公開へ' : '公開へ'}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => onDeleteEvent(evt.id, evt.title)}
+                                  className="p-1.5 rounded-lg bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 transition-all border border-slate-300 text-xs"
+                                  title="削除"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
         </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
@@ -430,6 +571,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
+                            type="button"
                             onClick={() => handleOpenEdit(evt)}
                             className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all border border-slate-300"
                             title="編集"
@@ -438,6 +580,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
                           </button>
 
                           <button
+                            type="button"
                             onClick={() => onTogglePublish(evt.id, isPub)}
                             className={`p-2 rounded-xl transition-all border ${
                               isPub
@@ -450,6 +593,7 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
                           </button>
 
                           <button
+                            type="button"
                             onClick={() => onDeleteEvent(evt.id, evt.title)}
                             className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 transition-all border border-slate-300"
                             title="削除"
@@ -498,13 +642,37 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-300">団体・サークル名 (organization_name)</label>
+                <label className="text-xs font-medium text-slate-300">団体・サークル選択 / 名称 (organization_name)</label>
+                <select
+                  value={createForm.organization_id || ''}
+                  onChange={(e) => {
+                    const orgId = e.target.value;
+                    if (!orgId) {
+                      setCreateForm({ ...createForm, organization_id: '', organization_name: '' });
+                    } else {
+                      const found = organizations?.find((o) => o.id === orgId);
+                      setCreateForm({
+                        ...createForm,
+                        organization_id: orgId,
+                        organization_name: found ? found.name : ''
+                      });
+                    }
+                  }}
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 transition-all shadow-xs"
+                >
+                  <option value="" className="bg-slate-900 text-slate-400">-- 登録団体から選択（または自由入力） --</option>
+                  {organizations?.map((org) => (
+                    <option key={org.id} value={org.id} className="bg-slate-900 text-white">
+                      {org.name} ({org.category === 'class' ? 'クラス' : org.category === 'club' ? '部活・委員会' : '有志'})
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   value={createForm.organization_name}
                   onChange={(e) => setCreateForm({ ...createForm, organization_name: e.target.value })}
-                  placeholder="例: 軽音楽部・ダンス部・有志バンド"
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all shadow-xs"
+                  placeholder="団体名（リスト選択時は自動補完、手動編集も可能）"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all shadow-xs mt-1"
                 />
               </div>
 
@@ -612,13 +780,37 @@ export const AdminEventsTab: React.FC<AdminEventsTabProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-300">団体・サークル名 (organization_name)</label>
+                <label className="text-xs font-medium text-slate-300">団体・サークル選択 / 名称 (organization_name)</label>
+                <select
+                  value={editForm.organization_id || ''}
+                  onChange={(e) => {
+                    const orgId = e.target.value;
+                    if (!orgId) {
+                      setEditForm({ ...editForm, organization_id: '', organization_name: '' });
+                    } else {
+                      const found = organizations?.find((o) => o.id === orgId);
+                      setEditForm({
+                        ...editForm,
+                        organization_id: orgId,
+                        organization_name: found ? found.name : ''
+                      });
+                    }
+                  }}
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 transition-all shadow-xs"
+                >
+                  <option value="" className="bg-slate-900 text-slate-400">-- 登録団体から選択（または自由入力） --</option>
+                  {organizations?.map((org) => (
+                    <option key={org.id} value={org.id} className="bg-slate-900 text-white">
+                      {org.name} ({org.category === 'class' ? 'クラス' : org.category === 'club' ? '部活・委員会' : '有志'})
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   value={editForm.organization_name}
                   onChange={(e) => setEditForm({ ...editForm, organization_name: e.target.value })}
-                  placeholder="例: 軽音楽部・ダンス部・有志バンド"
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all shadow-xs"
+                  placeholder="団体名（リスト選択時は自動補完、手動編集も可能）"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-all shadow-xs mt-1"
                 />
               </div>
 
