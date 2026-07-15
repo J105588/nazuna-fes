@@ -86,11 +86,13 @@ export const App: React.FC = () => {
   const [introKey, setIntroKey] = useState<number>(0);
   const [isShojiFinished, setIsShojiFinished] = useState<boolean>(() => checkShouldSkipIntro());
   const [isShojiOpeningStarted, setIsShojiOpeningStarted] = useState<boolean>(() => checkShouldSkipIntro());
+  const [hasShojiIntro, setHasShojiIntro] = useState<boolean>(() => !checkShouldSkipIntro());
 
   useEffect(() => {
     // home 以外の画面に遷移・リロードした際は確実にヘッダーを表示する
     if (currentTab !== 'home' && !isIntroFinished) {
       setIsIntroFinished(true);
+      setHasShojiIntro(false);
     }
   }, [currentTab, isIntroFinished]);
 
@@ -234,6 +236,7 @@ export const App: React.FC = () => {
   // ホームに戻った際にポスターの重ねる演出が再度正しく流れるようリセット＆キー更新
   const handleNavigateToHome = () => {
     setIsIntroFinished(false);
+    setHasShojiIntro(false); // 障子はないため、ヘッダーと半円部はそのまま表示
     setIntroKey((prev) => prev + 1);
     setCurrentTab('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -287,6 +290,7 @@ export const App: React.FC = () => {
       <Navbar
         currentTab={currentTab === 'not_found' ? 'home' : currentTab}
         isIntroFinished={isIntroFinished}
+        hasShojiIntro={hasShojiIntro}
         onSelectTab={(tab) => {
           if (tab === 'home') {
             handleNavigateToHome();
@@ -367,8 +371,10 @@ export const App: React.FC = () => {
                 isShojiFinished={isShojiFinished}
                 isShojiOpeningStarted={isShojiOpeningStarted}
                 isIntroFinished={isIntroFinished}
+                hasShojiIntro={hasShojiIntro}
                 onIntroComplete={() => {
                   setIsIntroFinished(true);
+                  setHasShojiIntro(false);
                   try {
                     localStorage.setItem('last_shoji_played_time', Date.now().toString());
                   } catch {}
@@ -458,7 +464,7 @@ export const App: React.FC = () => {
       })()}
 
       {/* フッター（オープニング演出完了後にのみ実行） */}
-      {isIntroFinished && (
+      {(!hasShojiIntro || isIntroFinished) && (
         <Footer
           onNavigatePolicyPage={(section) => {
             setActivePolicySection(section);

@@ -27,7 +27,17 @@ export let mockTimetableEvents: TimetableEvent[] = [];
 export let mockAnnouncements: Announcement[] = [];
 export let mockLostItems: LostItem[] = [];
 export let mockPyramidReleases: PyramidRelease[] = [];
-export let mockPageSettings: PageSetting[] = [];
+export let mockPageSettings: PageSetting[] = [
+  { id: 'home', title: 'トップページ', is_public: true, custom_message: '現在メンテナンス中です。しばらくお待ちください。' },
+  { id: 'news', title: '実行委員会からのお知らせ', is_public: true, custom_message: '現在、お知らせ準備中です。公開までしばらくお待ちください。' },
+  { id: 'exhibitions', title: '出し物・展示 企画一覧', is_public: true, custom_message: '現在、企画詳細を最終調整中です。公開までしばらくお待ちください。' },
+  { id: 'timetable', title: 'タイムテーブル', is_public: true, custom_message: '現在、ステージスケジュールを最終調整中です。公開までしばらくお待ちください。' },
+  { id: 'map', title: '校内マップ', is_public: true, custom_message: '現在、校内マップを準備中です。公開までしばらくお待ちください。' },
+  { id: 'guidance', title: 'ご案内・総合案内所', is_public: true, custom_message: '現在準備中です。公開までしばらくお待ちください。' },
+  { id: 'info', title: 'テーマ「百輝夜行」について', is_public: true, custom_message: '現在準備中です。公開までしばらくお待ちください。' },
+  { id: 'lostfound', title: '落とし物掲示板', is_public: true, custom_message: '現在準備中です。公開までしばらくお待ちください。' },
+  { id: 'policy', title: 'プライバシー＆サイトポリシー', is_public: true, custom_message: '現在準備中です。公開までしばらくお待ちください。' }
+];
 
 // DBからのデータ取得関数
 export async function fetchOrganizationsFromDB(): Promise<Organization[]> {

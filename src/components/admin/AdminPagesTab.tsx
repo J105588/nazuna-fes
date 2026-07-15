@@ -51,10 +51,10 @@ export const AdminPagesTab: React.FC<AdminPagesTabProps> = ({
         <div>
           <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
             <Globe className="w-5 h-5 text-blue-600" />
-            <span>ページ単位の公開・準備中設定</span>
+            <span>ページ単位の公開・メニュー表示設定</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            サイト上の各主要ページの公開状況をリアルタイムで切替できます。非公開（準備中）に設定したページに一般ユーザーがアクセスした際は、案内画面とメッセージが表示されます。
+            サイト上の各主要ページの公開状況をリアルタイムで切替できます。非公開（準備中）に設定したページはハンバーガーメニュー内に表示されなくなり、URLで直接アクセスした際も準備中案内画面とメッセージが表示されます。
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -116,14 +116,14 @@ export const AdminPagesTab: React.FC<AdminPagesTabProps> = ({
                         : 'bg-amber-50 text-amber-700 border-amber-200'
                         }`}
                     >
-                      {page.is_public ? '公開中' : '準備中（非公開）'}
+                      {page.is_public ? '公開中（メニュー表示）' : '準備中（メニュー非表示）'}
                     </span>
                     <button
                       onClick={() => onTogglePublic(page.id, !page.is_public)}
                       className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${page.is_public ? 'bg-blue-600' : 'bg-slate-300'
                         }`}
-                      title={page.is_public ? '非公開（準備中）に切り替える' : '公開する'}
-                      aria-label={page.is_public ? '公開中' : '準備中'}
+                      title={page.is_public ? '準備中（メニュー非表示）に切り替える' : '公開する（メニュー表示）'}
+                      aria-label={page.is_public ? '公開中（メニュー表示）' : '準備中（メニュー非表示）'}
                     >
                       <span
                         className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${page.is_public ? 'translate-x-5' : 'translate-x-0'

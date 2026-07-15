@@ -21,6 +21,7 @@ interface HomeProps {
   isShojiFinished?: boolean;
   isShojiOpeningStarted?: boolean;
   isIntroFinished?: boolean;
+  hasShojiIntro?: boolean;
   onIntroComplete?: () => void;
   onSelectTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
   onNavigateGuidancePage?: (section: GuidanceSectionId) => void;
@@ -36,6 +37,7 @@ export const Home: React.FC<HomeProps> = ({
   isShojiFinished = true,
   isShojiOpeningStarted = false,
   isIntroFinished = true,
+  hasShojiIntro = false,
   onIntroComplete,
   onSelectTab,
   onNavigateGuidancePage,
@@ -204,7 +206,7 @@ export const Home: React.FC<HomeProps> = ({
 
           {/* 画面の下地の半円の弧（ポスター空間と企画検索エリアを優雅に繋ぐウェーブカーブ） */}
           <div
-            className={`absolute -bottom-[1px] left-0 right-0 w-full z-20 pointer-events-none overflow-hidden transition-opacity duration-700 ease-out ${isIntroFinished ? 'opacity-100' : 'opacity-0'
+            className={`absolute -bottom-[1px] left-0 right-0 w-full z-20 pointer-events-none overflow-hidden transition-opacity duration-700 ease-out ${(!hasShojiIntro || isIntroFinished) ? 'opacity-100' : 'opacity-0'
               }`}
           >
             <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[36px] sm:h-[80px] block" preserveAspectRatio="none">
@@ -693,8 +695,7 @@ export const Home: React.FC<HomeProps> = ({
                     <span>歴史と伝統：「第三教育」の舞台</span>
                   </h3>
                   <p>
-                    市川中学校・市川高等学校の文化祭「なずな祭」は、本校が大切にする教育理念「第三教育（自分で自分を教育する）」が最高潮に発揮される一大行事です。
-                    生徒実行委員会を中心に、企画立案、ポスター原画・Web開発、ステージ運営から当日の安全誘導まで、すべてを生徒たちが自立して運営しています。
+                    市川中学校・市川高等学校の文化祭「なずな祭」は、本校が大切にする教育理念「第三教育」が最高潮に発揮される一大行事です。
                   </p>
                 </div>
 
@@ -704,7 +705,7 @@ export const Home: React.FC<HomeProps> = ({
                     <span>「なずな」の由来と自律精神</span>
                   </h3>
                   <p>
-                    校歌や行事名にも冠される「なずな」は、春の七草のひとつ。踏まれてもたくましく花を咲かせる野草であり、市川学園生の強靭な精神と誠実さを象徴しています。
+                    校歌や行事名にも冠される「なずな」は、春の七草のひとつ。踏まれてもたくましく花を咲かせる野草であり、教育理念のよく見れば精神を象徴するものです。
                     創立89周年を迎える今年度も、その誇りを胸に、ご来場いただくすべての方へ最高の「百輝夜行」をお届けします。
                   </p>
                 </div>
@@ -712,7 +713,7 @@ export const Home: React.FC<HomeProps> = ({
 
               <div className="pt-4 flex flex-wrap items-center justify-between gap-4 text-xs text-wafuu-text-sub font-mono border-t border-wafuu-sumi/10">
                 <span>主催：2026年度 なずな祭実行委員会</span>
-                <span>場所：千葉県市川市本北方2-38-1 市川学園市川中学校・高等学校</span>
+                <span>場所：千葉県市川市本北方2-38-1 市川中学校・高等学校</span>
               </div>
 
             </div>

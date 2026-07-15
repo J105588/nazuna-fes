@@ -141,6 +141,6 @@ export interface PageSetting {
   title: string;
   is_public: boolean;
   custom_message?: string;
-  updated_at: string;
+  updated_at?: string;
 }
 

@@ -184,7 +184,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     try {
       await updatePageSettingInDB(pageId, { is_public: nextPublic });
       setPageSettings((prev) => prev.map((p) => (p.id === pageId ? { ...p, is_public: nextPublic } : p)));
-      showToast(`ページ公開ステータスを「${nextPublic ? '公開中' : '準備中（非公開）'}」に変更しました。`, 'success');
+      showToast(`ページ公開ステータスを「${nextPublic ? '公開中（メニュー表示）' : '準備中（メニュー非表示）'}」に変更しました。`, 'success');
     } catch {
       showToast('ページのステータス変更に失敗しました。', 'error');
     }
@@ -206,7 +206,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         await updatePageSettingInDB(page.id, { is_public: nextPublic });
       }
       setPageSettings((prev) => prev.map((p) => ({ ...p, is_public: nextPublic })));
-      showToast(`すべてのページを「${nextPublic ? '公開中' : '準備中（非公開）'}」に一括変更しました。`, 'success');
+      showToast(`すべてのページを「${nextPublic ? '公開中（メニュー表示）' : '準備中（メニュー非表示）'}」に一括変更しました。`, 'success');
     } catch {
       showToast('一括変更に失敗しました。', 'error');
     }

@@ -81,7 +81,7 @@ export const GuidanceDetailPage: React.FC<GuidanceDetailPageProps> = ({
             ご来場者ガイド ＆ 総合案内所
           </h1>
           <p className="text-sm sm:text-base text-wafuu-sumi/80 max-w-2xl mx-auto leading-relaxed font-sans">
-            2026年度なずな祭「百輝夜行」へようこそ。安心・安全に文化祭をお楽しみいただくためのご案内窓口およびすべての注意事項・ガイドラインを掲載しております。
+            2026年度なずな祭「百輝夜行」へようこそ。文化祭をお楽しみいただくためのご案内窓口およびすべての注意事項・ガイドラインを掲載しております。
           </p>
         </div>
 
@@ -140,13 +140,13 @@ export const GuidanceDetailPage: React.FC<GuidanceDetailPageProps> = ({
             className="px-6 py-3.5 rounded-2xl bg-white border border-wafuu-ekasumi text-wafuu-sumi hover:bg-[#FAF8F5] transition-colors font-bold flex items-center gap-2 shadow-sm text-sm"
           >
             <ArrowUp className="w-4 h-4 text-wafuu-shu" />
-            <span>ページトップに戻る</span>
+            <span>ページ最上部に戻る</span>
           </button>
           <button
             onClick={() => onNavigateTab && onNavigateTab('home')}
             className="px-8 py-4 rounded-2xl bg-wafuu-sumi text-white hover:bg-wafuu-shu transition-colors font-bold flex items-center gap-2 shadow-lg active:scale-95 text-sm sm:text-base"
           >
-            <span>総合トップページへ戻る</span>
+            <span>トップページへ戻る</span>
           </button>
         </div>
 

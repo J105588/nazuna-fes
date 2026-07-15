@@ -195,66 +195,59 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({
 
         {/* ページナビゲーションリスト */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 my-auto">
-          {navItems.map((item, idx) => {
-            const isActive = currentTab === item.id;
-            const setting = pageSettings?.find((p) => p.id === item.id);
-            const isHiddenOr404 = Boolean(setting && !setting.is_public && item.id !== 'home');
+          {navItems
+            .filter((item) => {
+              const setting = pageSettings?.find((p) => p.id === item.id);
+              return !(setting && !setting.is_public && item.id !== 'home');
+            })
+            .map((item, idx) => {
+              const isActive = currentTab === item.id;
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabClick(item.id)}
-                disabled={isHiddenOr404}
-                className={`w-full p-5 sm:p-6 rounded-2xl text-left flex items-center justify-between transition-all duration-300 group border ${isHiddenOr404
-                  ? 'bg-gray-100/80 border-dashed border-gray-300 opacity-50 cursor-not-allowed'
-                  : isActive
-                    ? 'bg-white border-2 border-wafuu-shu shadow-md scale-[1.01]'
-                    : 'bg-white/90 hover:bg-white border-[#2C3E55]/10 hover:border-wafuu-shu/50 shadow-sm hover:shadow-md hover:translate-y-[-2px]'
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleTabClick(item.id)}
+                  className={`w-full p-5 sm:p-6 rounded-2xl text-left flex items-center justify-between transition-all duration-300 group border ${
+                    isActive
+                      ? 'bg-white border-2 border-wafuu-shu shadow-md scale-[1.01]'
+                      : 'bg-white/90 hover:bg-white border-[#2C3E55]/10 hover:border-wafuu-shu/50 shadow-sm hover:shadow-md hover:translate-y-[-2px]'
                   }`}
-                style={{
-                  transitionDelay: isOpen ? `${idx * 40}ms` : '0ms',
-                  opacity: isOpen ? (isHiddenOr404 ? 0.5 : 1) : 0,
-                  transform: isOpen ? 'translateY(0)' : 'translateY(12px)',
-                }}
-              >
-                <div className="flex items-center gap-4 min-w-0 flex-1">
-                  <div className={`p-3.5 rounded-xl transition-transform duration-300 shrink-0 shadow-sm ${isHiddenOr404 ? 'bg-gray-300 text-gray-500' : `${item.color} group-hover:scale-105`
-                    }`}>
-                    {item.icon}
-                  </div>
-                  <div className="min-w-0 flex-1 pr-2">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className={`text-base sm:text-lg font-serif font-bold tracking-wider transition-colors ${isHiddenOr404 ? 'text-gray-500 line-through' : 'text-[#2C3E55] group-hover:text-wafuu-shu'
-                        }`}>
-                        {item.label}
-                      </span>
-                      {isHiddenOr404 ? (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-gray-200 border border-gray-300 text-gray-600 font-bold">
-                          準備中
-                        </span>
-                      ) : item.badge ? (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#F5F0E6] border border-[#2C3E55]/15 text-[#2C3E55]/70">
-                          {item.badge}
-                        </span>
-                      ) : null}
+                  style={{
+                    transitionDelay: isOpen ? `${idx * 40}ms` : '0ms',
+                    opacity: isOpen ? 1 : 0,
+                    transform: isOpen ? 'translateY(0)' : 'translateY(12px)',
+                  }}
+                >
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className={`p-3.5 rounded-xl transition-transform duration-300 shrink-0 shadow-sm ${item.color} group-hover:scale-105`}>
+                      {item.icon}
                     </div>
-                    <span className={`text-xs font-sans block leading-relaxed line-clamp-1 ${isHiddenOr404 ? 'text-gray-400' : 'text-[#2C3E55]/60'
-                      }`}>
-                      {isHiddenOr404 ? '現在このページは準備中です' : item.subLabel}
-                    </span>
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-base sm:text-lg font-serif font-bold tracking-wider transition-colors text-[#2C3E55] group-hover:text-wafuu-shu">
+                          {item.label}
+                        </span>
+                        {item.badge ? (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#F5F0E6] border border-[#2C3E55]/15 text-[#2C3E55]/70">
+                            {item.badge}
+                          </span>
+                        ) : null}
+                      </div>
+                      <span className="text-xs font-sans block leading-relaxed line-clamp-1 text-[#2C3E55]/60">
+                        {item.subLabel}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ml-2 ${isHiddenOr404
-                  ? 'bg-gray-200 text-gray-400'
-                  : isActive
-                    ? 'bg-wafuu-shu text-white'
-                    : 'bg-[#F5F0E6] text-[#2C3E55]/40 group-hover:bg-wafuu-shu group-hover:text-white group-hover:translate-x-1'
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ml-2 ${
+                    isActive
+                      ? 'bg-wafuu-shu text-white'
+                      : 'bg-[#F5F0E6] text-[#2C3E55]/40 group-hover:bg-wafuu-shu group-hover:text-white group-hover:translate-x-1'
                   }`}>
-                  <ChevronRight className="w-5 h-5 stroke-[2.5]" />
-                </div>
-              </button>
-            );
-          })}
+                    <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+                  </div>
+                </button>
+              );
+            })}
         </div>
       </div>
       </div>

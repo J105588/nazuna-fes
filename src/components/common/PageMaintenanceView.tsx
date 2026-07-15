@@ -82,7 +82,7 @@ export const PageMaintenanceView: React.FC<PageMaintenanceViewProps> = ({
                     管理者向けご案内
                   </p>
                   <p className="text-[11px] text-blue-800 leading-normal mb-2.5">
-                    このページは現在、一般ユーザーに対して非公開設定となっています。管理画面からいつでも公開設定や準備中メッセージを変更可能です。
+                    このページは現在、一般ユーザーに対して非公開設定（メニュー非表示および直接アクセス制限）となっています。管理画面からいつでも公開設定や準備中メッセージを変更可能です。
                   </p>
                   <button
                     onClick={onNavigateAdmin}

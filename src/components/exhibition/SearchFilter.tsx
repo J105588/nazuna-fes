@@ -51,7 +51,7 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
                 出し物・展示 企画検索
               </h3>
               <span className="text-xs text-wafuu-text-muted block mt-0.5 font-sans">
-                全クラス・部活動・有志企画を瞬時に絞り込み
+                全クラス・部活動・有志企画を絞り込み
               </span>
             </div>
           </div>
@@ -134,11 +134,10 @@ export const SearchFilter: React.FC<SearchFilterProps> = ({
               <button
                 key={g.value}
                 onClick={() => onGenreChange(g.value)}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
-                  isActive
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 ${isActive
                     ? 'bg-wafuu-shu text-white border border-wafuu-shu shadow-sm'
                     : 'bg-white text-wafuu-text-sub hover:text-wafuu-sumi border border-wafuu-sumi/8 hover:border-wafuu-ekasumi/60'
-                }`}
+                  }`}
               >
                 {isActive && <span className="w-2 h-2 rounded-full bg-white animate-pulse" />}
                 <span>{g.label}</span>

@@ -52,9 +52,6 @@ export const Footer: React.FC<FooterProps> = () => {
           <div>
             &copy; {new Date().getFullYear()} 市川中学校・高等学校 なずな祭実行委員会 All Rights Reserved.
           </div>
-          <div className="flex items-center gap-3 text-xs font-serif text-wafuu-sumi/70">
-            <span>2026年度 なずな祭 テーマ：「百輝夜行」</span>
-          </div>
         </div>
       </div>
     </footer>

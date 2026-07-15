@@ -26,18 +26,17 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
 }) => {
   return (
     <div className="min-h-[85vh] w-full flex flex-col items-center justify-center px-6 py-20 bg-[#FAF8F5] text-wafuu-sumi font-serif select-none relative overflow-hidden">
-      
+
       {/* 質素な背景アクセント（極薄の和紙市松模様） */}
       <div className="absolute inset-0 pattern-ichimatsu opacity-[0.15] pointer-events-none" />
 
       {/* メインコンテンツ（404または準備中文字主体・質素な和風構成） */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-lg mx-auto space-y-8 animate-fade-in">
-        
+
         {/* 主体となるタイポグラフィ ＋ 朱色の落款（ハンコ）風あしらい */}
         <div className="relative flex items-center justify-center my-4">
-          <span className={`font-black tracking-widest text-[#2C3E55] leading-none select-all font-serif ${
-            isHiddenPage ? 'text-5xl sm:text-7xl py-2' : 'text-7xl sm:text-9xl'
-          }`}>
+          <span className={`font-black tracking-widest text-[#2C3E55] leading-none select-all font-serif ${isHiddenPage ? 'text-5xl sm:text-7xl py-2' : 'text-7xl sm:text-9xl'
+            }`}>
             {isHiddenPage ? '準備中' : '404'}
           </span>
           {/* 朱色の落款風スタンプあしらい */}
@@ -71,7 +70,7 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             {isHiddenPage ? (
               <>
                 アクセスされたページは現在、公開が停止されているか、準備中です。<br className="hidden sm:inline" />
-                公開までお待ちいただくか、総合トップページより他の企画をお楽しみください。
+                公開までお待ちいただくか、トップページより他の企画をお楽しみください。
               </>
             ) : (
               <>
@@ -89,7 +88,7 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             className="px-8 py-3.5 rounded-xl bg-[#2C3E55] text-white text-sm tracking-widest hover:bg-wafuu-shu transition-colors shadow-sm flex items-center justify-center gap-2 group border border-white/10"
           >
             <Compass className="w-4 h-4 text-wafuu-kincha group-hover:text-white transition-colors" />
-            <span>総合トップページへ戻る</span>
+            <span>トップページへ戻る</span>
           </button>
 
           {onNavigateAdmin && isAdminLoggedIn && (

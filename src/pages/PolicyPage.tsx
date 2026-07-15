@@ -74,9 +74,8 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
           {activeSection === 'filming-guidelines' && (
             <div className="space-y-8 animate-fade-in">
               <div className="border-b border-wafuu-sumi/15 pb-5">
-                <span className="text-xs font-mono font-bold text-wafuu-shu block">GUIDELINE ON PHOTOGRAPHY & SNS</span>
                 <h2 className="text-2xl sm:text-4xl font-black text-wafuu-sumi mt-1">
-                  なずな祭に関する情報指針 （撮影・SNS掲載制限事項）
+                  なずな祭に関する情報指針
                 </h2>
               </div>
 
@@ -126,9 +125,8 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
           {activeSection === 'privacy' && (
             <div className="space-y-8 animate-fade-in">
               <div className="border-b border-wafuu-sumi/15 pb-5">
-                <span className="text-xs font-mono font-bold text-wafuu-kincha block">PRIVACY POLICY</span>
                 <h2 className="text-2xl sm:text-4xl font-black text-wafuu-sumi mt-1">
-                  個人情報保護方針 (Privacy Policy)
+                  個人情報保護方針
                 </h2>
               </div>
 
@@ -152,7 +150,6 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
           {activeSection === 'sitepolicy' && (
             <div className="space-y-8 animate-fade-in">
               <div className="border-b border-wafuu-sumi/15 pb-5">
-                <span className="text-xs font-mono font-bold text-wafuu-ai block">SITE POLICY & TERMS</span>
                 <h2 className="text-2xl sm:text-4xl font-black text-wafuu-sumi mt-1">
                   サイトポリシー ＆ 免責事項
                 </h2>
@@ -175,15 +172,14 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({
           {activeSection === 'sitemap' && (
             <div className="space-y-8 animate-fade-in">
               <div className="border-b border-wafuu-sumi/15 pb-5">
-                <span className="text-xs font-mono font-bold text-wafuu-sumi block">SITE MAP</span>
                 <h2 className="text-2xl sm:text-4xl font-black text-wafuu-sumi mt-1">
-                  サイトマップ （全ページ目次）
+                  サイトマップ
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 font-sans text-sm">
                 <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-wafuu-ekasumi/40 space-y-3">
-                  <h4 className="font-bold text-lg font-serif border-b pb-2">メインポータル</h4>
+                  <h4 className="font-bold text-lg font-serif border-b pb-2">HOME</h4>
                   <ul className="space-y-2">
                     <li><button onClick={() => onNavigateTab && onNavigateTab('home')} className="hover:text-wafuu-shu font-bold">・ トップページ</button></li>
                     <li><button onClick={() => onNavigateTab && onNavigateTab('timetable')} className="hover:text-wafuu-shu font-bold">・ ステージタイムテーブル</button></li>
