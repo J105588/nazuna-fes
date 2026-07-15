@@ -164,9 +164,8 @@ export const Home: React.FC<HomeProps> = ({
               オープニング終了後：ヘッダーと同時に出現するスクロール促進アニメーション
               ========================================================= */}
           <div
-            className={`absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 transition-all duration-700 ease-out pointer-events-auto ${
-              isIntroFinished && showScrollGuide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-            }`}
+            className={`absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2 z-30 transition-all duration-700 ease-out pointer-events-auto ${isIntroFinished && showScrollGuide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+              }`}
           >
             <button
               onClick={() => {
@@ -205,9 +204,8 @@ export const Home: React.FC<HomeProps> = ({
 
           {/* 画面の下地の半円の弧（ポスター空間と企画検索エリアを優雅に繋ぐウェーブカーブ） */}
           <div
-            className={`absolute -bottom-[1px] left-0 right-0 w-full z-20 pointer-events-none overflow-hidden transition-opacity duration-700 ease-out ${
-              isIntroFinished ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute -bottom-[1px] left-0 right-0 w-full z-20 pointer-events-none overflow-hidden transition-opacity duration-700 ease-out ${isIntroFinished ? 'opacity-100' : 'opacity-0'
+              }`}
           >
             <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-[36px] sm:h-[80px] block" preserveAspectRatio="none">
               <path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="#FAF8F5" />
@@ -674,7 +672,7 @@ export const Home: React.FC<HomeProps> = ({
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-wafuu-sumi/10 pb-6">
                 <div>
-                  <span className="text-xs font-serif font-bold text-wafuu-shu tracking-widest block">第76回なずな祭 テーマコンセプトストーリー</span>
+                  <span className="text-xs font-serif font-bold text-wafuu-shu tracking-widest block">2026年度 なずな祭</span>
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-wafuu-sumi tracking-wider mt-1">
                     なずな祭とは
                   </h2>
