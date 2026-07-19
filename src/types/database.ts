@@ -1,7 +1,7 @@
 export type OrganizationCategory = 'class' | 'club' | 'volunteer';
 export type OrganizationGenre = 'food' | 'exhibition' | 'attraction' | 'stage';
 export type InventoryStatus = 'STATUS_AVAILABLE' | 'STATUS_FEW' | 'STATUS_SOLD_OUT' | 'STATUS_PREPARING';
-export type StageLocation = 'gym' | 'courtyard' | 'av_room' | 'kunieda_hall' | 'koga_arena' | 'n_stage';
+export type StageLocation = 'gym' | 'courtyard' | 'av_room';
 
 // NazunaGraph (Public Items API /api/items) インターフェース定義
 export interface NazunaGraphItemStatus {
@@ -75,6 +75,7 @@ export interface TimetableEvent {
   updated_at: string;
   organization_name?: string;
   description?: string;
+  color?: string;
 }
 
 export type PyramidTierLevel = 'high' | 'upper' | 'middle' | 'normal' | 'embargoed';

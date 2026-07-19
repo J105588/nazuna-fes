@@ -186,9 +186,9 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
   const getCategoryBadge = (cat: string) => {
     switch (cat) {
       case 'class':
-        return { label: 'クラス展示', bg: 'bg-blue-500/10 text-blue-400 border-blue-500/20' };
+        return { label: 'クラス展示', bg: 'bg-[#E2E8F0] text-blue-400 border-[#607D8B]/20' };
       case 'club':
-        return { label: '部活動・委員会', bg: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' };
+        return { label: '部活動・委員会', bg: 'bg-[#E2E8F0] text-indigo-400 border-[#607D8B]/20' };
       case 'volunteer':
       default:
         return { label: '有志企画', bg: 'bg-purple-500/10 text-purple-400 border-purple-500/20' };
@@ -214,14 +214,14 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
       {/* ヘッダー＆統計サマリー */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2.5">
-            <Layers className="w-5 h-5 text-blue-600" />
+          <h2 className="text-xl font-bold text-[#2C3E55] flex items-center gap-2.5">
+            <Layers className="w-5 h-5 text-[#2C3E55]" />
             <span>出展団体・企画管理</span>
-            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-mono border border-slate-200">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#E2E8F0] text-[#2C3E55] text-xs font-mono border border-[#CBD5E1]">
               {filteredOrgs.length} / {organizations.length}件
             </span>
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-[#4A5568] mt-1">
             各教室・団体の基本情報、紹介文、公開ステータスの変更や NazunaGraph メニューAPI の設定を行います。
           </p>
         </div>
@@ -230,20 +230,20 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
           {onCreateOrg && (
             <button
               onClick={handleOpenCreate}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#2C3E55] to-[#2C3E55] hover:from-[#D14B41] hover:to-[#D14B41] text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md"
             >
               <PlusCircle className="w-4 h-4" />
               <span>＋ 新規出展団体を登録</span>
             </button>
           )}
           {/* 表示モードトグル */}
-          <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-white border border-slate-200 shadow-sm">
+          <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-white border border-[#CBD5E1] shadow-sm">
             <button
               onClick={() => setViewMode('grid')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 viewMode === 'grid'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-gradient-to-r from-[#2C3E55] to-[#2C3E55] text-white shadow-xs'
+                  : 'text-[#4A5568] hover:text-[#2C3E55] hover:bg-[#E2E8F0]'
               }`}
             >
               <Grid className="w-4 h-4" />
@@ -253,8 +253,8 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
               onClick={() => setViewMode('table')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 viewMode === 'table'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                ? 'bg-gradient-to-r from-[#2C3E55] to-[#2C3E55] text-white shadow-xs'
+                : 'text-[#4A5568] hover:text-[#2C3E55] hover:bg-[#E2E8F0]'
               }`}
             >
               <List className="w-4 h-4" />
@@ -265,22 +265,22 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
       </div>
 
       {/* 検索・フィルタツールバー */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3.5 shadow-md">
+      <div className="bg-white border border-[#CBD5E1] rounded-2xl p-5 space-y-3.5 shadow-md">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5">
           {/* 検索バー */}
           <div className="md:col-span-1 relative">
-            <Search className="w-4 h-4 text-blue-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#2C3E55] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="団体名・教室・キーワード検索..."
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 font-mono focus:outline-none focus:border-blue-500 transition-all"
+              className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#2C3E55] placeholder-slate-400 font-mono focus:outline-none focus:border-[#607D8B] transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-slate-200 p-1 rounded-full transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#4A5568] bg-slate-200 p-1 rounded-full transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -289,11 +289,11 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
 
           {/* カテゴリフィルタ */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-600 shrink-0 font-medium">種別:</span>
+            <span className="text-xs text-[#4A5568] shrink-0 font-medium">種別:</span>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value as any)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
+              className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl px-3.5 py-2.5 text-xs text-[#2C3E55] focus:outline-none focus:border-[#607D8B] transition-all"
             >
               <option value="all">すべて表示</option>
               <option value="class">クラス展示</option>
@@ -304,11 +304,11 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
 
           {/* ジャンルフィルタ */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-600 shrink-0 font-medium">ジャンル:</span>
+            <span className="text-xs text-[#4A5568] shrink-0 font-medium">ジャンル:</span>
             <select
               value={genreFilter}
               onChange={(e) => setGenreFilter(e.target.value as any)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
+              className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl px-3.5 py-2.5 text-xs text-[#2C3E55] focus:outline-none focus:border-[#607D8B] transition-all"
             >
               <option value="all">すべて表示</option>
               <option value="attraction">アトラクション</option>
@@ -320,11 +320,11 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
 
           {/* 公開状態フィルタ */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-600 shrink-0 font-medium">状態:</span>
+            <span className="text-xs text-[#4A5568] shrink-0 font-medium">状態:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-500 transition-all"
+              className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl px-3.5 py-2.5 text-xs text-[#2C3E55] focus:outline-none focus:border-[#607D8B] transition-all"
             >
               <option value="all">すべての状態</option>
               <option value="published">公開中のみ</option>
@@ -336,10 +336,10 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
 
       {/* 企画一覧表示 */}
       {filteredOrgs.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3 shadow-sm">
-          <Filter className="w-8 h-8 text-slate-400 mx-auto" />
-          <h3 className="font-bold text-sm text-slate-800">該当する団体・企画が見つかりませんでした</h3>
-          <p className="text-xs text-slate-500">検索条件やフィルタを変更してお試しください。</p>
+        <div className="bg-white border border-[#CBD5E1] rounded-2xl p-12 text-center space-y-3 shadow-sm">
+          <Filter className="w-8 h-8 text-[#94A3B8] mx-auto" />
+          <h3 className="font-bold text-sm text-[#2C3E55]">該当する団体・企画が見つかりませんでした</h3>
+          <p className="text-xs text-[#708090]">検索条件やフィルタを変更してお試しください。</p>
           <button
             onClick={() => {
               setSearchQuery('');
@@ -347,7 +347,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
               setGenreFilter('all');
               setStatusFilter('all');
             }}
-            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all"
+            className="px-4 py-2 rounded-xl bg-[#E2E8F0] hover:bg-slate-200 text-[#2C3E55] text-xs font-medium transition-all"
           >
             フィルタをリセット
           </button>
@@ -361,47 +361,47 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
             return (
               <div
                 key={org.id}
-                className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all hover:border-blue-400 hover:shadow-lg group"
+                className="bg-white border border-[#CBD5E1] rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all hover:border-[#78909C] hover:shadow-lg group"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-semibold border ${catBadge.bg}`}>
                       {catBadge.label}
                     </span>
-                    <span className="text-xs font-mono text-slate-600 flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
-                      <Building2 className="w-3 h-3 text-slate-400" />
+                    <span className="text-xs font-mono text-[#4A5568] flex items-center gap-1 bg-[#FAF8F5] px-2 py-0.5 rounded-md border border-[#CBD5E1]">
+                      <Building2 className="w-3 h-3 text-[#94A3B8]" />
                       <span>{org.room_code || '未定'}</span>
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="font-bold text-base text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                    <h3 className="font-bold text-base text-[#2C3E55] line-clamp-1 group-hover:text-[#2C3E55] transition-colors">
                       {org.name}
                     </h3>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                    <div className="flex items-center gap-2 mt-1 text-xs text-[#708090]">
                       <span className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-slate-400" />
+                        <MapPin className="w-3 h-3 text-[#94A3B8]" />
                         <span>{org.floor_info || 'フロア不明'}</span>
                       </span>
                       <span>•</span>
-                      <span className="text-slate-700 font-medium">{getGenreBadge(org.genre)}</span>
+                      <span className="text-[#2C3E55] font-medium">{getGenreBadge(org.genre)}</span>
                       {org.genre === 'food' && org.use_menu_api && (
-                        <span className="text-blue-600 font-mono text-[10px] bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
+                        <span className="text-[#2C3E55] font-mono text-[10px] bg-[#EEF2F6] px-1.5 py-0.2 rounded border border-[#B0BEC5]">
                           API同期
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100 min-h-[3.5rem]">
+                  <p className="text-xs text-[#4A5568] line-clamp-2 leading-relaxed bg-[#FAF8F5] p-3 rounded-xl border border-[#CBD5E1] min-h-[3.5rem]">
                     {org.description || '紹介文が登録されていません。'}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[#CBD5E1] flex items-center justify-between gap-2">
                   <button
                     onClick={() => handleOpenEdit(org)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all border border-slate-200"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#E2E8F0] hover:bg-slate-200 text-[#2C3E55] text-xs font-medium transition-all border border-[#CBD5E1]"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     <span>詳細編集</span>
@@ -412,7 +412,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-all border shadow-xs ${
                       isPub
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                        : 'bg-red-50 text-red-700 border-red-300 hover:bg-red-100'
+                        : 'bg-[#D14B41]/5 text-[#D14B41] border-red-300 hover:bg-[#D14B41]/10'
                     }`}
                   >
                     {isPub ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
@@ -425,11 +425,11 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
         </div>
       ) : (
         /* テーブルリスト表示 */
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-md">
+        <div className="bg-white border border-[#CBD5E1] rounded-2xl overflow-hidden shadow-md">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-xs text-slate-600 font-medium">
+                <tr className="bg-[#FAF8F5] border-b border-[#CBD5E1] text-xs text-[#4A5568] font-medium">
                   <th className="py-3 px-4">団体・企画名</th>
                   <th className="py-3 px-4">種別 / ジャンル</th>
                   <th className="py-3 px-4">教室 / フロア</th>
@@ -443,32 +443,32 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                   const isPub = Boolean(org.is_published);
                   const catBadge = getCategoryBadge(org.category);
                   return (
-                    <tr key={org.id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={org.id} className="hover:bg-[#FAF8F5]/80 transition-colors">
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-sm text-slate-900">{org.name}</div>
-                        <div className="text-slate-500 line-clamp-1 mt-0.5 max-w-xs">{org.description}</div>
+                        <div className="font-bold text-sm text-[#2C3E55]">{org.name}</div>
+                        <div className="text-[#708090] line-clamp-1 mt-0.5 max-w-xs">{org.description}</div>
                       </td>
                       <td className="py-3.5 px-4 space-y-1">
                         <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold border ${catBadge.bg}`}>
                           {catBadge.label}
                         </span>
-                        <div className="text-slate-700">{getGenreBadge(org.genre)}</div>
+                        <div className="text-[#2C3E55]">{getGenreBadge(org.genre)}</div>
                       </td>
                       <td className="py-3.5 px-4 font-mono">
-                        <div className="text-slate-900 font-bold">{org.room_code || '-'}</div>
-                        <div className="text-slate-500 text-[11px]">{org.floor_info || '-'}</div>
+                        <div className="text-[#2C3E55] font-bold">{org.room_code || '-'}</div>
+                        <div className="text-[#708090] text-[11px]">{org.floor_info || '-'}</div>
                       </td>
                       <td className="py-3.5 px-4">
                         {org.genre === 'food' ? (
                           org.use_menu_api ? (
-                            <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-mono text-[10px]">
+                            <span className="px-2 py-0.5 rounded bg-[#EEF2F6] text-[#2C3E55] border border-[#B0BEC5] font-mono text-[10px]">
                               ON
                             </span>
                           ) : (
-                            <span className="text-slate-400 font-mono text-[10px]">OFF</span>
+                            <span className="text-[#94A3B8] font-mono text-[10px]">OFF</span>
                           )
                         ) : (
-                          <span className="text-slate-400 font-mono text-[10px]">-</span>
+                          <span className="text-[#94A3B8] font-mono text-[10px]">-</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4">
@@ -476,7 +476,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium border ${
                             isPub
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-red-50 text-red-700 border-red-200'
+                              : 'bg-[#D14B41]/5 text-[#D14B41] border-[#D14B41]/20'
                           }`}
                         >
                           {isPub ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
@@ -486,7 +486,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                       <td className="py-3.5 px-4 text-right space-x-2">
                         <button
                           onClick={() => handleOpenEdit(org)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all border border-slate-200"
+                          className="px-3 py-1.5 rounded-xl bg-[#E2E8F0] hover:bg-slate-200 text-[#2C3E55] text-xs font-medium transition-all border border-[#CBD5E1]"
                         >
                           詳細編集
                         </button>
@@ -494,8 +494,8 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                           onClick={() => onTogglePublish(org.id, isPub)}
                           className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${
                             isPub
-                              ? 'bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 border-slate-200'
-                              : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600'
+                              ? 'bg-[#E2E8F0] hover:bg-[#D14B41]/5 text-[#2C3E55] hover:text-[#D14B41] border-[#CBD5E1]'
+                              : 'bg-[#2C3E55] hover:bg-[#2C3E55] text-white border-blue-600'
                           }`}
                         >
                           {isPub ? '非公開へ' : '公開へ'}
@@ -528,7 +528,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
               </div>
               <button
                 onClick={() => { setEditingOrg(null); setIsCreatingOrg(false); }}
-                className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-all"
+                className="text-[#94A3B8] hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -542,7 +542,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                   value={orgForm.name}
                   onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
                   placeholder="例: 3年A組「赤い和傘と極夜の謎解き迷宮」"
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#607D8B] transition-all"
                   required
                 />
               </div>
@@ -555,7 +555,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     value={orgForm.room_code}
                     onChange={(e) => setOrgForm({ ...orgForm, room_code: e.target.value })}
                     placeholder="例: 3A, 3-3, 102"
-                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#607D8B] transition-all"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -565,7 +565,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     value={orgForm.floor_info}
                     onChange={(e) => setOrgForm({ ...orgForm, floor_info: e.target.value })}
                     placeholder="例: 本館3階 北側教室"
-                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#607D8B] transition-all"
                   />
                 </div>
               </div>
@@ -576,7 +576,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                   <select
                     value={orgForm.category}
                     onChange={(e) => setOrgForm({ ...orgForm, category: e.target.value as OrganizationCategory })}
-                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#607D8B] transition-all"
                   >
                     <option value="class" className="bg-slate-900 text-white">クラス企画</option>
                     <option value="club" className="bg-slate-900 text-white">部活動・委員会</option>
@@ -588,7 +588,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                   <select
                     value={orgForm.genre}
                     onChange={(e) => setOrgForm({ ...orgForm, genre: e.target.value as OrganizationGenre })}
-                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all"
+                    className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#607D8B] transition-all"
                   >
                     <option value="attraction" className="bg-slate-900 text-white">アトラクション</option>
                     <option value="food" className="bg-slate-900 text-white">喫茶・食品</option>
@@ -604,7 +604,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     <Coffee className="w-5 h-5 text-blue-400 mt-0.5 shrink-0" />
                     <div>
                       <span className="text-xs font-bold text-white block">NazunaGraph メニュー在庫API連携</span>
-                      <span className="text-[11px] text-slate-400 leading-relaxed block mt-0.5">
+                      <span className="text-[11px] text-[#94A3B8] leading-relaxed block mt-0.5">
                         オンにすると定時リクエスト＆キャッシュにより、メニューや混雑状況が自動同期されます。
                       </span>
                     </div>
@@ -613,7 +613,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                     type="checkbox"
                     checked={orgForm.use_menu_api}
                     onChange={(e) => setOrgForm({ ...orgForm, use_menu_api: e.target.checked })}
-                    className="w-5 h-5 rounded border-slate-600 text-blue-600 focus:ring-blue-500 bg-slate-900 cursor-pointer shrink-0"
+                    className="w-5 h-5 rounded border-slate-600 text-[#2C3E55] focus:ring-[#90A4AE] bg-slate-900 cursor-pointer shrink-0"
                   />
                 </div>
               )}
@@ -643,7 +643,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                   value={orgForm.description}
                   onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
                   placeholder="企画の特徴や来場者へのアピールポイントを入力してください。"
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all leading-relaxed"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#607D8B] transition-all leading-relaxed"
                 />
               </div>
 
@@ -654,7 +654,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                   value={orgForm.image_url}
                   onChange={(e) => setOrgForm({ ...orgForm, image_url: e.target.value })}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#607D8B] transition-all"
                 />
               </div>
 
@@ -670,7 +670,7 @@ export const AdminOrgsTab: React.FC<AdminOrgsTabProps> = ({
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-all flex items-center gap-2 shadow-md"
+                  className="px-6 py-2.5 rounded-xl bg-[#2C3E55] hover:bg-[#2C3E55] text-white text-xs font-medium transition-all flex items-center gap-2 shadow-md"
                 >
                   {isSaving ? (
                     <>

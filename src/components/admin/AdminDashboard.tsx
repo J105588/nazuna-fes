@@ -299,6 +299,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     description?: string;
     organization_id?: string;
     organization_name?: string;
+    color?: string;
   }) => {
     try {
       await createTimetableEventInDB(data);
@@ -320,6 +321,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       description?: string;
       organization_id?: string;
       organization_name?: string;
+      color?: string;
     }
   ) => {
     try {
@@ -562,11 +564,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   return (
-    <div className="admin-portal min-h-screen bg-[#F8FAFC] text-slate-800 font-sans relative selection:bg-blue-600 selection:text-white">
-      {/* モダン・アンビエントグローオーブ（明るく見やすい清潔感のあるガラス演出背景） */}
-      <div className="fixed top-[-10%] left-[20%] w-[500px] h-[500px] bg-blue-400/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-indigo-400/15 rounded-full blur-[150px] pointer-events-none" />
-      <div className="fixed top-[40%] right-[40%] w-[400px] h-[400px] bg-sky-300/15 rounded-full blur-[130px] pointer-events-none" />
+    <div className="admin-portal min-h-screen bg-[#FAF8F5] text-[#2C3E55] font-sans relative selection:bg-[#2C3E55] selection:text-white">
+      {/* 和風アンビエントグロー */}
+      <div className="fixed top-[-10%] left-[20%] w-[500px] h-[500px] bg-[#E2E8F0] rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-[#D14B41]/4 rounded-full blur-[150px] pointer-events-none" />
 
       {/* 共通のカスタム確認ダイアログ */}
       <AdminConfirmModal

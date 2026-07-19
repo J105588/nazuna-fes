@@ -158,7 +158,7 @@ export const Home: React.FC<HomeProps> = ({
       <div className="relative z-10 w-full font-serif">
 
         {/* ファーストビュー: ポスター鑑賞空間（スマホは100svh、PCは1画面分の完璧な高さ） */}
-        <div id="hero-poster" className="w-full h-[100svh] sm:h-screen relative pointer-events-none select-none bg-[#050711] overflow-hidden">
+        <div id="hero-poster" className="w-full h-[100svh] sm:h-screen relative pointer-events-none select-none bg-[#2B3A5C] overflow-hidden">
           {/* ポスター＆霧結晶演出（ページと一緒にスクロール＆超軽量化） */}
           <OpeningIntro startTrigger={isShojiOpeningStarted || isShojiFinished} skipAnimation={isIntroFinished && isShojiFinished} key={introKey} onComplete={onIntroComplete} />
 

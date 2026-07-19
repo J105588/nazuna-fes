@@ -414,6 +414,34 @@ export async function updateOrganizationMenuApiInDB(id: string, use_menu_api: bo
 }
 
 // 2. タイムテーブル操作
+
+// timetable_events テーブルに送信可能なカラムのホワイトリスト
+const TIMETABLE_EVENT_DB_COLUMNS = [
+  'title', 'organization_id', 'organization_name', 'day_id',
+  'start_time', 'end_time', 'stage_location', 'description',
+  'color', 'is_published', 'updated_at'
+] as const;
+
+/**
+ * timetable_events 用のサニタイズ処理
+ * - 空文字のUUIDフィールド (organization_id) を null に変換
+ * - ホワイトリストに含まれるカラムのみ抽出
+ */
+function sanitizeTimetableEventForDB(data: Record<string, unknown>): Record<string, unknown> {
+  const sanitized: Record<string, unknown> = {};
+  for (const key of TIMETABLE_EVENT_DB_COLUMNS) {
+    if (key in data) {
+      let value = data[key];
+      // organization_id: 空文字はUUID型として不正 → null に変換
+      if (key === 'organization_id' && (value === '' || value === undefined)) {
+        value = null;
+      }
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+}
+
 export async function toggleTimetableEventPublish(id: string, published: boolean) {
   mockTimetableEvents = mockTimetableEvents.map((e) =>
     e.id === id ? { ...e, is_published: published, updated_at: new Date().toISOString() } : e
@@ -421,10 +449,13 @@ export async function toggleTimetableEventPublish(id: string, published: boolean
   notifyDataChanged();
 
   if (supabase) {
-    try {
-      await supabase.from('timetable_events').update({ is_published: published, updated_at: new Date().toISOString() }).eq('id', id);
-    } catch {
-      // オフラインフォールバック
+    const { error } = await supabase
+      .from('timetable_events')
+      .update({ is_published: published, updated_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) {
+      console.error('[toggleTimetableEventPublish] Supabase error:', error);
+      throw new Error(error.message);
     }
   }
 }
@@ -436,17 +467,25 @@ export async function updateTimetableEventInDB(id: string, updates: Partial<Time
   notifyDataChanged();
 
   if (supabase) {
-    try {
-      await supabase.from('timetable_events').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
-    } catch {
-      // オフラインフォールバック
+    const dbData = sanitizeTimetableEventForDB({
+      ...updates,
+      updated_at: new Date().toISOString()
+    } as Record<string, unknown>);
+    const { error } = await supabase
+      .from('timetable_events')
+      .update(dbData)
+      .eq('id', id);
+    if (error) {
+      console.error('[updateTimetableEventInDB] Supabase error:', error);
+      throw new Error(error.message);
     }
   }
 }
 
 export async function createTimetableEventInDB(eventData: Omit<TimetableEvent, 'id' | 'updated_at' | 'is_published'>) {
+  const newId = crypto.randomUUID();
   const newItem: TimetableEvent = {
-    id: crypto.randomUUID(),
+    id: newId,
     ...eventData,
     is_published: true,
     updated_at: new Date().toISOString()
@@ -455,10 +494,17 @@ export async function createTimetableEventInDB(eventData: Omit<TimetableEvent, '
   notifyDataChanged();
 
   if (supabase) {
-    try {
-      await supabase.from('timetable_events').insert([newItem]);
-    } catch {
-      // オフラインフォールバック
+    const dbData = sanitizeTimetableEventForDB({
+      ...newItem
+    } as Record<string, unknown>);
+    // id はホワイトリスト外なので明示的に付与
+    const insertData = { id: newId, ...dbData };
+    const { error } = await supabase
+      .from('timetable_events')
+      .insert([insertData]);
+    if (error) {
+      console.error('[createTimetableEventInDB] Supabase error:', error);
+      throw new Error(error.message);
     }
   }
   return newItem;

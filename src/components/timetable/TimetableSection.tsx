@@ -9,6 +9,84 @@ import { Calendar, Clock, Heart } from 'lucide-react';
   ========================================================================
 */
 
+interface ColorTheme {
+  bg: string;
+  hoverBg: string;
+  border: string;
+  text: string;
+  timeText: string;
+  orgText: string;
+  clockIcon: string;
+  badgeBg: string;
+  badgeText: string;
+  badgeBorder: string;
+}
+
+const COLOR_THEMES: Record<string, ColorTheme> = {
+  red: {
+    bg: 'bg-[#FCECEB]',
+    hoverBg: 'hover:bg-[#FCDDDB]',
+    border: 'border-[#D14B41]',
+    text: 'text-[#2C3E55]',
+    timeText: 'text-wafuu-sumi/80',
+    orgText: 'text-wafuu-sumi/70',
+    clockIcon: 'text-[#D14B41]',
+    badgeBg: 'bg-[#FCECEB]',
+    badgeText: 'text-[#D14B41]',
+    badgeBorder: 'border-[#D14B41]/30'
+  },
+  blue: {
+    bg: 'bg-[#EBF1FA]',
+    hoverBg: 'hover:bg-[#D6E3F5]',
+    border: 'border-[#2C3E55]',
+    text: 'text-[#2C3E55]',
+    timeText: 'text-[#2C3E55]/80',
+    orgText: 'text-[#2C3E55]/70',
+    clockIcon: 'text-[#2C3E55]',
+    badgeBg: 'bg-[#EBF1FA]',
+    badgeText: 'text-[#2C3E55]',
+    badgeBorder: 'border-[#2C3E55]/30'
+  },
+  green: {
+    bg: 'bg-[#F0FAEB]',
+    hoverBg: 'hover:bg-[#E1F5D6]',
+    border: 'border-[#558F3E]',
+    text: 'text-[#2C3E55]',
+    timeText: 'text-[#2C3E55]/80',
+    orgText: 'text-[#2C3E55]/70',
+    clockIcon: 'text-[#558F3E]',
+    badgeBg: 'bg-[#F0FAEB]',
+    badgeText: 'text-[#558F3E]',
+    badgeBorder: 'border-[#558F3E]/30'
+  },
+  purple: {
+    bg: 'bg-[#FAF0FC]',
+    hoverBg: 'hover:bg-[#F5E1FA]',
+    border: 'border-[#8F3E9C]',
+    text: 'text-[#2C3E55]',
+    timeText: 'text-[#2C3E55]/80',
+    orgText: 'text-[#2C3E55]/70',
+    clockIcon: 'text-[#8F3E9C]',
+    badgeBg: 'bg-[#FAF0FC]',
+    badgeText: 'text-[#8F3E9C]',
+    badgeBorder: 'border-[#8F3E9C]/30'
+  },
+  yellow: {
+    bg: 'bg-[#FCF6EB]',
+    hoverBg: 'hover:bg-[#FAF0D6]',
+    border: 'border-[#D4982A]',
+    text: 'text-[#2C3E55]',
+    timeText: 'text-[#2C3E55]/80',
+    orgText: 'text-[#2C3E55]/70',
+    clockIcon: 'text-[#D4982A]',
+    badgeBg: 'bg-[#FCF6EB]',
+    badgeText: 'text-[#D4982A]',
+    badgeBorder: 'border-[#D4982A]/30'
+  }
+};
+
+const DEFAULT_THEME = COLOR_THEMES.red;
+
 interface TimetableSectionProps {
   events: TimetableEvent[];
   initialStage?: StageLocation;
@@ -206,6 +284,7 @@ export const TimetableSection: React.FC<TimetableSectionProps> = ({ events }) =>
             {stages.map((stage, colIdx) => {
               const stageEvts = dayEvents.filter((e) => stage.aliases.includes(e.stage_location) || e.stage_location === stage.id);
               return stageEvts.map((evt) => {
+                const theme = COLOR_THEMES[evt.color || ''] || DEFAULT_THEME;
                 const startV = parseHourValue(evt.start_time);
                 const endV = parseHourValue(evt.end_time);
 
@@ -230,27 +309,27 @@ export const TimetableSection: React.FC<TimetableSectionProps> = ({ events }) =>
                     style={{ top: `${topPx}px`, height: `${heightPx}px` }}
                   >
                     {/* カード本体（ショートイベント時も文字切れゼロにする弾力レイアウト） */}
-                    <div className="w-full h-full bg-[#FCECEB] border-2 border-[#D14B41] rounded-xl p-1.5 sm:p-2.5 flex flex-col justify-center shadow-xs hover:shadow-lg transition-all overflow-hidden relative group font-serif select-none">
+                    <div className={`w-full h-full ${theme.bg} ${theme.hoverBg} border-2 ${theme.border} rounded-xl p-1 sm:p-2 flex flex-col justify-center shadow-xs hover:shadow-lg transition-all overflow-hidden relative group font-serif select-none`}>
                       {isShort ? (
-                        <div className="flex items-center justify-between gap-1 overflow-hidden">
-                          <div className="font-bold text-xs sm:text-sm text-[#2C3E55] truncate leading-tight">
+                        <div className="flex flex-col justify-between h-full overflow-hidden">
+                          <div className={`font-bold text-[10px] sm:text-xs ${theme.text} line-clamp-2 leading-tight break-words`}>
                             {evt.title}
                           </div>
-                          <div className="font-mono text-[10px] sm:text-[11px] text-wafuu-sumi/80 font-extrabold shrink-0">
+                          <div className={`font-mono text-[9px] sm:text-[10px] ${theme.timeText} font-extrabold shrink-0 mt-0.5`}>
                             {formatTimeText(evt.start_time)}-{formatTimeText(evt.end_time)}
                           </div>
                         </div>
                       ) : (
                         <>
-                          <div className="font-bold text-xs sm:text-sm text-[#2C3E55] leading-snug line-clamp-2 break-words">
+                          <div className={`font-bold text-xs sm:text-sm ${theme.text} leading-snug line-clamp-2 break-words`}>
                             {evt.title}
                           </div>
-                          <div className="font-mono text-[10px] sm:text-[11px] text-wafuu-sumi/85 mt-1 font-extrabold flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-wafuu-shu shrink-0" />
+                          <div className={`font-mono text-[10px] sm:text-[11px] ${theme.timeText} mt-1 font-extrabold flex items-center gap-1`}>
+                            <Clock className={`w-3 h-3 ${theme.clockIcon} shrink-0`} />
                             <span>{formatTimeText(evt.start_time)} - {formatTimeText(evt.end_time)}</span>
                           </div>
                           {evt.organization_name && (
-                            <div className="text-[10px] sm:text-[11px] text-wafuu-sumi/70 font-sans mt-0.5 truncate font-semibold">
+                            <div className={`text-[10px] sm:text-[11px] ${theme.orgText} font-sans mt-0.5 truncate font-semibold`}>
                               {evt.organization_name}
                             </div>
                           )}
@@ -267,65 +346,68 @@ export const TimetableSection: React.FC<TimetableSectionProps> = ({ events }) =>
       </div>
 
       {/* 演目詳細確認用ポップアップモーダル (クリックですべての文字や内容を綺麗に確認) */}
-      {selectedEvent && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in select-none"
-          onClick={() => setSelectedEvent(null)}
-        >
+      {selectedEvent && (() => {
+        const theme = COLOR_THEMES[selectedEvent.color || ''] || DEFAULT_THEME;
+        return (
           <div
-            className="wafuu-panel w-full max-w-lg bg-white border border-wafuu-sumi/15 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative animate-modal-scale font-serif"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in select-none"
+            onClick={() => setSelectedEvent(null)}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-wafuu-sumi/10 pb-4">
-              <div>
-                <span className="inline-block px-3 py-1 rounded-full bg-[#FCECEB] text-wafuu-shu font-mono text-xs font-extrabold border border-wafuu-shu/30 mb-2">
-                  {stages.find((s) => s.aliases.includes(selectedEvent.stage_location) || s.id === selectedEvent.stage_location)?.label || '特設会場'}
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-[#2C3E55] leading-snug">
-                  {selectedEvent.title}
-                </h3>
-              </div>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-wafuu-shu text-slate-600 hover:text-white transition-colors text-xs font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4 text-sm sm:text-base text-wafuu-sumi/85 font-sans">
-              <div className="flex items-center gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/60">
-                <Clock className="w-5 h-5 text-wafuu-shu shrink-0" />
-                <span className="font-mono font-extrabold text-base text-[#2C3E55]">
-                  {formatTimeText(selectedEvent.start_time)} 〜 {formatTimeText(selectedEvent.end_time)}
-                </span>
+            <div
+              className="wafuu-panel w-full max-w-lg bg-white border border-wafuu-sumi/15 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative animate-modal-scale font-serif"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-4 border-b border-wafuu-sumi/10 pb-4">
+                <div>
+                  <span className={`inline-block px-3 py-1 rounded-full ${theme.badgeBg} ${theme.badgeText} font-mono text-xs font-extrabold border ${theme.badgeBorder} mb-2`}>
+                    {stages.find((s) => s.aliases.includes(selectedEvent.stage_location) || s.id === selectedEvent.stage_location)?.label || '特設会場'}
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-black text-[#2C3E55] leading-snug">
+                    {selectedEvent.title}
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-wafuu-shu text-slate-600 hover:text-white transition-colors text-xs font-bold"
+                >
+                  ✕
+                </button>
               </div>
 
-              {selectedEvent.organization_name && (
+              <div className="space-y-4 text-sm sm:text-base text-wafuu-sumi/85 font-sans">
                 <div className="flex items-center gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/60">
-                  <span className="font-bold text-xs bg-[#2C3E55] text-white px-2 py-0.5 rounded">出演・団体</span>
-                  <span className="font-bold text-[#2C3E55]">{selectedEvent.organization_name}</span>
+                  <Clock className={`w-5 h-5 ${theme.clockIcon} shrink-0`} />
+                  <span className="font-mono font-extrabold text-base text-[#2C3E55]">
+                    {formatTimeText(selectedEvent.start_time)} 〜 {formatTimeText(selectedEvent.end_time)}
+                  </span>
                 </div>
-              )}
 
-              {selectedEvent.description && (
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-wafuu-ekasumi/60 leading-relaxed font-serif">
-                  {selectedEvent.description}
-                </div>
-              )}
-            </div>
+                {selectedEvent.organization_name && (
+                  <div className="flex items-center gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/60">
+                    <span className="font-bold text-xs bg-[#2C3E55] text-white px-2 py-0.5 rounded">出演・団体</span>
+                    <span className="font-bold text-[#2C3E55]">{selectedEvent.organization_name}</span>
+                  </div>
+                )}
 
-            <div className="pt-2 text-right">
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="px-6 py-2.5 rounded-xl bg-[#2C3E55] hover:bg-wafuu-shu text-white font-bold transition-all shadow-sm text-sm font-serif"
-              >
-                閉じる
-              </button>
+                {selectedEvent.description && (
+                  <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-wafuu-ekasumi/60 leading-relaxed font-serif">
+                    {selectedEvent.description}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2 text-right">
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="px-6 py-2.5 rounded-xl bg-[#2C3E55] hover:bg-wafuu-shu text-white font-bold transition-all shadow-sm text-sm font-serif"
+                >
+                  閉じる
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
     </div>
   );

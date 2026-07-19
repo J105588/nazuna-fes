@@ -119,67 +119,115 @@ export const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ announceme
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-wafuu-sumi/15 text-wafuu-sumi/70 text-xs sm:text-sm font-serif tracking-wider">
-                    <th className="py-4 px-4 sm:px-6 font-bold whitespace-nowrap w-44">配信日時</th>
-                    <th className="py-4 px-4 sm:px-6 font-bold whitespace-nowrap w-36">区分</th>
-                    <th className="py-4 px-4 sm:px-6 font-bold">タイトル / プレビュー</th>
-                    <th className="py-4 px-4 sm:px-6 font-bold text-right whitespace-nowrap w-24">詳細</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-wafuu-ekasumi/60">
-                  {publishedAnnouncements.map((ann) => {
-                    const badge = getCategoryBadge(ann.category);
-                    const previewText = ann.content.length > 25
-                      ? `${ann.content.slice(0, 25)}...`
-                      : ann.content;
+            <div>
+              {/* ========== モバイル用カードリスト (sm未満) ========== */}
+              <div className="sm:hidden space-y-4">
+                {publishedAnnouncements.map((ann) => {
+                  const badge = getCategoryBadge(ann.category);
+                  const previewText = ann.content.length > 60
+                    ? `${ann.content.slice(0, 60)}...`
+                    : ann.content;
 
-                    return (
-                      <tr
-                        key={ann.id}
-                        onClick={() => setSelectedAnnouncement(ann)}
-                        className="hover:bg-wafuu-sumi/[0.03] transition-all duration-200 cursor-pointer group"
-                      >
-                        {/* 配信日時 */}
-                        <td className="py-5 px-4 sm:px-6 text-xs sm:text-sm font-mono text-wafuu-sumi/85 whitespace-nowrap align-middle">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-3.5 h-3.5 text-wafuu-kincha shrink-0" />
-                            <span>{formatDate(ann.created_at)}</span>
-                          </div>
-                        </td>
+                  return (
+                    <div
+                      key={ann.id}
+                      onClick={() => setSelectedAnnouncement(ann)}
+                      className="bg-white p-5 rounded-2xl border border-wafuu-ekasumi/60 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer space-y-3 group active:scale-[0.98]"
+                    >
+                      {/* 上部: 日時 + カテゴリバッジ */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 text-xs text-wafuu-sumi/70 font-mono">
+                          <Calendar className="w-3.5 h-3.5 text-wafuu-kincha shrink-0" />
+                          <span>{formatDate(ann.created_at)}</span>
+                        </div>
+                        <span className={badge.className}>
+                          {badge.label}
+                        </span>
+                      </div>
 
-                        {/* カテゴリ（管理画面と完全一致） */}
-                        <td className="py-5 px-4 sm:px-6 align-middle whitespace-nowrap">
-                          <span className={badge.className}>
-                            {badge.label}
-                          </span>
-                        </td>
+                      {/* タイトル */}
+                      <h3 className="font-serif font-bold text-base text-wafuu-sumi group-hover:text-wafuu-shu transition-colors leading-snug line-clamp-2">
+                        {ann.title}
+                      </h3>
 
-                        {/* タイトル & プレビュー */}
-                        <td className="py-5 px-4 sm:px-6 align-middle">
-                          <div className="flex flex-col gap-1">
-                            <span className="font-serif font-bold text-sm sm:text-base text-wafuu-sumi group-hover:text-wafuu-shu transition-colors line-clamp-1">
-                              {ann.title}
+                      {/* プレビューテキスト */}
+                      <p className="text-xs text-wafuu-sumi/60 leading-relaxed line-clamp-2 font-sans">
+                        {previewText}
+                      </p>
+
+                      {/* 下部: 詳細リンク */}
+                      <div className="pt-2 border-t border-wafuu-ekasumi/40 flex items-center justify-end gap-1 text-xs font-bold text-wafuu-sumi/60 group-hover:text-wafuu-shu transition-colors">
+                        <span>詳細を見る</span>
+                        <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ========== デスクトップ用テーブル (sm以上) ========== */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-wafuu-sumi/15 text-wafuu-sumi/70 text-xs sm:text-sm font-serif tracking-wider">
+                      <th className="py-4 px-4 sm:px-6 font-bold whitespace-nowrap w-44">配信日時</th>
+                      <th className="py-4 px-4 sm:px-6 font-bold whitespace-nowrap w-36">区分</th>
+                      <th className="py-4 px-4 sm:px-6 font-bold">タイトル / プレビュー</th>
+                      <th className="py-4 px-4 sm:px-6 font-bold text-right whitespace-nowrap w-24">詳細</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-wafuu-ekasumi/60">
+                    {publishedAnnouncements.map((ann) => {
+                      const badge = getCategoryBadge(ann.category);
+                      const previewText = ann.content.length > 25
+                        ? `${ann.content.slice(0, 25)}...`
+                        : ann.content;
+
+                      return (
+                        <tr
+                          key={ann.id}
+                          onClick={() => setSelectedAnnouncement(ann)}
+                          className="hover:bg-wafuu-sumi/[0.03] transition-all duration-200 cursor-pointer group"
+                        >
+                          {/* 配信日時 */}
+                          <td className="py-5 px-4 sm:px-6 text-xs sm:text-sm font-mono text-wafuu-sumi/85 whitespace-nowrap align-middle">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-3.5 h-3.5 text-wafuu-kincha shrink-0" />
+                              <span>{formatDate(ann.created_at)}</span>
+                            </div>
+                          </td>
+
+                          {/* カテゴリ（管理画面と完全一致） */}
+                          <td className="py-5 px-4 sm:px-6 align-middle whitespace-nowrap">
+                            <span className={badge.className}>
+                              {badge.label}
                             </span>
-                            <span className="text-xs text-wafuu-sumi/60 line-clamp-1 font-normal">
-                              {previewText}
-                            </span>
-                          </div>
-                        </td>
+                          </td>
 
-                        {/* 詳細開閉インジケーター */}
-                        <td className="py-5 px-4 sm:px-6 text-right align-middle">
-                          <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-wafuu-sumi/5 border border-wafuu-sumi/10 group-hover:bg-wafuu-shu group-hover:border-wafuu-shu transition-all">
-                            <ChevronRight className="w-4 h-4 text-wafuu-sumi group-hover:text-white transition-transform group-hover:translate-x-0.5" />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          {/* タイトル & プレビュー */}
+                          <td className="py-5 px-4 sm:px-6 align-middle">
+                            <div className="flex flex-col gap-1">
+                              <span className="font-serif font-bold text-sm sm:text-base text-wafuu-sumi group-hover:text-wafuu-shu transition-colors line-clamp-1">
+                                {ann.title}
+                              </span>
+                              <span className="text-xs text-wafuu-sumi/60 line-clamp-1 font-normal">
+                                {previewText}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* 詳細開閉インジケーター */}
+                          <td className="py-5 px-4 sm:px-6 text-right align-middle">
+                            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-wafuu-sumi/5 border border-wafuu-sumi/10 group-hover:bg-wafuu-shu group-hover:border-wafuu-shu transition-all">
+                              <ChevronRight className="w-4 h-4 text-wafuu-sumi group-hover:text-white transition-transform group-hover:translate-x-0.5" />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

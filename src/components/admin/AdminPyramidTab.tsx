@@ -141,14 +141,14 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
       {/* 画面ヘッダー */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2.5">
-            <TrendingUp className="w-5 h-5 text-indigo-600" />
+          <h2 className="text-xl font-bold text-[#2C3E55] flex items-center gap-2.5">
+            <TrendingUp className="w-5 h-5 text-[#2C3E55]" />
             <span>ピラミッド結果開示設定</span>
-            <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-mono border border-indigo-200">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#EEF2F6] text-[#2C3E55] text-xs font-mono border border-[#B0BEC5]">
               {pyramidReleases.length}タイミング
             </span>
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-[#4A5568] mt-1">
             後夜祭ピラミッド企画の結果発表スケジュールおよび、ユーザー画面への即時開示・ロック・受賞構成をすべて管理画面から制御します。
           </p>
         </div>
@@ -156,7 +156,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
         {onCreateRelease && (
           <button
             onClick={() => setIsCreating(true)}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-md self-start sm:self-auto"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2C3E55] to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-md self-start sm:self-auto"
           >
             <PlusCircle className="w-4 h-4" />
             <span>＋ 新規開示タイミングを追加</span>
@@ -177,12 +177,12 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
               onClick={() => setSelectedReleaseIndex(index)}
               className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between gap-3.5 ${
                 isSelected
-                  ? 'bg-white border-indigo-500 shadow-md scale-[1.02]'
-                  : 'bg-white border-slate-200 hover:border-indigo-300 shadow-sm'
+                  ? 'bg-white border-[#607D8B] shadow-md scale-[1.02]'
+                  : 'bg-white border-[#CBD5E1] hover:border-[#90A4AE] shadow-sm'
               }`}
             >
               <div className="flex items-center justify-between gap-2 w-full">
-                <span className="text-xs font-mono font-bold text-indigo-600 tracking-wider">
+                <span className="text-xs font-mono font-bold text-[#2C3E55] tracking-wider">
                   RELEASE #{index + 1}
                 </span>
                 <span
@@ -198,11 +198,11 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
               </div>
 
               <div>
-                <h4 className="font-bold text-sm text-slate-900 line-clamp-1">
+                <h4 className="font-bold text-sm text-[#2C3E55] line-clamp-1">
                   {release.title || `開示タイミング ${index + 1}`}
                 </h4>
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-mono mt-1.5">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <div className="flex items-center gap-1.5 text-[11px] text-[#708090] font-mono mt-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[#94A3B8]" />
                   <span>
                     {release.scheduledTime
                       ? new Date(release.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -217,22 +217,22 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
 
       {/* 選択中の開示詳細＆コントロール */}
       {currentRelease && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-8 shadow-md relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-indigo-50 rounded-full blur-3xl pointer-events-none" />
+        <div className="bg-white border border-[#CBD5E1] rounded-3xl p-6 sm:p-8 space-y-8 shadow-md relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-[#EEF2F6] rounded-full blur-3xl pointer-events-none" />
 
           {/* ステータスバナー */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[#CBD5E1]">
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono text-indigo-600 font-bold uppercase tracking-wider">
+                <span className="text-xs font-mono text-[#2C3E55] font-bold uppercase tracking-wider">
                   Target Configuration
                 </span>
-                <span className="text-slate-400 font-mono">•</span>
-                <span className="text-xs font-mono text-slate-600">
+                <span className="text-[#94A3B8] font-mono">•</span>
+                <span className="text-xs font-mono text-[#4A5568]">
                   予定日時: {currentRelease.scheduledTime ? new Date(currentRelease.scheduledTime).toLocaleString() : '未定'}
                 </span>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 tracking-tight">{currentRelease.title}</h3>
+              <h3 className="text-xl font-bold text-[#2C3E55] tracking-tight">{currentRelease.title}</h3>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -273,7 +273,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
           <form onSubmit={handleSave} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 flex items-center gap-1.5">
+                <label className="text-xs font-medium text-[#2C3E55] flex items-center gap-1.5">
                   <span>開示タイトル</span>
                 </label>
                 <input
@@ -281,25 +281,25 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                   value={releaseTitleInput}
                   onChange={(e) => setReleaseTitleInput(e.target.value)}
                   placeholder="例: 中間発表1"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl px-3.5 py-2.5 text-sm text-[#2C3E55] focus:outline-none focus:border-[#607D8B] transition-all"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 flex items-center gap-1.5">
+                <label className="text-xs font-medium text-[#2C3E55] flex items-center gap-1.5">
                   <span>開示予定時刻</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={scheduledTimeInput}
                   onChange={(e) => setScheduledTimeInput(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl px-3.5 py-2.5 text-sm text-[#2C3E55] font-mono focus:outline-none focus:border-[#607D8B] transition-all"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 flex items-center gap-1.5">
+                <label className="text-xs font-medium text-[#2C3E55] flex items-center gap-1.5">
                   <span>ロック中の表示メッセージ</span>
                 </label>
                 <input
@@ -307,19 +307,19 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                   value={embargoMsgInput}
                   onChange={(e) => setEmbargoMsgInput(e.target.value)}
                   placeholder="例: 13:00 頃に結果発表を行います"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl px-3.5 py-2.5 text-sm text-[#2C3E55] focus:outline-none focus:border-[#607D8B] transition-all"
                   required
                 />
               </div>
             </div>
 
             {/* ピラミッド受賞構成の設定パネル */}
-            <div className="pt-4 border-t border-slate-200 space-y-4">
+            <div className="pt-4 border-t border-[#CBD5E1] space-y-4">
               <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-indigo-600" />
+                <Award className="w-5 h-5 text-[#2C3E55]" />
                 <div>
-                  <h4 className="font-bold text-sm text-slate-900">ピラミッド受賞構成・順位団体設定</h4>
-                  <p className="text-xs text-slate-500">
+                  <h4 className="font-bold text-sm text-[#2C3E55]">ピラミッド受賞構成・順位団体設定</h4>
+                  <p className="text-xs text-[#708090]">
                     このタイミングで発表される各賞（金賞・銀賞・銅賞）に該当する出展団体を選択して登録します。
                   </p>
                 </div>
@@ -344,7 +344,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                       e.target.value = '';
                     }}
                     defaultValue=""
-                    className="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs text-[#2C3E55] focus:outline-none focus:border-amber-500"
                   >
                     <option value="" disabled>＋ 金賞に団体を追加...</option>
                     {organizations.map((org) => (
@@ -360,11 +360,11 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                         key={orgIdOrName}
                         className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-amber-200 text-xs shadow-2xs"
                       >
-                        <span className="font-medium text-slate-800 truncate">{getOrgDisplayName(orgIdOrName)}</span>
+                        <span className="font-medium text-[#2C3E55] truncate">{getOrgDisplayName(orgIdOrName)}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveOrgFromTier('high', orgIdOrName)}
-                          className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
+                          className="text-[#94A3B8] hover:text-rose-600 transition-colors p-0.5"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -377,13 +377,13 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                 </div>
 
                 {/* 銀賞 (Upper) */}
-                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-300 space-y-3">
+                <div className="p-4 rounded-2xl bg-[#E2E8F0]/80 border border-[#B0BEC5] space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                      <Award className="w-4 h-4 text-slate-500" />
+                    <span className="text-xs font-bold text-[#2C3E55] uppercase tracking-wider flex items-center gap-1.5">
+                      <Award className="w-4 h-4 text-[#708090]" />
                       <span>銀賞 (UPPER層)</span>
                     </span>
-                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-800">
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-[#2C3E55]">
                       {pyramidTiersInput.upper.length}団体
                     </span>
                   </div>
@@ -394,7 +394,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                       e.target.value = '';
                     }}
                     defaultValue=""
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-slate-500"
+                    className="w-full bg-white border border-[#B0BEC5] rounded-xl px-3 py-2 text-xs text-[#2C3E55] focus:outline-none focus:border-slate-500"
                   >
                     <option value="" disabled>＋ 銀賞に団体を追加...</option>
                     {organizations.map((org) => (
@@ -408,20 +408,20 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                     {pyramidTiersInput.upper.map((orgIdOrName) => (
                       <div
                         key={orgIdOrName}
-                        className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-slate-200 text-xs shadow-2xs"
+                        className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-[#CBD5E1] text-xs shadow-2xs"
                       >
-                        <span className="font-medium text-slate-800 truncate">{getOrgDisplayName(orgIdOrName)}</span>
+                        <span className="font-medium text-[#2C3E55] truncate">{getOrgDisplayName(orgIdOrName)}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveOrgFromTier('upper', orgIdOrName)}
-                          className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
+                          className="text-[#94A3B8] hover:text-rose-600 transition-colors p-0.5"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ))}
                     {pyramidTiersInput.upper.length === 0 && (
-                      <p className="text-[11px] text-slate-500 text-center py-3">団体が選択されていません</p>
+                      <p className="text-[11px] text-[#708090] text-center py-3">団体が選択されていません</p>
                     )}
                   </div>
                 </div>
@@ -444,7 +444,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                       e.target.value = '';
                     }}
                     defaultValue=""
-                    className="w-full bg-white border border-orange-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-orange-500"
+                    className="w-full bg-white border border-orange-200 rounded-xl px-3 py-2 text-xs text-[#2C3E55] focus:outline-none focus:border-orange-500"
                   >
                     <option value="" disabled>＋ 銅賞に団体を追加...</option>
                     {organizations.map((org) => (
@@ -460,11 +460,11 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                         key={orgIdOrName}
                         className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-orange-200 text-xs shadow-2xs"
                       >
-                        <span className="font-medium text-slate-800 truncate">{getOrgDisplayName(orgIdOrName)}</span>
+                        <span className="font-medium text-[#2C3E55] truncate">{getOrgDisplayName(orgIdOrName)}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveOrgFromTier('middle', orgIdOrName)}
-                          className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
+                          className="text-[#94A3B8] hover:text-rose-600 transition-colors p-0.5"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -478,8 +478,8 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-              <div className="flex items-center gap-2 text-xs text-slate-600">
+            <div className="flex items-center justify-between pt-4 border-t border-[#CBD5E1]">
+              <div className="flex items-center gap-2 text-xs text-[#4A5568]">
                 <ShieldAlert className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>変更はデータベースに保存され、すべてのユーザーにリアルタイム反映されます。</span>
               </div>
@@ -487,7 +487,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:opacity-90 text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-md disabled:opacity-50"
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#2C3E55] to-blue-600 hover:opacity-90 text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-md disabled:opacity-50"
               >
                 {isSaving ? (
                   <>
@@ -520,7 +520,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
               </div>
               <button
                 onClick={() => setIsCreating(false)}
-                className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-all"
+                className="text-[#94A3B8] hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -534,7 +534,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                   value={createForm.title}
                   onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
                   placeholder="例: 中間発表2, 最終結果発表"
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#607D8B] transition-all"
                   required
                 />
               </div>
@@ -545,7 +545,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                   type="datetime-local"
                   value={createForm.scheduledTime}
                   onChange={(e) => setCreateForm({ ...createForm, scheduledTime: e.target.value })}
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#607D8B] transition-all"
                   required
                 />
               </div>
@@ -557,7 +557,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                   value={createForm.embargoMessage}
                   onChange={(e) => setCreateForm({ ...createForm, embargoMessage: e.target.value })}
                   placeholder="例: 15:00 頃に順位と結果を公開します"
-                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#607D8B] transition-all"
                   required
                 />
               </div>
@@ -574,7 +574,7 @@ export const AdminPyramidTab: React.FC<AdminPyramidTabProps> = ({
                 <button
                   type="submit"
                   disabled={isCreatingSaving}
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all flex items-center gap-2 shadow-md"
+                  className="px-6 py-2.5 rounded-xl bg-[#2C3E55] hover:bg-[#2C3E55] text-white text-xs font-medium transition-all flex items-center gap-2 shadow-md"
                 >
                   {isCreatingSaving ? (
                     <>

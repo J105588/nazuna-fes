@@ -57,10 +57,7 @@ export const OfficialPyramidGraphic: React.FC<OfficialPyramidGraphicProps> = ({
       {/* ヘッダー */}
       <div className="flex items-center justify-between border-b border-wafuu-sumi/10 pb-3 mb-4">
         <span className="text-sm font-bold text-wafuu-sumi tracking-wider">
-          なずな大賞 ピラミッド評価 【{releaseTitle}】
-        </span>
-        <span className="text-xs text-wafuu-kincha font-mono font-bold px-3 py-1 rounded-full bg-wafuu-kincha/10 border border-wafuu-kincha/30">
-          1日2回 自動更新
+          なずな大賞 【{releaseTitle}】
         </span>
       </div>
 

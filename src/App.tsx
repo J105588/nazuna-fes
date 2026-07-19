@@ -10,6 +10,7 @@ import { GuidanceDetailPage, type GuidanceSectionId } from './pages/GuidanceDeta
 import { PolicyPage, type PolicySectionId } from './pages/PolicyPage';
 import { ExhibitionPage } from './pages/ExhibitionPage';
 import { AnnouncementsPage } from './pages/AnnouncementsPage';
+import { ClassDetailPage } from './pages/ClassDetailPage';
 import { UrgentAnnouncementModal } from './components/common/UrgentAnnouncementModal';
 import { ShojiOpening } from './components/intro/ShojiOpening';
 import { openExternalMap } from './lib/api';
@@ -103,6 +104,10 @@ export const App: React.FC = () => {
       return;
     }
     setCurrentTabState(tab);
+    // タブ切り替え時に展示企画詳細ページをリセット
+    if (tab !== 'exhibitions') {
+      setSelectedOrganization(null);
+    }
     const currentHash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
     if (currentHash !== tab && !(tab === 'home' && !currentHash)) {
       if (tab === 'home') {
@@ -149,6 +154,9 @@ export const App: React.FC = () => {
   const [stageQuick, setStageQuick] = useState<string>('gym');
   const [searchQueryQuick, setSearchQueryQuick] = useState<string>('');
   const [floorQuick, setFloorQuick] = useState<string>('all');
+
+  // 展示企画詳細ページ表示用
+  const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null);
 
   // 専用ページ切り替え用の初期セクション記憶
   const [activeGuidanceSection, setActiveGuidanceSection] = useState<GuidanceSectionId>('precautions');
@@ -244,7 +252,7 @@ export const App: React.FC = () => {
 
   if (currentTab === 'admin') {
     return (
-      <div className="admin-portal min-h-screen w-full bg-[#F8FAFC] text-slate-800 font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden">
+      <div className="admin-portal min-h-screen w-full bg-[#FAF8F5] text-[#2C3E55] font-sans selection:bg-[#2C3E55] selection:text-white overflow-x-hidden">
         <AdminPage
           organizations={organizations}
           timetableEvents={timetableEvents}
@@ -413,16 +421,30 @@ export const App: React.FC = () => {
             )}
             {currentTab === 'exhibitions' && (
               <main className="w-full pt-20">
-                <ExhibitionPage
-                  organizations={organizations}
-                  initialQuery={searchQueryQuick}
-                  initialGenre={genreQuick}
-                  initialFloor={floorQuick}
-                  onNavigateTab={(tab) => {
-                    setCurrentTab(tab);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                />
+                {selectedOrganization ? (
+                  <ClassDetailPage
+                    org={selectedOrganization}
+                    onBack={() => {
+                      setSelectedOrganization(null);
+                      // 企画一覧のスクロール位置は維持（トップに戻さない）
+                    }}
+                  />
+                ) : (
+                  <ExhibitionPage
+                    organizations={organizations}
+                    initialQuery={searchQueryQuick}
+                    initialGenre={genreQuick}
+                    initialFloor={floorQuick}
+                    onNavigateTab={(tab) => {
+                      setCurrentTab(tab);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    onSelectOrganization={(org) => {
+                      setSelectedOrganization(org);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  />
+                )}
               </main>
             )}
             {currentTab === 'timetable' && (

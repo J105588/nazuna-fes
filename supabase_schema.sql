@@ -98,7 +98,8 @@ CREATE TABLE IF NOT EXISTS public.timetable_events (
   stage_location    text        NOT NULL DEFAULT 'courtyard'
                                 CHECK (stage_location IN ('gym', 'courtyard', 'av_room')),
   description       text,
-  is_published      boolean     NOT NULL DEFAULT false,
+  color             text,
+  is_published      boolean     NOT NULL DEFAULT true,
   updated_at        timestamptz NOT NULL DEFAULT now()
 );
 

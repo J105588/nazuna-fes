@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldAlert, KeyRound, AlertCircle, Mail, ShieldCheck } from 'lucide-react';
+import { KeyRound, AlertCircle, Mail, ShieldCheck } from 'lucide-react';
 import { verifyAdminCredentials } from '../../lib/supabase';
 
 interface AdminLoginProps {
@@ -41,27 +41,28 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="admin-portal min-h-screen bg-[#F8FAFC] text-slate-800 flex items-center justify-center p-4 font-sans select-none relative overflow-hidden">
-      {/* モダン背景グロー効果 */}
-      <div className="absolute top-1/4 left-1/3 -mt-32 -ml-32 w-96 h-96 bg-blue-400/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/3 -mb-32 -mr-32 w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl pointer-events-none" />
+    <div className="admin-portal min-h-screen bg-[#FAF8F5] text-[#2C3E55] flex items-center justify-center p-4 font-sans select-none relative overflow-hidden">
+      {/* 和風背景グロー */}
+      <div className="absolute top-1/4 left-1/3 -mt-32 -ml-32 w-96 h-96 bg-[#E2E8F0] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 -mb-32 -mr-32 w-96 h-96 bg-[#D14B41]/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-8 sm:p-10 space-y-8 shadow-xl relative z-10">
+      <div className="bg-white border border-[#CBD5E1] rounded-3xl max-w-md w-full p-8 sm:p-10 space-y-8 shadow-lg relative z-10">
         {/* ログインヘッダー */}
-        <div className="text-center space-y-3.5">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center mx-auto text-white shadow-md">
-            <ShieldAlert className="w-7 h-7" />
+        <div className="text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-[#2C3E55] flex items-center justify-center mx-auto text-white shadow-md">
+            <ShieldCheck className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="font-black text-2xl text-slate-900 tracking-tight">管理ポータル</h1>
+            <h1 className="font-black text-2xl text-[#2C3E55] tracking-tight">管理ポータル</h1>
+            <p className="text-sm text-[#708090] mt-1">Nazuna Fes 2026</p>
           </div>
         </div>
 
         {/* メイン認証フォーム */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-blue-600" />
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#4A5568] flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-[#D14B41]" />
               <span>メールアドレス</span>
             </label>
             <input
@@ -72,14 +73,14 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 setError(false);
               }}
               placeholder="メールアドレス"
-              className="w-full bg-slate-50 text-slate-900 placeholder-slate-400 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
+              className="w-full bg-[#FAF8F5] text-[#2C3E55] placeholder-[#94A3B8] text-sm px-4 py-3.5 rounded-xl border border-[#CBD5E1] focus:outline-none focus:border-[#607D8B] focus:ring-1 focus:ring-[#90A4AE] transition-all"
               required
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-              <KeyRound className="w-3.5 h-3.5 text-blue-600" />
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#4A5568] flex items-center gap-1.5">
+              <KeyRound className="w-3.5 h-3.5 text-[#D14B41]" />
               <span>パスワード</span>
             </label>
             <input
@@ -90,14 +91,14 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 setError(false);
               }}
               placeholder="パスワード"
-              className="w-full bg-slate-50 text-slate-900 placeholder-slate-400 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
+              className="w-full bg-[#FAF8F5] text-[#2C3E55] placeholder-[#94A3B8] text-sm px-4 py-3.5 rounded-xl border border-[#CBD5E1] focus:outline-none focus:border-[#607D8B] focus:ring-1 focus:ring-[#90A4AE] transition-all"
               required
             />
           </div>
 
           {error && (
-            <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-3 shadow-2xs animate-in shake duration-200">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+            <div className="p-4 rounded-xl bg-[#D14B41]/5 border border-[#D14B41]/20 text-[#D14B41] text-xs flex items-start gap-3">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span className="leading-relaxed">{errorMessage}</span>
             </div>
           )}
@@ -105,9 +106,9 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           <button
             type="submit"
             disabled={loading || !email || !password}
-            className={`w-full py-3.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all ${loading || !email || !password
-              ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-              : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white'
+            className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all ${loading || !email || !password
+              ? 'bg-[#E2E8F0] text-[#2C3E55]/30 cursor-not-allowed border border-[#2C3E55]/5'
+              : 'bg-[#2C3E55] hover:bg-[#D14B41] text-white'
               }`}
           >
             {loading ? (

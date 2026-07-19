@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import type { Organization } from '../types/database';
 import { SearchFilter } from '../components/exhibition/SearchFilter';
 import { OrganizationCard } from '../components/exhibition/OrganizationCard';
-import { ClassDetailModal } from '../components/exhibition/ClassDetailModal';
 
 /*
   ========================================================================
@@ -16,6 +15,7 @@ interface ExhibitionPageProps {
   initialGenre?: string;
   initialFloor?: string;
   onNavigateTab?: (tab: 'home' | 'exhibitions' | 'timetable' | 'map' | 'news' | 'info' | 'lostfound' | 'admin' | 'guidance' | 'policy') => void;
+  onSelectOrganization?: (org: Organization) => void;
 }
 
 export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
@@ -23,12 +23,17 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
   initialQuery = '',
   initialGenre = 'all',
   initialFloor = 'all',
-  onNavigateTab
+  onNavigateTab,
+  onSelectOrganization
 }) => {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedGenre, setSelectedGenre] = useState(initialGenre);
   const [selectedFloor, setSelectedFloor] = useState(initialFloor);
-  const [selectedCard, setSelectedCard] = useState<Organization | null>(null);
+  const handleSelectCard = (org: Organization) => {
+    if (onSelectOrganization) {
+      onSelectOrganization(org);
+    }
+  };
 
   useEffect(() => {
     setSearchQuery(initialQuery);
@@ -166,7 +171,7 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {filteredOrganizations.map((org) => (
-                <OrganizationCard key={org.id} org={org} onSelectCard={setSelectedCard} />
+                <OrganizationCard key={org.id} org={org} onSelectCard={handleSelectCard} />
               ))}
             </div>
           )}
@@ -184,7 +189,7 @@ export const ExhibitionPage: React.FC<ExhibitionPageProps> = ({
 
       </div>
 
-      <ClassDetailModal org={selectedCard} onClose={() => setSelectedCard(null)} />
+
     </div>
   );
 };

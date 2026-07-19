@@ -33,7 +33,7 @@ export const AdminToast: React.FC<AdminToastProps> = ({
         };
       case 'info':
         return {
-          bg: 'bg-blue-950/90 border-blue-500/40 text-blue-200',
+          bg: 'bg-blue-950/90 border-[#607D8B]/40 text-blue-200',
           icon: <Info className="w-5 h-5 text-blue-400 shrink-0" />
         };
       case 'success':
@@ -54,7 +54,7 @@ export const AdminToast: React.FC<AdminToastProps> = ({
         <span className="text-xs font-medium flex-1 leading-relaxed">{message}</span>
         <button
           onClick={onClose}
-          className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all shrink-0"
+          className="p-1 rounded-lg hover:bg-white/10 text-[#94A3B8] hover:text-white transition-all shrink-0"
         >
           <X className="w-4 h-4" />
         </button>

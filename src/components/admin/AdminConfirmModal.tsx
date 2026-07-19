@@ -33,8 +33,8 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
     switch (variant) {
       case 'danger':
         return {
-          iconBg: 'bg-red-500/15 border-red-500/30 text-red-400',
-          confirmBtn: 'bg-red-600 hover:bg-red-500 text-white shadow-md',
+          iconBg: 'bg-[#D14B41]/50/15 border-red-500/30 text-red-400',
+          confirmBtn: 'bg-[#D14B41] hover:bg-[#D14B41]/50 text-white shadow-md',
           icon: <ShieldAlert className="w-6 h-6" />
         };
       case 'warning':
@@ -46,8 +46,8 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
       case 'info':
       default:
         return {
-          iconBg: 'bg-blue-500/15 border-blue-500/30 text-blue-400',
-          confirmBtn: 'bg-blue-600 hover:bg-blue-500 text-white shadow-md',
+          iconBg: 'bg-[#2C3E55]/15 border-[#607D8B]/30 text-blue-400',
+          confirmBtn: 'bg-[#2C3E55] hover:bg-[#2C3E55] text-white shadow-md',
           icon: <Info className="w-6 h-6" />
         };
     }
@@ -68,13 +68,13 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-lg text-white tracking-tight">{title}</h3>
-              <p className="text-xs text-slate-400 mt-0.5">確認が必要な操作です</p>
+              <p className="text-xs text-[#94A3B8] mt-0.5">確認が必要な操作です</p>
             </div>
           </div>
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-all"
+            className="text-[#94A3B8] hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-all"
           >
             <X className="w-5 h-5" />
           </button>

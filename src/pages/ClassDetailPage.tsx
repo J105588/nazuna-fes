@@ -1,28 +1,30 @@
 import React from 'react';
 import useSWR from 'swr';
-import type { Organization, VotePyramidData, NazunaGraphItem, InventoryStatus } from '../../types/database';
-import { fetchVotePyramid, openExternalMap, openGoogleFormVote, fetchNazunaGraphItems, fetchInventoryStatus, getNazunaGraphOwnerId } from '../../lib/api';
-import { OfficialPyramidGraphic } from '../common/OfficialPyramidGraphic';
-import { useScrollLock } from '../../hooks/useScrollLock';
+import type { Organization, VotePyramidData, NazunaGraphItem, InventoryStatus } from '../types/database';
+import { fetchVotePyramid, openExternalMap, openGoogleFormVote, fetchNazunaGraphItems, fetchInventoryStatus, getNazunaGraphOwnerId } from '../lib/api';
+import { OfficialPyramidGraphic } from '../components/common/OfficialPyramidGraphic';
 import {
-  X,
   MapPin,
   Heart,
   ExternalLink,
-  CheckCircle2,
-  AlertTriangle,
-  Ban,
-  Clock,
-  Coffee
+  Coffee,
+  ArrowLeft
 } from 'lucide-react';
 
-interface ClassDetailModalProps {
-  org: Organization | null;
-  onClose: () => void;
+/*
+  ========================================================================
+  ClassDetailPage - 出し物・展示 企画詳細 独立ページ
+  ========================================================================
+  モーダルではなく通常のページとして表示。
+  画像とテキストは分離し、画像はアップロードされたものをそのまま表示。
+*/
+
+interface ClassDetailPageProps {
+  org: Organization;
+  onBack: () => void;
 }
 
-export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose }) => {
-  useScrollLock(Boolean(org));
+export const ClassDetailPage: React.FC<ClassDetailPageProps> = ({ org, onBack }) => {
 
   const { data: pyramid } = useSWR<VotePyramidData>(
     org ? `pyramid-${org.id}` : null,
@@ -42,15 +44,22 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
 
   // 総合ステータス (喫茶展示かつトグルオン時のみ)
   const { data: currentStatus } = useSWR<InventoryStatus>(
-    isCafeExhibition ? `modal-status-${org?.id}` : null,
+    isCafeExhibition ? `detail-status-${org?.id}` : null,
     () => (org ? fetchInventoryStatus(org) : Promise.reject('No org')),
     { refreshInterval: 15000, fallbackData: 'STATUS_AVAILABLE' }
   );
 
-  if (!org) return null;
-
   const isSoldOut = isCafeExhibition && currentStatus === 'STATUS_SOLD_OUT';
-  const isPreparing = isCafeExhibition && currentStatus === 'STATUS_PREPARING';
+
+  const getGenreLabel = (genre: string) => {
+    switch (genre) {
+      case 'food': return '食品・カフェ';
+      case 'attraction': return 'アトラクション';
+      case 'exhibition': return '展示・アート';
+      case 'stage': return 'ステージ';
+      default: return genre;
+    }
+  };
 
   const renderPyramidIndicator = () => {
     if (!pyramid) {
@@ -79,82 +88,68 @@ export const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ org, onClose
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-wafuu-sumi/50 backdrop-blur-sm animate-fade-in select-none">
-      <div className="wafuu-panel w-full max-w-2xl max-h-[92vh] overflow-y-auto relative rounded-2xl border border-wafuu-sumi/10 shadow-[0_20px_60px_rgba(30,30,30,0.2)] animate-modal-scale">
-        {/* 閉じるボタン */}
+    <div className="w-full min-h-screen bg-[#FAF8F5] font-serif relative overflow-hidden select-none">
+
+      {/* 背景の市松模様あしらい */}
+      <div className="absolute top-0 right-0 w-48 h-48 pattern-ichimatsu pointer-events-none opacity-40" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 pattern-ichimatsu pointer-events-none opacity-40" />
+
+      {/* 戻るボタン (固定上部) */}
+      <div className="sticky top-20 z-30 px-5 sm:px-8 pt-6 pb-2">
         <button
-          onClick={onClose}
-          className="absolute top-4.5 right-4.5 z-30 p-3 rounded-xl bg-white/90 hover:bg-wafuu-shu text-wafuu-sumi hover:text-white border border-wafuu-sumi/10 transition-all duration-300 shadow-sm hover:shadow-md"
-          title="詳細を閉じる"
+          onClick={onBack}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/90 backdrop-blur-sm text-wafuu-sumi hover:text-wafuu-shu border border-wafuu-sumi/10 hover:border-wafuu-shu/30 transition-all duration-300 shadow-sm hover:shadow-md font-sans text-sm font-bold"
         >
-          <X className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4" />
+          <span>企画一覧に戻る</span>
         </button>
+      </div>
 
-        {/* ヘッダー画像 */}
-        <div className="relative h-72 w-full overflow-hidden bg-wafuu-silk">
-          <img
-            src={org.image_url || '/assets/poster/poster_complete.png'}
-            alt={org.name}
-            className={`w-full h-full object-cover ${isSoldOut || isPreparing ? 'filter grayscale' : ''}`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 pb-16 relative z-10 animate-fade-in">
 
-          <div className="absolute bottom-6 left-6 right-6 z-20 space-y-2.5">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-wafuu-shu text-white font-bold text-xs tracking-wider shadow-sm font-serif">
-                {org.genre.toUpperCase()}
-              </span>
-              <span className="px-3 py-1 rounded-full bg-white/90 text-wafuu-ai border border-wafuu-sumi/10 font-bold text-xs tracking-wider shadow-sm font-serif backdrop-blur-sm">
-                {org.floor_info}
-              </span>
-            </div>
-            <h2 className="font-bold text-2xl sm:text-4xl text-wafuu-sumi font-serif tracking-wide drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
-              {org.name}
-            </h2>
+        {/* ヘッダー画像（自然サイズ、アップロード画像をそのまま表示） */}
+        {org.image_url && (
+          <div className="w-full overflow-hidden bg-white rounded-3xl mt-4 border border-wafuu-sumi/8 shadow-md">
+            <img
+              src={org.image_url}
+              alt={org.name}
+              className="w-full max-h-[500px] object-contain"
+            />
           </div>
+        )}
+
+        {/* 団体名・ジャンル・フロア情報（画像から分離） */}
+        <div className="mt-6 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-3.5 py-1 rounded-full bg-wafuu-shu text-white font-bold text-xs tracking-wider shadow-sm font-serif">
+              {getGenreLabel(org.genre)}
+            </span>
+            <span className="px-3.5 py-1 rounded-full bg-white text-wafuu-ai border border-wafuu-sumi/10 font-bold text-xs tracking-wider shadow-sm font-serif">
+              {org.floor_info}
+            </span>
+            <span className="px-3.5 py-1 rounded-full bg-wafuu-kinari text-wafuu-sumi/70 border border-wafuu-sumi/8 font-mono text-xs font-bold">
+              {org.room_code}
+            </span>
+          </div>
+          <h1 className="font-bold text-2xl sm:text-4xl text-wafuu-sumi font-serif tracking-wide leading-tight">
+            {org.name}
+          </h1>
         </div>
 
         {/* コンテンツ */}
-        <div className="p-6 sm:p-9 space-y-7 relative z-10 bg-white">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4.5 rounded-xl bg-wafuu-kinari border border-wafuu-sumi/6">
-            <div className="flex items-center gap-2.5 text-xs sm:text-sm text-wafuu-text-sub">
-              <span className="text-wafuu-text-muted">ステータス：</span>
-              {currentStatus === 'STATUS_AVAILABLE' && (
-                <span className="text-wafuu-ai font-bold flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" /> スムーズにご案内可能
-                </span>
-              )}
-              {currentStatus === 'STATUS_FEW' && (
-                <span className="text-[#9A7A1E] font-bold flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4" /> 残りわずか・混雑
-                </span>
-              )}
-              {currentStatus === 'STATUS_SOLD_OUT' && (
-                <span className="text-wafuu-shu font-bold flex items-center gap-1.5">
-                  <Ban className="w-4 h-4" /> 本日の受付終了・完売
-                </span>
-              )}
-              {currentStatus === 'STATUS_PREPARING' && (
-                <span className="text-gray-600 font-bold flex items-center gap-1.5">
-                  <Clock className="w-4 h-4" /> 準備中・公開待ち
-                </span>
-              )}
-            </div>
-            <span className="font-mono text-xs text-wafuu-ai bg-white px-3 py-1 rounded-lg border border-wafuu-sumi/8 font-bold">
-              ID: {org.room_code}
-            </span>
-          </div>
+        <div className="mt-8 space-y-7 relative z-10">
 
+          {/* 企画説明 */}
           <div className="space-y-3.5">
             <h4 className="text-sm font-bold text-wafuu-shu tracking-widest uppercase flex items-center gap-2">
               <span className="font-serif">企画・展示内容の詳細</span>
             </h4>
-            <p className="text-sm sm:text-base text-wafuu-text-sub leading-relaxed bg-wafuu-kinari p-6 rounded-xl border border-wafuu-sumi/6 font-serif">
+            <p className="text-sm sm:text-base text-wafuu-text-sub leading-relaxed bg-white p-6 rounded-xl border border-wafuu-sumi/8 shadow-sm font-serif">
               {org.description}
             </p>
           </div>
 
-          {/* NazunaGraph メニュー＆販売状況一覧 (/api/items 連携：喫茶展示かつトグルオン時のみ) */}
+          {/* NazunaGraph メニュー＆販売状況一覧 */}
           {isCafeExhibition && menuItems && menuItems.length > 0 && (
             <div className="space-y-4 pt-2 border-t border-wafuu-sumi/10">
               <div className="flex items-center justify-between">

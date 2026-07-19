@@ -89,14 +89,14 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
       {/* 画面ヘッダー */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2.5">
+          <h2 className="text-xl font-bold text-[#2C3E55] flex items-center gap-2.5">
             <Search className="w-5 h-5 text-emerald-600" />
             <span>落とし物・拾得物掲示板管理</span>
-            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-mono border border-slate-200">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#E2E8F0] text-[#2C3E55] text-xs font-mono border border-[#CBD5E1]">
               全{lostItems.length}件 / 保管中 {lostItems.filter((l) => l.status === 'storage').length}件
             </span>
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-[#4A5568] mt-1">
             会場内で拾得された物品の登録・写真添付、持ち主への返却完了ステータスの更新を行います。
           </p>
         </div>
@@ -111,7 +111,7 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
       </div>
 
       {/* 検索・ステータスフィルタバー */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-white border border-[#CBD5E1] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         {/* ステータスセグメント */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {[
@@ -125,11 +125,11 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
               className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 statusFilter === f.id
                   ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs border border-emerald-500'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-[#4A5568] hover:text-[#2C3E55] hover:bg-[#E2E8F0]'
               }`}
             >
               <span>{f.label}</span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${statusFilter === f.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${statusFilter === f.id ? 'bg-white/20 text-white' : 'bg-[#E2E8F0] text-[#2C3E55] border border-[#CBD5E1]'}`}>
                 {f.badge}
               </span>
             </button>
@@ -144,12 +144,12 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="品名・場所から検索..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 font-mono focus:outline-none focus:border-emerald-500 transition-all"
+            className="w-full bg-[#FAF8F5] border border-[#CBD5E1] rounded-xl pl-9 pr-4 py-2 text-xs text-[#2C3E55] placeholder-slate-400 font-mono focus:outline-none focus:border-emerald-500 transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1 rounded-full hover:bg-slate-200 transition-colors"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#2C3E55] p-1 rounded-full hover:bg-slate-200 transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -159,10 +159,10 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
 
       {/* 拾得物カードグリッド */}
       {filteredItems.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3 shadow-sm">
-          <Package className="w-8 h-8 text-slate-400 mx-auto" />
-          <h3 className="font-bold text-sm text-slate-800">該当する落とし物・拾得物はありません</h3>
-          <p className="text-xs text-slate-500">条件を変更するか、右上の「拾得物を新規登録」より追加してください。</p>
+        <div className="bg-white border border-[#CBD5E1] rounded-2xl p-12 text-center space-y-3 shadow-sm">
+          <Package className="w-8 h-8 text-[#94A3B8] mx-auto" />
+          <h3 className="font-bold text-sm text-[#2C3E55]">該当する落とし物・拾得物はありません</h3>
+          <p className="text-xs text-[#708090]">条件を変更するか、右上の「拾得物を新規登録」より追加してください。</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -174,8 +174,8 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
                 key={item.id}
                 className={`bg-white border rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all group shadow-sm ${
                   isReturned
-                    ? 'border-slate-200 opacity-75 hover:opacity-100 bg-slate-50'
-                    : 'border-slate-200 hover:border-emerald-400'
+                    ? 'border-[#CBD5E1] opacity-75 hover:opacity-100 bg-[#FAF8F5]'
+                    : 'border-[#CBD5E1] hover:border-emerald-400'
                 }`}
               >
                 <div className="space-y-3.5">
@@ -189,14 +189,14 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
                     >
                       {isReturned ? '返却完了' : '保管中 (未返却)'}
                     </span>
-                    <span className="text-xs font-mono text-slate-500">
+                    <span className="text-xs font-mono text-[#708090]">
                       {new Date(item.created_at).toLocaleString()}
                     </span>
                   </div>
 
                   {/* 画像またはプレビュー */}
                   {item.image_url ? (
-                    <div className="relative h-36 w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+                    <div className="relative h-36 w-full rounded-xl overflow-hidden bg-[#E2E8F0] border border-[#CBD5E1]">
                       <img
                         src={item.image_url}
                         alt={item.item_name}
@@ -204,33 +204,33 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
                       />
                     </div>
                   ) : (
-                    <div className="h-28 w-full rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center text-slate-400 gap-1.5">
+                    <div className="h-28 w-full rounded-xl bg-[#FAF8F5] border border-[#CBD5E1] flex flex-col items-center justify-center text-[#94A3B8] gap-1.5">
                       <ImageIcon className="w-6 h-6 opacity-60" />
                       <span className="text-[11px] font-mono">写真なし</span>
                     </div>
                   )}
 
                   <div>
-                    <h4 className="font-bold text-base text-slate-900 line-clamp-1">{item.item_name}</h4>
-                    <div className="space-y-1 mt-2 text-xs text-slate-600">
+                    <h4 className="font-bold text-base text-[#2C3E55] line-clamp-1">{item.item_name}</h4>
+                    <div className="space-y-1 mt-2 text-xs text-[#4A5568]">
                       <div className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate">拾得場所: <strong className="text-slate-900">{item.found_place}</strong></span>
+                        <MapPin className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                        <span className="truncate">拾得場所: <strong className="text-[#2C3E55]">{item.found_place}</strong></span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Package className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate">保管窓口: <strong className="text-slate-900">{item.storage_location}</strong></span>
+                        <Package className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                        <span className="truncate">保管窓口: <strong className="text-[#2C3E55]">{item.storage_location}</strong></span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[#CBD5E1] flex items-center justify-between gap-2">
                   <button
                     onClick={() => onUpdateStatus(item.id, isReturned ? 'storage' : 'returned')}
                     className={`flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all border flex items-center justify-center gap-1.5 ${
                       isReturned
-                        ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                        ? 'bg-[#E2E8F0] hover:bg-slate-200 text-[#2C3E55] border-[#CBD5E1]'
                         : 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-sm'
                     }`}
                   >
@@ -249,7 +249,7 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
 
                   <button
                     onClick={() => onDeleteLostItem(item.id, item.item_name)}
-                    className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 transition-all border border-slate-200 shrink-0"
+                    className="p-2 rounded-xl bg-[#E2E8F0] hover:bg-[#D14B41]/5 text-[#4A5568] hover:text-[#D14B41] transition-all border border-[#CBD5E1] shrink-0"
                     title="削除"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -273,7 +273,7 @@ export const AdminLostFoundTab: React.FC<AdminLostFoundTabProps> = ({
                 <span className="text-xs font-mono text-emerald-400 block uppercase tracking-wider">New Lost Item</span>
                 <h3 className="font-bold text-lg text-white">拾得物の新規登録</h3>
               </div>
-              <button onClick={() => setShowCreateDrawer(false)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
+              <button onClick={() => setShowCreateDrawer(false)} className="text-[#94A3B8] hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
